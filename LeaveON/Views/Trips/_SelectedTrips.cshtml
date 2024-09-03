@@ -1,0 +1,233 @@
+@model IEnumerable<InventoryRepo.Models.Trip>
+<style>
+  .badge-custom-danger {
+    background-color: #f8d7da; /* Light red */
+    color: #721c24; /* Dark red */
+    padding: 0.5em 1em;
+    border-radius: 0.25rem;
+    font-weight: 500;
+  }
+
+  .badge-custom-success {
+    background-color: #d4edda; /* Light green */
+    color: #155724; /* Dark green */
+    padding: 0.5em 1em;
+    border-radius: 0.25rem;
+    font-weight: 500;
+  }
+
+  .badge-custom-warning {
+    background-color: #fff3cd; /* Light yellow */
+    color: #856404; /* Dark yellow */
+    padding: 0.5em 1em;
+    border-radius: 0.25rem;
+    font-weight: 500;
+  }
+
+  .badge-custom-secondary {
+    background-color: #7ba5f7; /* Light gray */
+    color: #eaeef5; /* Dark gray */
+    padding: 0.5em 1em;
+    border-radius: 0.25rem;
+    font-weight: 500;
+  }
+</style>
+<div id="NewData">
+  <section class="content">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">
+              Trip
+              @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+              {
+                @Html.ActionLink("Add New", "Create", new object { }, new { @class = "btn btn-warning" })
+              }
+            </h3>
+          </div>
+          <div class="card-body">
+            <div id="example2_wrapper" class="dataTables_wrapper dt-bootstrap4">
+              <div class="row">
+                <div class="col-sm-12 col-md-6">
+                </div>
+                <div class="col-sm-12 col-md-6"></div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  @*<table id="items" class="table table-bordered table-hover dataTable dtr-inline" role="grid" aria-describedby="example2_info">*@
+                  <table id="example" class="display" style="width:100%">
+                    <thead>
+                      <tr>
+                        <th>
+                          Cost
+                        </th>
+                        <th>
+                          Driver Name
+                        </th>
+                        <th>
+                          Passenger Name
+                        </th>
+                        <th>
+                          Trip Start Date Time
+                        </th>
+                        <th>
+                          Trip End Date Time
+                        </th>
+                        <th>
+                          Status
+                        </th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    @foreach (var item in Model)
+                    {
+                      <tr>
+                        <td>
+                          @Html.DisplayFor(modelItem => item.Cost)
+                        </td>
+                        <td>
+                          @Html.DisplayFor(modelItem => item.Driver.Name)
+                        </td>
+                        <td>
+                          @Html.DisplayFor(modelItem => item.Passenger.Name)
+                        </td>
+                        <td>
+                          @(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss") : "")
+                          @*@Html.DisplayFor(modelItem => item.DateCreated != null ? item.DateCreated.ToString("dd/MM/yyyy") : "")*@
+                        </td>
+                        <td>
+                          @(item.EndDateTime.HasValue ? item.EndDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss") : "")
+                          @*@Html.DisplayFor(modelItem => item.DateCreated != null ? item.DateCreated.ToString("dd/MM/yyyy") : "")*@
+                        </td>
+                        <td>
+                          @if (item.Status == "Success(Not Paid)")
+                          {
+                            <span class="badge-custom-danger">Success Not Paid</span>
+                          }
+                          else if (item.Status == "Success")
+                          {
+                            <span class="badge-custom-success">Succeeded</span>
+                          }
+                          else if (item.Status == "In Progress")
+                          {
+                            <span class="badge-custom-warning">In progress</span>
+                          }
+                          else if (item.Status == "Cancel")
+                          {
+                            <span class="badge-custom-secondary">Cancelled</span>
+                          }
+                        </td>
+                        <td>
+                          @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                          {
+
+                            @Html.ActionLink("Update", "Edit", new { id = item.Id }, new { @class = "btn btn-info" })
+                          }
+                          else
+                          {
+                            @Html.ActionLink("View", "Edit", new { id = item.Id }, new { @class = "btn btn-info" })
+                          }
+
+
+                          @if (User.IsInRole("Admin"))
+                          {
+                            @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-danger" })
+
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<link href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="https://cdn.datatables.net/buttons/2.1.0/css/buttons.dataTables.min.css" rel="stylesheet" />
+
+@*<script src="https://code.jquery.com/jquery-3.5.1.js"></script>*@
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.1.0/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.print.min.js"></script>
+
+<script type="text/javascript">
+
+  $(document).ready(function () {
+    $('#example').DataTable({
+      //  "paging": false,
+      //  "lengthChange": false,
+      //  "pageLength": 100,
+      //  "searching": false,
+      //  "ordering": true,
+      //  "info": false,
+      //  "autoWidth": true,
+      //  "responsive": true,
+      //  "order": [[0, "asc"]]//,
+      //  //dom: 'Bfrtip',
+      //  //buttons: [
+      //  //  'copy', 'csv', 'excel', 'pdf', 'print'
+      //  //]
+
+      //});
+      "paging": true,
+      "lengthChange": true,
+      "pageLength": 100,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      rowReorder: {
+        selector: 'td:nth-child(2)'
+      },
+      "responsive": true,
+      "autoWidth": false,
+      "order": [[0, "desc"]],
+      dom: 'Bfrtip',
+      buttons: [
+        {
+          extend: 'copyHtml5',
+          exportOptions: {
+            columns: [0, 1, 2, 3, 4, 5, 6]
+          }
+        },
+        {
+          extend: 'csvHtml5',
+          exportOptions: {
+            columns: [0, 1, 2, 3, 4, 5, 6]
+          }
+        },
+        {
+          extend: 'excelHtml5',
+          exportOptions: {
+            columns: [0, 1, 2, 3, 4, 5, 6]
+          }
+        },
+        {
+          extend: 'pdfHtml5',
+          orientation: 'landscape',
+          pageSize: 'LEGAL',
+          exportOptions: {
+            columns: [0, 1, 2, 3, 4, 5, 6]
+          }
+        },
+        {
+          extend: 'print',
+          exportOptions: {
+            columns: [0, 1, 2, 3, 4, 5, 6]
+          }
+        },
+        'colvis'
+      ]
+
+    });
+  });
+</script>

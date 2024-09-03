@@ -1,0 +1,160 @@
+@model InventoryRepo.Models.Trip
+
+@{
+  ViewBag.Title = "Edit";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+  ViewBag.StatusList = new SelectList(new[]
+  {
+        new { Value = "Success", Text = "Success" },
+        new { Value = "Success(Not Paid)", Text = "Success(Not Paid)" },
+        new { Value = "In Progress", Text = "In Progress" },
+        new { Value = "Cancel", Text = "Cancel" }
+    }, "Value", "Text");
+}
+<style>
+  .select2-container .select2-selection--single {
+    box-sizing: border-box;
+    cursor: pointer;
+    display: block;
+    height: 39px !important;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+</style>
+<!-- Include Select2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+<!-- Include jQuery and Select2 JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.css">
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+<div class="col-md-6">
+  <!-- general form elements -->
+  <div class="card card-warning">
+    <div class="card-header">
+      <h3 class="card-title">Edit Trip</h3>
+    </div>
+    <!-- /.card-header -->
+    <!-- form start -->
+
+    @using (Html.BeginForm())
+    {
+      @Html.AntiForgeryToken()
+
+      <div class="card-body">
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+          <label>Driver Name</label>
+          @Html.DropDownListFor(model => model.DriverId, (SelectList)ViewBag.DriverId, new { @class = "form-control driver-dropdown" })
+          @Html.ValidationMessageFor(model => model.DriverId, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+          <label>Passenger Name</label>
+          @Html.DropDownListFor(model => model.PassengerId, (SelectList)ViewBag.PassengerId, new { @class = "form-control passenger-dropdown" })
+          @Html.ValidationMessageFor(model => model.PassengerId, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+          <label>Place</label>
+          @Html.DropDownListFor(model => model.PlaceId, (SelectList)ViewBag.PlaceId, new { @class = "form-control place-dropdown" })
+          @Html.ValidationMessageFor(model => model.PlaceId, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+          @Html.LabelFor(model => model.Cost, htmlAttributes: new { @class = "" })
+          @Html.EditorFor(model => model.Cost, new { htmlAttributes = new { @class = "form-control" } })
+          @Html.ValidationMessageFor(model => model.Cost, "", new { @class = "text-danger" })
+        </div>
+        <div class="form-group">
+          <label>Start Date Time</label>
+          <input type="text" autocomplete="off" class="form-control from-date-picker" value="@Model.StartDateTime" name="startDateTime" id="startDateTime">
+          @*@Html.TextBoxFor(model => model.StartDateTime, new { @type = "date", @class = "form-control" })*@
+          @Html.ValidationMessageFor(model => model.StartDateTime, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+          <label>End Date Time</label>
+          <input type="text" autocomplete="off" class="form-control from-date-picker" value="@Model.EndDateTime" name="endDateTime" id="endDateTime">
+          @*@Html.TextBoxFor(model => model.EndDateTime, new { @type = "date", @class = "form-control" })*@
+          @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          @Html.DropDownListFor(model => model.Status, (SelectList)ViewBag.StatusList, "Select a Status", new { @class = "form-control status-dropdown", @Value = Model.Status })
+          @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+        </div>
+        @*<div class="form-group">
+            <label>Start Date Time</label>
+            @Html.TextBoxFor(model => model.StartDateTime, new { @type = "datetime", @class = "form-control", @Value = Model.StartDateTime?.ToString("yyyy-MM-dd HH-mm-ss") })
+            @Html.ValidationMessageFor(model => model.StartDateTime, "", new { @class = "text-danger" })
+          </div>
+
+          <div class="form-group">
+            <label>End Date Time</label>
+            @Html.TextBoxFor(model => model.EndDateTime, new { @type = "datetime", @class = "form-control", @Value = Model.EndDateTime?.ToString("yyyy-MM-dd HH-mm-ss") })
+            @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
+          </div>*@
+        @*<div class="form-group">
+            <label>Created Date</label>
+            @Html.TextBoxFor(model => model.DateCreated,
+                              new { @type = "date", @class = "form-control", @Value = Model.DateCreated?.ToString("yyyy-MM-dd") })
+            @Html.ValidationMessageFor(model => model.DateCreated, "", new { @class = "text-danger" })
+          </div>*@
+
+        <div class="form-group">
+          <div class="card-footer">
+            <input type="submit" value="Save Changes" class="btn btn-warning" style="width: 180px; margin-left:auto; margin-right:auto; display:block; margin-top:auto; margin-bottom:0%" />
+          </div>
+        </div>
+        <br />
+        <div>
+          @Html.ActionLink("Back to List", "Index")
+        </div>
+      </div>
+    }
+
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    // Initialize Select2 on dropdowns
+    $('.driver-dropdown').select2({
+      placeholder: "Select a Driver",
+      allowClear: true
+    });
+    $('.passenger-dropdown').select2({
+      placeholder: "Select a Passenger",
+      allowClear: true
+    });
+    $('.place-dropdown').select2({
+      placeholder: "Select a Place",
+      allowClear: true
+    });
+    $('.from-date-picker').datetimepicker({
+      dateFormat: "dd-M-yy",
+      timeFormat: "hh:mm tt",
+      showOn: "both",
+      timeInput: true,
+      stepHour: 1,
+      stepMinute: 5,
+      oneLine: true,
+      //changeMonth: true,
+      //changeYear: true,
+      controlType: 'select',
+      buttonImageOnly: true,
+      buttonImage: "http://jqueryui.com/resources/demos/datepicker/images/calendar.gif",
+      buttonText: "Select date"
+    });
+  });
+</script>

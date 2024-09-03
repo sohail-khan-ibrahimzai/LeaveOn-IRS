@@ -1,0 +1,73 @@
+@model IEnumerable<InventoryRepo.Models.Trip>
+
+@{
+  ViewBag.Title = "Index";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container">
+  <div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+      <form name="registration_form_Product" id='registration_form_Product' class="form-inline noPrint">
+        <center>
+          <div class="row">
+            @*<input type="text" autocomplete="off" class="form-control" name="Customer.Name" id="customer" value="" placeholder="Search by customer" data-toggle="tooltip" data-placement="top" title="Search by customer">*@
+
+            @Html.Editor("startDate", new { htmlAttributes = new { @class = "form-control datepicker", @id = "datepickerStart", @placeholder = "Start date", @Value = ViewBag.StartDate } })
+            &nbsp;
+            @Html.Editor("endDate", new { htmlAttributes = new { @class = "form-control datepicker", @id = "datepickerEnd", @placeholder = "End date", @Value = ViewBag.EndDate } })
+            &nbsp;
+            <input type="button" value="Go" id="btnSearch" class="btn btn-warning add-new" />
+          </div>
+        </center>
+      </form>
+    </div>
+    <div class="col-md-3"></div>
+  </div>
+</div>
+
+<br/>
+@{Html.RenderPartial("_SelectedTrips", Model); }
+
+<link href="@Url.Content("~/Content/custom/downloads/jquery-ui-1.12.1.custom/jquery-ui.min.css")" rel="stylesheet" type="text/css" />
+<script src="~/Content/custom/downloads/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+<script src="~/Content/custom/downloads/jquery.mcautocomplete.js"></script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+    $(function () { // will trigger when the document is ready
+        //var date = $('.datepicker').datepicker({ dateFormat: 'dd-mm-yy' }).val();
+        $('.datepicker').datepicker({
+            dateFormat: 'dd-M-yy',
+            showOn: "both"//,
+            //buttonImageOnly: true,
+            //buttonImage: "http://jqueryui.com/resources/demos/datepicker/images/calendar.gif",
+
+            //buttonText: "Select date"
+        });
+
+    });
+
+    $('#btnSearch').click(function () {
+        SearchThis();
+    });
+
+    function SearchThis() {
+        var startDate = $('#datepickerStart').datepicker({ dateFormat: 'dd-mm-yy' }).val();
+        var endDate = $('#datepickerEnd').datepicker({ dateFormat: 'dd-mm-yy' }).val();
+        $.ajax({
+            url: "@Url.Action("SearchData","Trips")",
+            data: { 'startDate': startDate, 'endDate': endDate },
+            type: "GET",
+            cache: false,
+            success: function (data) {
+                $("#NewData").html(data);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Data provided was not valid');
+            }
+        });
+    }
+});
+</script>
