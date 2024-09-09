@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />
+    <Compile Include="Enums\TripStatus.cs" />
     <Compile Include="Models\AnnualOffDay.cs">
       <DependentUpon>InventoryModel.tt</DependentUpon>
     </Compile>
@@ -126,6 +127,7 @@
     </Compile>
     <Compile Include="PartialClasses\Items.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\CreateTripDto.cs" />
     <Compile Include="ViewModels\Dashboard.cs" />
   </ItemGroup>
   <ItemGroup>

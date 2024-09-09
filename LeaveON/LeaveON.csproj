@@ -15161,6 +15161,7 @@
     <Content Include="Views\Places\Delete.cshtml" />
     <Content Include="Views\Places\Edit.cshtml" />
     <Content Include="Views\Places\Index.cshtml" />
+    <Content Include="Views\Trips\GetBlackListedLocations.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\SelectWeakListHtmlHelper\" />

@@ -173,6 +173,7 @@
           <Property Name="IsDeleted" Type="bit" />
           <Property Name="DateCreated" Type="datetime" />
           <Property Name="DateUpdated" Type="datetime" />
+          <Property Name="IsBlackListed" Type="bit" />
         </EntityType>
         <EntityType Name="Status">
           <Key>
@@ -947,6 +948,7 @@
           <Property Name="IsDeleted" Type="Boolean" />
           <Property Name="DateCreated" Type="DateTime" Precision="3" />
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
+          <Property Name="IsBlackListed" Type="Boolean" />
         </EntityType>
         <Association Name="FK_Trip_Places">
           <End Type="InventoryPortalModel.Place" Role="Place" Multiplicity="0..1" />
@@ -1200,6 +1202,7 @@
           <EntitySetMapping Name="Places">
             <EntityTypeMapping TypeName="InventoryPortalModel.Place">
               <MappingFragment StoreEntitySet="Places">
+                <ScalarProperty Name="IsBlackListed" ColumnName="IsBlackListed" />
                 <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
                 <ScalarProperty Name="DateCreated" ColumnName="DateCreated" />
                 <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />

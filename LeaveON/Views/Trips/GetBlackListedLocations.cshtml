@@ -40,11 +40,11 @@
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">
-              Trip
-              @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+              Black Listed Locations
+              @*@if (User.IsInRole("Admin") || User.IsInRole("Manager"))
               {
                 @Html.ActionLink("Add New", "Create", new object { }, new { @class = "btn btn-warning" })
-              }
+              }*@
             </h3>
           </div>
           <div class="card-body">
@@ -57,7 +57,7 @@
               <div class="row">
                 <div class="col-sm-12">
                   @*<table id="items" class="table table-bordered table-hover dataTable dtr-inline" role="grid" aria-describedby="example2_info">*@
-                  <table id="tripTable" class="display" style="width:100%">
+                  <table id="blacListedLocationsTable" class="display" style="width:100%">
                     <thead>
                       <tr>
                         <th>
@@ -78,7 +78,7 @@
                         <th>
                           Status
                         </th>
-                        <th>Actions</th>
+                        @*<th>Actions</th>*@
                       </tr>
                     </thead>
                     @foreach (var item in Model)
@@ -95,23 +95,21 @@
                         </td>
                         <td>
                           @(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("dd/MM/yyyy HH-mm") : "")
-                          @*@(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss") : "")*@
-                          @*@Html.DisplayFor(modelItem => item.DateCreated != null ? item.DateCreated.ToString("dd/MM/yyyy") : "")*@
                         </td>
                         <td>
                           @(item.EndDateTime.HasValue ? item.EndDateTime.Value.ToString("dd/MM/yyyy HH-mm") : "")
-                          @*@(item.EndDateTime.HasValue ? item.EndDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss") : "")*@
-                          @*@Html.DisplayFor(modelItem => item.DateCreated != null ? item.DateCreated.ToString("dd/MM/yyyy") : "")*@
                         </td>
                         <td>
-                          <select class="form-control status-select" onchange="handleStatusChange(@item.Id, this.value)">
-                            <option value="Success(Not Paid)" @(item.Status == "Success(Not Paid)" ? "selected" : "") class="badge-custom-danger">Success Not Paid</option>
-                            <option value="Success" @(item.Status == "Success" ? "selected" : "") class="badge-custom-success">Succeeded</option>
-                            <option value="In Progress" @(item.Status == "In Progress" ? "selected" : "") class="badge-custom-warning">In progress</option>
-                            <option value="Cancel" @(item.Status == "Cancel" ? "selected" : "") class="badge-custom-secondary">Cancelled</option>
-                          </select>
+                          @if (item.Status == "Success(Not Paid)")
+                          {
+                            <span class="badge-custom-danger">Success Not Paid</span>
+                          }
+                          else if (item.Status == "Cancel")
+                          {
+                            <span class="badge-custom-secondary">Cancelled</span>
+                          }
                         </td>
-                        <td>
+                        @*<td>
                           @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                           {
 
@@ -128,7 +126,7 @@
                             @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-danger" })
 
                           }
-                        </td>
+                        </td>*@
                       </tr>
                     }
                   </table>
@@ -155,22 +153,7 @@
 
 <script type="text/javascript">
   $(document).ready(function () {
-    $('#tripTable').DataTable({
-      //  "paging": false,
-      //  "lengthChange": false,
-      //  "pageLength": 100,
-      //  "searching": false,
-      //  "ordering": true,
-      //  "info": false,
-      //  "autoWidth": true,
-      //  "responsive": true,
-      //  "order": [[0, "asc"]]//,
-      //  //dom: 'Bfrtip',
-      //  //buttons: [
-      //  //  'copy', 'csv', 'excel', 'pdf', 'print'
-      //  //]
-
-      //});
+    $('#blacListedLocationsTable').DataTable({
       "paging": true,
       "lengthChange": true,
       "pageLength": 100,
@@ -225,70 +208,4 @@
 
     });
   });
-
-  function updateSelectBackground(selectElement) {
-    const value = selectElement.value;
-    switch (value) {
-      case "Success(Not Paid)":
-        selectElement.style.backgroundColor = "#f8d7da"; // Light red
-        selectElement.style.color = "#721c24"; // Dark red
-        break;
-      case "Success":
-        selectElement.style.backgroundColor = "#d4edda"; // Light green
-        selectElement.style.color = "#155724"; // Dark green
-        break;
-      case "In Progress":
-        selectElement.style.backgroundColor = "#fff3cd"; // Light yellow
-        selectElement.style.color = "#856404"; // Dark yellow
-        break;
-      case "Cancel":
-        selectElement.style.backgroundColor = "#7ba5f7"; // Light gray
-        selectElement.style.color = "#eaeef5"; // Dark gray
-        break;
-      default:
-        selectElement.style.backgroundColor = ""; // Default background
-        selectElement.style.color = ""; // Default text color
-        break;
-    }
-  }
-
-  // Initialize background color on page load
-  document.addEventListener("DOMContentLoaded", function () {
-    const selectElements = document.querySelectorAll(".status-select");
-    selectElements.forEach(function (selectElement) {
-      updateSelectBackground(selectElement);
-
-      selectElement.addEventListener("change", function () {
-        updateSelectBackground(selectElement);
-      });
-    });
-  });
-  function handleStatusChange(itemId, selectedStatus) {
-    // Logging the values for demonstration
-    console.log("Item ID:", itemId);
-    console.log("Selected Status:", selectedStatus);
-
-    // You can now use these values to perform actions such as:
-    // - Sending an AJAX request to update the status in the database
-    // - Displaying a confirmation message
-    // - Updating other UI elements
-    // Example AJAX call (replace with your actual API endpoint and logic):
-    
-    $.ajax({
-      url: '/Trips/UpdateStatus/',
-        method: 'POST',
-        data: {
-            id: itemId,
-            status: selectedStatus
-        },
-        success: function(response) {
-            console.log('Status updated successfully:', response);
-            // Optionally, update the UI or provide feedback to the user
-        },
-        error: function(xhr, status, error) {
-            console.error('Error updating status:', error);
-        }
-    });
-    
-  }
 </script>
