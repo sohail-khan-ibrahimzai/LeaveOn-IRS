@@ -8,6 +8,8 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using InventoryRepo.Models;
+using InventoryRepo.ViewModels;
+using Microsoft.AspNet.Identity;
 
 namespace LeaveON.Controllers
 {
@@ -15,11 +17,29 @@ namespace LeaveON.Controllers
   public class PassengersController : Controller
   {
     private InventoryPortalEntities db = new InventoryPortalEntities();
-
+    public UserInfoDto GetCurrentUserInfo()
+    {
+      // Get the current user's ID
+      var userId = User.Identity.GetUserId();
+      if (userId == null)
+      {
+        return null; // No user is logged in
+      }
+      var userName = User.Identity.GetUserName();
+      return new UserInfoDto
+      {
+        UserId = userId,
+        UserName = userName,
+      };
+    }
     // GET: Passengers
     public async Task<ActionResult> Index()
     {
-      return View(await db.Passengers.Where(x => x.IsDeleted == false).ToListAsync());
+      var currentUser = GetCurrentUserInfo();
+      if (User.IsInRole("Admin"))
+        return View(await db.Passengers.Where(x => x.IsDeleted == false).ToListAsync());
+      else
+        return View(await db.Passengers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false).ToListAsync());
     }
 
     // GET: Passengers/Details/5
@@ -48,18 +68,38 @@ namespace LeaveON.Controllers
     // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Create([Bind(Include = "Id,Name,DateCreated,DateModified")] Passenger passenger)
+    public async Task<ActionResult> Create([Bind(Include = "Id,Name,DateCreated,DateModified,Remarks,NickName,PhoneNumber,PickupAddress")] CreatePassengerDto createPassengerDto)
     {
+      var currentUser = GetCurrentUserInfo();
       if (ModelState.IsValid)
       {
-        passenger.DateCreated = DateTime.Now;
-        passenger.IsDeleted = false;
-        db.Passengers.Add(passenger);
-        await db.SaveChangesAsync();
-        return RedirectToAction("Index");
-      }
+        var passengerExists = await db.Passengers
+          .FirstOrDefaultAsync(x => x.Name == createPassengerDto.Name);
 
-      return View(passenger);
+        if (passengerExists != null)
+        {
+          // Add a model state error
+          ModelState.AddModelError("Name", "Passenger already exists.");
+        }
+        else
+        {
+          var passenger = new Passenger
+          {
+            DateCreated = DateTime.Now,
+            Name = createPassengerDto.Name,
+            Remarks = createPassengerDto.Remarks,
+            IsDeleted = false,
+            NickName = createPassengerDto.NickName,
+            PhoneNumber = createPassengerDto.PhoneNumber,
+            PickupAddress = createPassengerDto.PickupAddress,
+            CreatedBy = currentUser.UserId
+          };
+          db.Passengers.Add(passenger);
+          await db.SaveChangesAsync();
+          return RedirectToAction("Index");
+        }
+      }
+      return View(createPassengerDto);
     }
 
     // GET: Passengers/Edit/5
@@ -71,10 +111,14 @@ namespace LeaveON.Controllers
       }
       Passenger passenger = await db.Passengers.FindAsync(id);
       if (passenger == null)
-      {
         return HttpNotFound();
-      }
-      return View(passenger);
+      var editPassengerDto = new CreatePassengerDto
+      {
+        Id = passenger.Id,
+        Name = passenger.Name,
+        Remarks = passenger.Remarks,
+      };
+      return View(editPassengerDto);
     }
 
     // POST: Passengers/Edit/5
@@ -82,19 +126,27 @@ namespace LeaveON.Controllers
     // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Edit([Bind(Include = "Id,Name,DateCreated,DateModified")] Passenger passenger)
+    public async Task<ActionResult> Edit([Bind(Include = "Id,Name,DateCreated,DateModified,Remarks,NickName,PhoneNumber,PickupAddress")] CreatePassengerDto updatePassengerDto)
     {
+      var currentUser = GetCurrentUserInfo();
       if (ModelState.IsValid)
       {
+        var passenger = await db.Passengers.FirstOrDefaultAsync(x => x.Id == updatePassengerDto.Id);
+        if (passenger == null)
+          return HttpNotFound();
         passenger.DateModified = DateTime.Now;
-        passenger.IsDeleted = false;
+        //driver.IsDeleted = false;
+        passenger.Name = updatePassengerDto.Name;
+        passenger.Remarks = updatePassengerDto.Remarks;
+        passenger.NickName = updatePassengerDto.NickName;
+        passenger.PhoneNumber = updatePassengerDto.PhoneNumber;
+        passenger.PickupAddress = updatePassengerDto.PickupAddress;
+        passenger.UpdateBy = currentUser.UserId;
         db.Entry(passenger).State = EntityState.Modified;
         await db.SaveChangesAsync();
-        return RedirectToAction("Index");
       }
-      return View(passenger);
+      return RedirectToAction("Index");
     }
-
     // GET: Passengers/Delete/5
     public async Task<ActionResult> Delete(int? id)
     {

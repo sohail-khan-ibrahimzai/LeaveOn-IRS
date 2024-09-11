@@ -1,16 +1,16 @@
+using InventoryRepo.Enums;
+using InventoryRepo.Models;
+using InventoryRepo.ViewModels;
+using LeaveON.Dtos;
+using Microsoft.AspNet.Identity;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using InventoryRepo.Models;
-using System.Text;
-using LeaveON.Dtos;
-using InventoryRepo.Enums;
 
 namespace LeaveON.Controllers
 {
@@ -18,10 +18,25 @@ namespace LeaveON.Controllers
   public class TripsController : Controller
   {
     private InventoryPortalEntities db = new InventoryPortalEntities();
-
+    public UserInfoDto GetCurrentUserInfo()
+    {
+      // Get the current user's ID
+      var userId = User.Identity.GetUserId();
+      if (userId == null)
+      {
+        return null; // No user is logged in
+      }
+      var userName = User.Identity.GetUserName();
+      return new UserInfoDto
+      {
+        UserId = userId,
+        UserName = userName,
+      };
+    }
     // GET: Trips
     public async Task<ActionResult> Index()
     {
+      var currentUser = GetCurrentUserInfo();
       ///Date Format
       DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
       var dtStartDate = new DateTime(PKDate.Year, PKDate.Month, 1);
@@ -31,13 +46,31 @@ namespace LeaveON.Controllers
       ViewBag.EndDate = dtEndtDate.ToString("dd-MMM-yyyy");
 
       ///////Trips/////////
-      var trips = db.Trips.Include(t => t.Driver).Include(t => t.Passenger).Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndtDate && x.IsDeleted == false);
-      return View(await trips.ToListAsync());
+      if (User.IsInRole("Admin"))
+      {
+        var trips = db.Trips.Include(t => t.Driver).Include(t => t.Passenger).Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndtDate && x.IsDeleted == false);
+        return View(await trips.ToListAsync());
+      }
+      else
+      {
+        var trips = db.Trips.Include(t => t.Driver).Include(t => t.Passenger).Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndtDate && x.CreatedBy == currentUser.UserId && x.IsDeleted == false);
+        return View(await trips.ToListAsync());
+      }
+
     }
     public async Task<ActionResult> GetBlackListedLocations()
     {
-      var blacListedLocation = db.Trips.Where(x => x.Status == TripStatus.SuccessNotPaid);
-      return View(await blacListedLocation.ToListAsync());
+      var currentUser = GetCurrentUserInfo();
+      if (User.IsInRole("Admin"))
+      {
+        var blacListedLocation = db.Trips.Where(x => x.Status == TripStatus.SuccessNotPaid);
+        return View(await blacListedLocation.ToListAsync());
+      }
+      else
+      {
+        var blacListedLocation = db.Trips.Where(x => x.Status == TripStatus.SuccessNotPaid && x.CreatedBy == currentUser.UserId);
+        return View(await blacListedLocation.ToListAsync());
+      }
     }
     public ActionResult SearchData(string startDate, string endDate)
     {
@@ -105,6 +138,7 @@ namespace LeaveON.Controllers
     //public async Task<ActionResult> Create([Bind(Include = "Id,DriverId,PassengerId,PlaceId,Cost,DateCreated,DateModified,StartDateTime,EndDateTime,Status")] Trip trip)
     public async Task<ActionResult> Create([Bind(Include = "Id,DriverId,PassengerId,PlaceId,Cost,DateCreated,DateModified,StartDateTime,EndDateTime,Status,PlaceName,Remarks")] CreateTripDto tripDto)
     {
+      var currentUser = GetCurrentUserInfo();
       if (tripDto.Id == null || tripDto.Id == 0)
       {
         if (tripDto.PlaceName != null)
@@ -112,6 +146,7 @@ namespace LeaveON.Controllers
           Place addPlace = await AddNewPlace(tripDto);
           var addTrip = new Trip
           {
+
             DateCreated = DateTime.Now,
             DriverId = tripDto.DriverId,
             PassengerId = tripDto.PassengerId,
@@ -121,7 +156,8 @@ namespace LeaveON.Controllers
             Cost = tripDto.Cost,
             Remarks = tripDto.Remarks,
             IsDeleted = false,
-            Status = tripDto.Status
+            Status = tripDto.Status,
+            CreatedBy = currentUser.UserId
           };
           db.Trips.Add(addTrip);
         }
@@ -138,7 +174,8 @@ namespace LeaveON.Controllers
             Cost = tripDto.Cost,
             Remarks = tripDto.Remarks,
             IsDeleted = false,
-            Status = tripDto.Status
+            Status = tripDto.Status,
+            CreatedBy = currentUser.UserId
           };
           db.Trips.Add(addTrip);
         }
@@ -204,6 +241,7 @@ namespace LeaveON.Controllers
         StartDateTime = trip.StartDateTime,
         EndDateTime = trip.EndDateTime,
         Cost = trip.Cost,
+        Remarks = trip.Remarks,
         Status = trip.Status
       };
       if (trip == null)
@@ -222,27 +260,28 @@ namespace LeaveON.Controllers
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Edit([Bind(Include = "Id,DriverId,PassengerId,PlaceId,Cost,DateCreated,DateModified,StartDateTime,EndDateTime,Status")] Trip trip)
+    public async Task<ActionResult> Edit([Bind(Include = "Id,DriverId,PassengerId,PlaceId,Cost,DateCreated,DateModified,StartDateTime,EndDateTime,Status,Remarks")] CreateTripDto updateTripDto)
     {
+      var currentUser = GetCurrentUserInfo();
       if (ModelState.IsValid)
       {
-        var getTrip = await db.Trips.FirstOrDefaultAsync(x => x.Id == trip.Id);
-        if (getTrip == null)
+        var trip = await db.Trips.FirstOrDefaultAsync(x => x.Id == updateTripDto.Id);
+        if (trip == null)
           return HttpNotFound();
-        getTrip.DateModified = DateTime.Now;
-        getTrip.StartDateTime = trip.StartDateTime;
-        getTrip.EndDateTime = trip.EndDateTime;
-        getTrip.Cost = trip.Cost;
-        getTrip.Status = trip.Status;
-        getTrip.DriverId = trip.DriverId;
-        getTrip.PassengerId = trip.PassengerId;
-        getTrip.PassengerId = trip.PassengerId;
-        getTrip.PlaceId = trip.PlaceId;
-        db.Entry(getTrip).State = EntityState.Modified;
+        trip.DriverId = updateTripDto.DriverId;
+        trip.PassengerId = updateTripDto.PassengerId;
+        trip.PassengerId = updateTripDto.PassengerId;
+        trip.PlaceId = updateTripDto.PlaceId;
+        trip.Cost = updateTripDto.Cost;
+        trip.DateModified = DateTime.Now;
+        trip.StartDateTime = updateTripDto.StartDateTime;
+        trip.EndDateTime = updateTripDto.EndDateTime;
+        trip.Status = updateTripDto.Status;
+        trip.Remarks = updateTripDto.Remarks;
+        trip.UpdatedBy = currentUser.UserId;
+        db.Entry(trip).State = EntityState.Modified;
         await db.SaveChangesAsync();
-        return RedirectToAction("Index");
       }
-
       // Repopulate dropdowns if the model state is invalid
       //ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false), "Id", "Name", trip.DriverId);
       //ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.IsDeleted == false), "Id", "Name", trip.PassengerId);
@@ -317,6 +356,30 @@ namespace LeaveON.Controllers
       db.Entry(trip).State = EntityState.Modified;
       await db.SaveChangesAsync();
       return RedirectToAction("Index");
+    }
+    public JsonResult SearchDrivers(string searchTerm)
+    {
+      var drivers = db.Drivers
+                      .Where(x => x.IsDeleted == false && x.Name.Contains(searchTerm))
+                      .Select(x => new { id = x.Id, text = x.Name })
+                      .ToList();
+      return Json(drivers, JsonRequestBehavior.AllowGet);
+    }
+    public JsonResult SearchPassengers(string searchTerm)
+    {
+      var drivers = db.Passengers
+                      .Where(x => x.IsDeleted == false && x.Name.Contains(searchTerm))
+                      .Select(x => new { id = x.Id, text = x.Name })
+                      .ToList();
+      return Json(drivers, JsonRequestBehavior.AllowGet);
+    }
+    public JsonResult SearchPlaces(string searchTerm)
+    {
+      var drivers = db.Places
+                      .Where(x => x.IsDeleted == false && x.Name.Contains(searchTerm))
+                      .Select(x => new { id = x.Id, text = x.Name })
+                      .ToList();
+      return Json(drivers, JsonRequestBehavior.AllowGet);
     }
     protected override void Dispose(bool disposing)
     {

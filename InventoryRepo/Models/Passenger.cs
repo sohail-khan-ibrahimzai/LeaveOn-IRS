@@ -26,6 +26,11 @@ namespace InventoryRepo.Models
         public Nullable<System.DateTime> DateModified { get; set; }
         public Nullable<bool> IsDeleted { get; set; }
         public string Remarks { get; set; }
+        public string NickName { get; set; }
+        public string PhoneNumber { get; set; }
+        public string PickupAddress { get; set; }
+        public string CreatedBy { get; set; }
+        public string UpdateBy { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Trip> Trips { get; set; }

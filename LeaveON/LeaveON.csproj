@@ -534,6 +534,10 @@
     <Content Include="Global.asax" />
     <Content Include="Images\Ripple_1s_200px_Transparent.gif" />
     <Content Include="Images\Ripple_1s_200px_White.gif" />
+    <Content Include="Irs_Js\Trips.js" />
+    <Content Include="Irs_Js\Places.js" />
+    <Content Include="Irs_Js\Passengers.js" />
+    <Content Include="Irs_Js\Drivers.js" />
     <Content Include="plugins\bootstrap-colorpicker\css\bootstrap-colorpicker.css" />
     <Content Include="plugins\bootstrap-colorpicker\css\bootstrap-colorpicker.min.css" />
     <Content Include="plugins\bootstrap-colorpicker\js\bootstrap-colorpicker.js" />

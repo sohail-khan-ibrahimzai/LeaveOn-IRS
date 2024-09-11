@@ -105,6 +105,9 @@
           <Property Name="DateModified" Type="datetime" />
           <Property Name="IsDeleted" Type="bit" />
           <Property Name="Remarks" Type="nvarchar" MaxLength="250" />
+          <Property Name="AspNetUserId" Type="nvarchar" MaxLength="128" />
+          <Property Name="CreatedBy" Type="nvarchar" MaxLength="128" />
+          <Property Name="UpdatedBy" Type="nvarchar" MaxLength="128" />
         </EntityType>
         <EntityType Name="Item">
           <Key>
@@ -162,6 +165,11 @@
           <Property Name="DateModified" Type="datetime" />
           <Property Name="IsDeleted" Type="bit" />
           <Property Name="Remarks" Type="nvarchar" MaxLength="250" />
+          <Property Name="NickName" Type="nvarchar" MaxLength="250" />
+          <Property Name="PhoneNumber" Type="nvarchar" MaxLength="250" />
+          <Property Name="PickupAddress" Type="nvarchar" MaxLength="250" />
+          <Property Name="CreatedBy" Type="nvarchar" MaxLength="128" />
+          <Property Name="UpdateBy" Type="nvarchar" MaxLength="128" />
         </EntityType>
         <EntityType Name="Places">
           <Key>
@@ -174,6 +182,9 @@
           <Property Name="DateCreated" Type="datetime" />
           <Property Name="DateUpdated" Type="datetime" />
           <Property Name="IsBlackListed" Type="bit" />
+          <Property Name="Address" Type="nvarchar(max)" />
+          <Property Name="CreatedBy" Type="nvarchar" MaxLength="128" />
+          <Property Name="UpdateBy" Type="nvarchar" MaxLength="128" />
         </EntityType>
         <EntityType Name="Status">
           <Key>
@@ -211,6 +222,8 @@
           <Property Name="PlaceId" Type="int" />
           <Property Name="Remarks" Type="text" />
           <Property Name="Status" Type="nvarchar" MaxLength="40" />
+          <Property Name="CreatedBy" Type="nvarchar" MaxLength="128" />
+          <Property Name="UpdatedBy" Type="nvarchar" MaxLength="128" />
         </EntityType>
         <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
           <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
@@ -840,6 +853,9 @@
           <NavigationProperty Name="Trips" Relationship="InventoryPortalModel.FK_Trip_Driver" FromRole="Driver" ToRole="Trip" />
           <Property Name="IsDeleted" Type="Boolean" />
           <Property Name="Remarks" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="AspNetUserId" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="UpdatedBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="Passenger">
           <Key>
@@ -852,6 +868,11 @@
           <NavigationProperty Name="Trips" Relationship="InventoryPortalModel.FK_Trip_Passenger" FromRole="Passenger" ToRole="Trip" />
           <Property Name="IsDeleted" Type="Boolean" />
           <Property Name="Remarks" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="NickName" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="PhoneNumber" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="PickupAddress" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="UpdateBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="Trip">
           <Key>
@@ -872,6 +893,8 @@
           <Property Name="StartDateTime" Type="DateTime" Precision="3" />
           <Property Name="EndDateTime" Type="DateTime" Precision="3" />
           <Property Name="Status" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="UpdatedBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
         </EntityType>
         <Association Name="FK_Trip_Driver">
           <End Type="InventoryPortalModel.Driver" Role="Driver" Multiplicity="0..1" />
@@ -949,6 +972,9 @@
           <Property Name="DateCreated" Type="DateTime" Precision="3" />
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
           <Property Name="IsBlackListed" Type="Boolean" />
+          <Property Name="Address" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="UpdateBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
         </EntityType>
         <Association Name="FK_Trip_Places">
           <End Type="InventoryPortalModel.Place" Role="Place" Multiplicity="0..1" />
@@ -1105,6 +1131,9 @@
           <EntitySetMapping Name="Drivers">
             <EntityTypeMapping TypeName="InventoryPortalModel.Driver">
               <MappingFragment StoreEntitySet="Driver">
+                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="AspNetUserId" ColumnName="AspNetUserId" />
                 <ScalarProperty Name="Remarks" ColumnName="Remarks" />
                 <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
                 <ScalarProperty Name="DateModified" ColumnName="DateModified" />
@@ -1117,6 +1146,11 @@
           <EntitySetMapping Name="Passengers">
             <EntityTypeMapping TypeName="InventoryPortalModel.Passenger">
               <MappingFragment StoreEntitySet="Passenger">
+                <ScalarProperty Name="UpdateBy" ColumnName="UpdateBy" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="PickupAddress" ColumnName="PickupAddress" />
+                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
+                <ScalarProperty Name="NickName" ColumnName="NickName" />
                 <ScalarProperty Name="Remarks" ColumnName="Remarks" />
                 <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
                 <ScalarProperty Name="DateModified" ColumnName="DateModified" />
@@ -1129,6 +1163,8 @@
           <EntitySetMapping Name="Trips">
             <EntityTypeMapping TypeName="InventoryPortalModel.Trip">
               <MappingFragment StoreEntitySet="Trip">
+                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="EndDateTime" ColumnName="EndDateTime" />
                 <ScalarProperty Name="StartDateTime" ColumnName="StartDateTime" />
@@ -1202,6 +1238,9 @@
           <EntitySetMapping Name="Places">
             <EntityTypeMapping TypeName="InventoryPortalModel.Place">
               <MappingFragment StoreEntitySet="Places">
+                <ScalarProperty Name="UpdateBy" ColumnName="UpdateBy" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="Address" ColumnName="Address" />
                 <ScalarProperty Name="IsBlackListed" ColumnName="IsBlackListed" />
                 <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
                 <ScalarProperty Name="DateCreated" ColumnName="DateCreated" />

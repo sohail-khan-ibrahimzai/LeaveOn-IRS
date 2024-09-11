@@ -41,12 +41,14 @@
 
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.js"></script>
+<script src="~/Irs_Js/Trips.js"></script>
+
 <div class="container">
   <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-12">
       <div class="card card-warning">
         <div class="card-header">
-          <h3 class="card-title">Edit Trip</h3>
+          <h3 class="card-title">Update Trip</h3>
         </div>
 
         @using (Html.BeginForm())
@@ -56,70 +58,70 @@
           <div class="card-body">
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-            @Html.HiddenFor(model => model.Id) <!-- Hidden field to hold the TripId -->
+            <div class="row">
+              <!-- Left column with form controls -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Driver Name</label>
+                  @Html.DropDownListFor(model => model.DriverId, null, "Select a Driver", new { @class = "form-control driver-dropdown" })
+                  @Html.ValidationMessageFor(model => model.DriverId, "", new { @class = "text-danger" })
+                </div>
 
-            <div class="form-group">
-              <label>Driver Name</label>
-              @Html.DropDownListFor(model => model.DriverId, null, "Select a Driver", new { @class = "form-control driver-dropdown" })
-              @Html.ValidationMessageFor(model => model.DriverId, "", new { @class = "text-danger" })
+                <div class="form-group">
+                  <label>Passenger Name</label>
+                  @Html.DropDownListFor(model => model.PassengerId, null, "Select a Passenger", new { @class = "form-control passenger-dropdown" })
+                  @Html.ValidationMessageFor(model => model.PassengerId, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                  <label>Place</label>
+                  @Html.DropDownListFor(model => model.PlaceId, null, "Select a Place", new { @class = "form-control place-dropdown" })
+                  @Html.ValidationMessageFor(model => model.PlaceId, "", new { @class = "text-danger" })
+                  @*@Html.DropDownListFor(model => model.PlaceId, (SelectList)ViewBag.PlaceId, "Select a Place", new { @class = "form-control place-dropdown", onchange = "onPlaceChange(event)" })*@
+                </div>
+
+                <div class="form-group" id="placeNameContainer" style="display:none;">
+                  <label>Place Name</label>
+                  <input type="text" name="placeName" id="placeName" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                  @Html.LabelFor(model => model.Cost, htmlAttributes: new { @class = "" })
+                  @Html.EditorFor(model => model.Cost, new { htmlAttributes = new { @class = "form-control" } })
+                  @Html.ValidationMessageFor(model => model.Cost, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                  <label>Start Date Time</label>
+                  <input type="text" autocomplete="off" class="form-control from-date-picker" name="startDateTime" id="startDateTime">
+                  @Html.ValidationMessageFor(model => model.StartDateTime, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                  <label>End Date Time</label>
+                  <input type="text" autocomplete="off" class="form-control from-date-picker" name="endDateTime" id="endDateTime">
+                  @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                  <label>Status</label>
+                  @Html.DropDownListFor(model => model.Status, (SelectList)ViewBag.StatusList, "Select a Status", new { @class = "form-control status-dropdown" })
+                  @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <!-- Right column with Remarks field -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="remarks">Comment</label>
+                  @Html.TextAreaFor(model => model.Remarks, new { @class = "form-control", @name = "Remarks", @id = "remarks", @placeholder = "Enter remarks here", rows = 10 })
+                </div>
+              </div>
             </div>
 
-            @*<div class="form-group">
-                <label>Driver Name</label>
-                @Html.DropDownListFor(model => model.DriverId, (SelectList)ViewBag.DriverId, "Select a Driver", new { @class = "form-control driver-dropdown" })
-                @Html.ValidationMessageFor(model => model.DriverId, "", new { @class = "text-danger" })
-              </div>*@
-
-            <div class="form-group">
-              <label>Passenger Name</label>
-              @Html.DropDownListFor(model => model.PassengerId, null, "Select a Passenger", new { @class = "form-control passenger-dropdown" })
-              @Html.ValidationMessageFor(model => model.PassengerId, "", new { @class = "text-danger" })
-            </div>
-
-            @*<div class="form-group">
-                <label>Passenger Name</label>
-                @Html.DropDownListFor(model => model.PassengerId, (SelectList)ViewBag.PassengerId, "Select a Passenger", new { @class = "form-control passenger-dropdown"})
-                @Html.ValidationMessageFor(model => model.PassengerId, "", new { @class = "text-danger" })
-              </div>*@
-
-            <div class="form-group">
-              <label>Place</label>
-              @Html.DropDownListFor(model => model.PlaceId, null, "Select a Place", new { @class = "form-control place-dropdown" })
-              @Html.ValidationMessageFor(model => model.PlaceId, "", new { @class = "text-danger" })
-              @*@Html.DropDownListFor(model => model.PlaceId, (SelectList)ViewBag.PlaceId, "Select a Place", new { @class = "form-control place-dropdown", onchange = "onPlaceChange(event)" })*@
-            </div>
-
-            <div class="form-group" id="placeNameContainer" style="display:none;">
-              <label>Place Name</label>
-              <input type="text" name="placeName" id="placeName" class="form-control" />
-            </div>
-
-            <div class="form-group">
-              @Html.LabelFor(model => model.Cost, htmlAttributes: new { @class = "" })
-              @Html.EditorFor(model => model.Cost, new { htmlAttributes = new { @class = "form-control" } })
-              @Html.ValidationMessageFor(model => model.Cost, "", new { @class = "text-danger" })
-            </div>
-
-            <div class="form-group">
-              <label>Start Date Time</label>
-              @Html.EditorFor(model => model.StartDateTime, new { htmlAttributes = new { @class = "form-control from-date-picker", @autocomplete = "off" } })
-              @Html.ValidationMessageFor(model => model.StartDateTime, "", new { @class = "text-danger" })
-            </div>
-
-            <div class="form-group">
-              <label>End Date Time</label>
-              @Html.EditorFor(model => model.EndDateTime, new { htmlAttributes = new { @class = "form-control from-date-picker", @autocomplete = "off" } })
-              @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
-            </div>
-
-            <div class="form-group">
-              <label>Status</label>
-              @Html.DropDownListFor(model => model.Status, (SelectList)ViewBag.StatusList, "Select a Status", new { @class = "form-control status-dropdown" })
-              @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
-            </div>
-
+            <!-- Form submission footer -->
             <div class="card-footer">
-              <input type="submit" value="Save Changes" class="btn btn-warning" style="width: 180px; margin: 0 auto; display: block;" />
+              <input type="submit" value="Update" class="btn btn-warning" style="width: 180px; margin: 0 auto; display: block;" />
             </div>
 
             <br />
@@ -130,66 +132,5 @@
         }
       </div>
     </div>
-
-    <div class="col-md-6">
-      <div class="form-group">
-        <label for="remarks">Remarks</label>
-        @Html.TextAreaFor(model => model.Remarks, new { @class = "form-control", @id = "remarks", @placeholder = "Enter remarks here" })
-      </div>
-    </div>
   </div>
 </div>
-
-<script>
-  $(document).ready(function () {
-    $('#remarks').summernote({
-      height: 250,
-      placeholder: "Remarks",
-      minHeight: null,
-      maxHeight: null,
-      dialogsInBody: true,
-      focus: true
-    });
-
-    // Initialize Select2 on dropdowns
-    $('.driver-dropdown').select2({
-      placeholder: "Select a Driver",
-      allowClear: true
-    });
-    $('.passenger-dropdown').select2({
-      placeholder: "Select a Passenger",
-      allowClear: true
-    });
-    $('.place-dropdown').select2({
-      placeholder: "Select a Place",
-      allowClear: true,
-      tags: true
-    });
-    $('.status-dropdown').select2({
-      placeholder: "Select a Status",
-      allowClear: true
-    });
-
-    $('.from-date-picker').datetimepicker({
-      dateFormat: "dd-M-yy",
-      timeFormat: "hh:mm tt",
-      showOn: "both",
-      timeInput: true,
-      stepHour: 1,
-      stepMinute: 5,
-      oneLine: true,
-      buttonImageOnly: true,
-      buttonImage: "http://jqueryui.com/resources/demos/datepicker/images/calendar.gif",
-      buttonText: "Select date"
-    });
-  });
-
-  function onPlaceChange(dropdown) {
-    var selectedValue = dropdown.target.value;
-    if (selectedValue === "" || isNaN(selectedValue)) {
-      $('#placeName').val(selectedValue);
-    } else {
-      $('#placeName').val('');  // Clear the value of the PlaceName input
-    }
-  }
-</script>

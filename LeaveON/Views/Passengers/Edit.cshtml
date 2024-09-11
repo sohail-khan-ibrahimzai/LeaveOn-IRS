@@ -1,59 +1,93 @@
-@model InventoryRepo.Models.Passenger
+@model InventoryRepo.ViewModels.CreatePassengerDto
 
 @{
-    ViewBag.Title = "Edit";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+  ViewBag.Title = "Edit";
+  Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Edit</h2>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
-<div class="col-md-6">
-  <!-- general form elements -->
-  <div class="card card-warning">
-    <div class="card-header">
-      <h3 class="card-title">Upate Passengers</h3>
-    </div>
-    <!-- /.card-header -->
-    <!-- form start -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.css">
 
-    @using (Html.BeginForm())
-    {
-      @Html.AntiForgeryToken()
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.js"></script>
 
-      <div class="card-body">
-
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @*<div class="form-group">
-            @Html.LabelFor(model => model.Id, htmlAttributes: new { @class = "" })
-
-            @Html.EditorFor(model => model.Id, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.Id, "", new { @class = "text-danger" })
-
-          </div>*@
-
-
-        <div class="form-group">
-          @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "" })
-
-          @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
-          @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
-
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.js"></script>
+<script src="~/Irs_Js/Passengers.js"></script>
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card card-warning">
+        <div class="card-header">
+          <h3 class="card-title">Update Passenger</h3>
         </div>
 
+        @using (Html.BeginForm())
+        {
+          @Html.AntiForgeryToken()
 
+          <div class="card-body">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-        <div class="form-group">
-          <div class="class=" card-footer">
-            <input type="submit" value="Add" class="btn btn-warning" style="width: 180px; margin-left:auto;margin-right:auto;display:block;margin-top:auto;margin-bottom:0%" />
+            <div class="row">
+              <!-- Left column with form controls -->
+              <div class="col-md-6">
+                @*<div class="form-group">
+                    <label>Id</label>
+                    @Html.LabelFor(model => model.Id, htmlAttributes: new { @class = "" })
+
+                    @Html.EditorFor(model => model.Id, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Id, "", new { @class = "text-danger" })
+                  </div>*@
+
+                <div class="form-group">
+                  <label>Name</label>
+                  @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                  @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-group">
+                  <label>Nick Name</label>
+                  @Html.EditorFor(model => model.NickName, new { htmlAttributes = new { @class = "form-control", @id = "passengerName" } })
+                  @Html.ValidationMessageFor(model => model.NickName, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-group">
+                  <label>Phone Number</label>
+                  @Html.EditorFor(model => model.PhoneNumber, new { htmlAttributes = new { @class = "form-control", @id = "passengerName" } })
+                  @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-group">
+                  <label>Pickup Address</label>
+                  @Html.EditorFor(model => model.PickupAddress, new { htmlAttributes = new { @class = "form-control", @id = "passengerName" } })
+                  @Html.ValidationMessageFor(model => model.PickupAddress, "", new { @class = "text-danger" })
+                </div>
+              </div>
+
+              <!-- Right column with Remarks field -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="remarks">Comment</label>
+                  @Html.TextAreaFor(model => model.Remarks, new { @class = "form-control", @name = "Remarks", @id = "remarks" })
+                </div>
+              </div>
+            </div>
+
+            <!-- Form submission footer -->
+            <div class="card-footer">
+              <input type="submit" value="Update" class="btn btn-warning" style="width: 180px; margin: 0 auto; display: block;" />
+            </div>
+
+            <br />
+            <div>
+              @Html.ActionLink("Back to List", "Index")
+            </div>
           </div>
-        </div>
-        <br />
-        <div>
-          @Html.ActionLink("Back to List", "Index")
-        </div>
+        }
       </div>
-    }
-
-
+    </div>
   </div>
 </div>
+

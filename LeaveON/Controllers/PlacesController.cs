@@ -8,6 +8,8 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using InventoryRepo.Models;
+using InventoryRepo.ViewModels;
+using Microsoft.AspNet.Identity;
 
 namespace LeaveON.Controllers
 {
@@ -15,11 +17,29 @@ namespace LeaveON.Controllers
   public class PlacesController : Controller
   {
     private InventoryPortalEntities db = new InventoryPortalEntities();
-
+    public UserInfoDto GetCurrentUserInfo()
+    {
+      // Get the current user's ID
+      var userId = User.Identity.GetUserId();
+      if (userId == null)
+      {
+        return null; // No user is logged in
+      }
+      var userName = User.Identity.GetUserName();
+      return new UserInfoDto
+      {
+        UserId = userId,
+        UserName = userName,
+      };
+    }
     // GET: Locations
     public async Task<ActionResult> Index()
     {
-      return View(await db.Places.Where(x=>x.IsDeleted==false).ToListAsync());
+      var currentUser = GetCurrentUserInfo();
+      if (User.IsInRole("Admin"))
+        return View(await db.Places.Where(x => x.IsDeleted == false).ToListAsync());
+      else
+        return View(await db.Places.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false).ToListAsync());
     }
 
     // GET: Locations/Create
@@ -35,17 +55,34 @@ namespace LeaveON.Controllers
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "Admin,Manager")]
-    public async Task<ActionResult> Create([Bind(Include = "Id,Name,Remarks,DateCreated,DateUpdated")] Place place)
+    public async Task<ActionResult> Create([Bind(Include = "Id,Name,Remarks,DateCreated,DateUpdated,Remarks")] CreatePlaceDto createPlaceDto)
     {
-      place.DateCreated = DateTime.Now;
+      var currentUser = GetCurrentUserInfo();
       if (ModelState.IsValid)
       {
-        place.IsDeleted = false;
+        var placeExists = await db.Places
+          .FirstOrDefaultAsync(x => x.Name == createPlaceDto.Name);
+
+        if (placeExists != null)
+        {
+          // Add a model state error
+          ModelState.AddModelError("Name", "Place already exists.");
+        }
+        else { 
+        var place = new Place
+        {
+          DateCreated = DateTime.Now,
+          Name = createPlaceDto.Name,
+          Remarks = createPlaceDto.Remarks,
+          IsDeleted = false,
+          CreatedBy = currentUser.UserId
+        };
         db.Places.Add(place);
         await db.SaveChangesAsync();
         return RedirectToAction("Index");
       }
-      return View(place);
+      }
+      return View(createPlaceDto);
     }
 
     // GET: Locations/Edit/5
@@ -57,10 +94,14 @@ namespace LeaveON.Controllers
       }
       Place place = await db.Places.FindAsync(id);
       if (place == null)
-      {
         return HttpNotFound();
-      }
-      return View(place);
+      var editPlaceDto = new CreatePlaceDto
+      {
+        Id = place.Id,
+        Name = place.Name,
+        Remarks = place.Remarks,
+      };
+      return View(editPlaceDto);
     }
 
     // POST: Locations/Edit/5
@@ -69,19 +110,22 @@ namespace LeaveON.Controllers
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "Admin,Manager")]
-    public async Task<ActionResult> Edit([Bind(Include = "Id,Name,Remarks,DateCreated,DateUpdated")] Place place)
+    public async Task<ActionResult> Edit([Bind(Include = "Id,Name,DateCreated,DateUpdated,Remarks")] CreatePlaceDto updatePlaceDto)
     {
-      place.DateUpdated = DateTime.Now;
+      var currentUser = GetCurrentUserInfo();
       if (ModelState.IsValid)
       {
-        place.IsDeleted = false;
+        var place = await db.Places.FirstOrDefaultAsync(x => x.Id == updatePlaceDto.Id);
+        if (place == null)
+          return HttpNotFound();
+        place.DateUpdated = DateTime.Now;
+        place.Name = updatePlaceDto.Name;
+        place.Remarks = updatePlaceDto.Remarks;
+        place.UpdateBy = currentUser.UserId;
         db.Entry(place).State = EntityState.Modified;
-        db.Entry(place).Property(x => x.DateCreated).IsModified = false;
-
         await db.SaveChangesAsync();
-        return RedirectToAction("Index");
       }
-      return View(place);
+      return RedirectToAction("Index");
     }
 
     // GET: Locations/Delete/5

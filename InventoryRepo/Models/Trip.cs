@@ -26,6 +26,8 @@ namespace InventoryRepo.Models
         public Nullable<System.DateTime> StartDateTime { get; set; }
         public Nullable<System.DateTime> EndDateTime { get; set; }
         public string Status { get; set; }
+        public string CreatedBy { get; set; }
+        public string UpdatedBy { get; set; }
     
         public virtual Driver Driver { get; set; }
         public virtual Passenger Passenger { get; set; }
