@@ -22,7 +22,7 @@ $(document).ready(function () {
     tags: true
   });
   $('.status-dropdown').select2({
-    placeholder: "Select a Place",
+    placeholder: "Select Status",
     allowClear: true
   });
   $('.passenger-dropdown').focus();

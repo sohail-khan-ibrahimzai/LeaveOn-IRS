@@ -22,7 +22,7 @@ namespace LeaveON.Dtos
         public string Remarks { get; set; }
         public DateTime? StartDateTime { get; set; }
         public DateTime? EndDateTime { get; set; }
-        public string Status { get; set; }
+        public string Status { get; set; } = "In progress";
         public string PlaceName { get; set; }
 
         public virtual Driver Driver { get; set; }
