@@ -87,6 +87,38 @@
       #placesList li:hover {
         background-color: #eee;
       }
+
+  .badge-custom-danger {
+    background-color: #f8d7da; /* Light red */
+    color: #721c24; /* Dark red */
+    padding: 0.5em 1em;
+    border-radius: 0.25rem;
+    font-weight: 500;
+  }
+
+  .badge-custom-success {
+    background-color: #d4edda; /* Light green */
+    color: #155724; /* Dark green */
+    padding: 0.5em 1em;
+    border-radius: 0.25rem;
+    font-weight: 500;
+  }
+
+  .badge-custom-warning {
+    background-color: #fff3cd; /* Light yellow */
+    color: #856404; /* Dark yellow */
+    padding: 0.5em 1em;
+    border-radius: 0.25rem;
+    font-weight: 500;
+  }
+
+  .badge-custom-secondary {
+    background-color: #7ba5f7; /* Light gray */
+    color: #eaeef5; /* Dark gray */
+    padding: 0.5em 1em;
+    border-radius: 0.25rem;
+    font-weight: 500;
+  }
 </style>
 <!-- Include Select2 CSS -->
 @*<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
@@ -129,10 +161,15 @@
               <!-- Left column with form controls -->
               <div class="col-md-6">
                 <div class="form-group">
-                  <label>Passenger Name</label>
-                  @Html.DropDownListFor(model => model.PassengerId, (SelectList)ViewBag.PassengerId, "Select a Passenger", new { @class = "form-control passenger-dropdown" })
-                  @Html.ValidationMessageFor(model => model.PassengerId, "", new { @class = "text-danger" })
+                  <label for="lblAutocompletePassengerId">Passenger Name</label>
+                  <input type="text" name="PassengerName" id="autocompletePassengerId" placeholder="Find Passenger..." class="form-control passenger-autocomplete">
+                  <input type="hidden" id="PassengerId" name="PassengerId" value="" />
                 </div>
+                @*<div class="form-group">
+                    <label>Passenger Name</label>
+                    @Html.DropDownListFor(model => model.PassengerId, (SelectList)ViewBag.PassengerId, "Select a Passenger", new { @class = "form-control passenger-dropdown" })
+                    @Html.ValidationMessageFor(model => model.PassengerId, "", new { @class = "text-danger" })
+                  </div>*@
 
                 @*<div class="form-group">
                     <label>Place</label>
@@ -141,36 +178,80 @@
                     <ul id="placesList"></ul>
                   </div>*@
 
+                @*<div class="form-group">
+                    <label>Place</label>
+                    @Html.DropDownListFor(model => model.PlaceId, (SelectList)ViewBag.PlaceId, "Select a Place", new { @class = "form-control place-dropdown", onchange = "onPlaceChange(event)" })
+                    @Html.ValidationMessageFor(model => model.PlaceId, "", new { @class = "text-danger" })
+                  </div>*@
+
                 <div class="form-group">
-                  <label>Place</label>
-                  @Html.DropDownListFor(model => model.PlaceId, (SelectList)ViewBag.PlaceId, "Select a Place", new { @class = "form-control place-dropdown", onchange = "onPlaceChange(event)" })
-                  @Html.ValidationMessageFor(model => model.PlaceId, "", new { @class = "text-danger" })
+                  <label for="lblAutocompletePlaceId">Place</label>
+                  <input type="text" name="PlaceName" id="autocompletePlaceId" placeholder="Find Places..." class="form-control place-autocomplete">
+                  <input type="hidden" id="PlaceId" name="PlaceId" value="" />
                 </div>
+
                 <div class="form-group">
-                  <label>Start Date Time</label>
-                  <input type="text" autocomplete="off" class="form-control from-date-picker" name="startDateTime" id="startDateTime" placeholder="Start date time">
+                  <label for="StartDateTime">Start Date Time</label>
+                  @Html.TextBoxFor(model => model.StartDateTime,
+                                                            "{0:dd-MMM-yyyy hh:mm:ss tt}",
+                                                            new { @class = "form-control from-date-picker", @id = "fromDateTime" })
                   @Html.ValidationMessageFor(model => model.StartDateTime, "", new { @class = "text-danger" })
                 </div>
 
                 <div class="form-group">
-                  <label>End Date Time</label>
-                  <input type="text" autocomplete="off" class="form-control from-date-picker" name="endDateTime" id="endDateTime" placeholder="Start date time">
+                  <label for="EndDateTime">End Date Time</label>
+                  @Html.TextBoxFor(model => model.EndDateTime,
+                                                            "{0:dd-MMM-yyyy hh:mm:ss tt}",
+                                                            new { @class = "form-control from-date-picker", @id = "toDateTime", @onchange = "handleDateTimeChange()" })
                   @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
                 </div>
+                
+                @*<div class="form-group">
+                  <label for="EndDateTime">End Date Time</label>
+                  @Html.TextBoxFor(model => model.EndDateTime,
+                                                            "{0:dd-MMM-yyyy hh:mm:ss tt}",
+                                                            new { @class = "form-control from-date-picker", @id = "toDateTime", @onchange = "handleDateTimeChange(this)" })
+                  @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
+                </div>*@
 
-                <div class="form-group">
-                  <label>Driver Name</label>
-                  @Html.DropDownListFor(model => model.DriverId, (SelectList)ViewBag.DriverId, "Select a Driver", new { @class = "form-control driver-dropdown" })
-                  @Html.ValidationMessageFor(model => model.DriverId, "", new { @class = "text-danger" })
-                </div>
+                @*<div class="form-group">
+                    <label>Start Date Time</label>
+                    @Html.EditorFor(model => model.StartDateTime, new { htmlAttributes = new { @class = "form-control from-date-picker", @id = "fromDateTime", @Value = ViewBag.FromDateTime } })
+                    @Html.ValidationMessageFor(model => model.StartDateTime, "", new { @class = "text-danger" })
+                  </div>
+
+                  <div class="form-group">
+                    <label>End Date Time</label>
+                    @Html.EditorFor(model => model.EndDateTime, new { htmlAttributes = new { @class = "form-control from-date-picker", @id = "toDateTime", @Value = ViewBag.ToDateTime } })
+                    @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
+                  </div>*@
+
+                @*<div class="form-group">
+                    <label>Start Date Time</label>
+                    <input type="text" autocomplete="off" class="form-control from-date-picker" name="startDateTime" id="startDateTime" placeholder="Start date time">
+                    @Html.ValidationMessageFor(model => model.StartDateTime, "", new { @class = "text-danger" })
+                  </div>*@
+
+                @*<div class="form-group">
+                    <label>End Date Time</label>
+                    <input type="text" autocomplete="off" class="form-control from-date-picker" name="endDateTime" id="endDateTime" placeholder="Start date time">
+                    @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
+                  </div>*@
+
+
+                @*<div class="form-group">
+                    <label>Driver Name</label>
+                    @Html.DropDownListFor(model => model.DriverId, (SelectList)ViewBag.DriverId, "Select a Driver", new { @class = "form-control driver-dropdown" })
+                    @Html.ValidationMessageFor(model => model.DriverId, "", new { @class = "text-danger" })
+                  </div>*@
 
                 @* Working for Driver *@
 
-                @*<div class="form-group">
-                    <label for="lblAutocompleteDriverId">Driver Name</label>
-                    <input type="text" name="DriverName" id="autocompleteDriverId" placeholder="Find Drivers..." class="form-control driver-autocomplete">
-                    <input type="hidden" id="DriverId" name="DriverId" value="" />
-                  </div>*@
+                <div class="form-group">
+                  <label for="lblAutocompleteDriverId">Driver Name</label>
+                  <input type="text" name="DriverName" id="autocompleteDriverId" placeholder="Find Drivers..." class="form-control driver-autocomplete">
+                  <input type="hidden" id="DriverId" name="DriverId" value="" />
+                </div>
 
 
                 @*<div class="form-group">
@@ -205,8 +286,14 @@
 
                 <div class="form-group">
                   <label>Status</label>
-                  @Html.DropDownListFor(model => model.Status, (SelectList)ViewBag.StatusList, "Select a Status", new { @class = "form-control status-dropdown" })
-                  @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+                  <select class="form-control status-select" name="Status">
+                    <option value="Success(Not Paid)" class="badge-custom-danger">Success Not Paid</option>
+                    <option value="Success" class="badge-custom-success">Succeeded</option>
+                    <option value="In Progress" class="badge-custom-warning" selected>In progress</option>
+                    <option value="Cancel" class="badge-custom-secondary">Cancelled</option>
+                  </select>
+                  @*@Html.DropDownListFor(model => model.Status, (SelectList)ViewBag.StatusList, "Select a Status", new { @class = "form-control status-dropdown" })
+                    @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })*@
                 </div>
               </div>
 
@@ -237,5 +324,7 @@
 <script type="text/javascript">
   // Pass ViewBag data to JavaScript
   var availableDrivers = @Html.Raw(Json.Encode(ViewBag.DriverId));
+  var availablePlaces = @Html.Raw(Json.Encode(ViewBag.PlaceId));
+  var availablePassengers = @Html.Raw(Json.Encode(ViewBag.PassengerId));
   console.log('Available Drivers:', availableDrivers);
 </script>

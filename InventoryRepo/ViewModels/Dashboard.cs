@@ -45,7 +45,7 @@ namespace InventoryRepo.Models
         [DisplayName("Users")]
         public int AspNetUsers { get; set; }
 
-
+        public IEnumerable<Trip> PassengerTrips { get; set; }
 
 
 

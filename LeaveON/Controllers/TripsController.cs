@@ -39,8 +39,11 @@ namespace LeaveON.Controllers
       var currentUser = GetCurrentUserInfo();
       ///Date Format
       DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
-      var dtStartDate = new DateTime(PKDate.Year, PKDate.Month, 1);
-      var dtEndtDate = dtStartDate.AddMonths(1).AddSeconds(-1);
+      var dtStartDate = DateTime.UtcNow;
+      var dtEndtDate = dtStartDate.AddHours(15).AddMinutes(3).AddSeconds(0);
+      //Old working
+      //var dtStartDate = new DateTime(PKDate.Year, PKDate.Month, 1);
+      //var dtEndtDate = dtStartDate.AddMonths(1).AddSeconds(-1);
 
       ViewBag.StartDate = dtStartDate.ToString("dd-MMM-yyyy");
       ViewBag.EndDate = dtEndtDate.ToString("dd-MMM-yyyy");
@@ -128,6 +131,23 @@ namespace LeaveON.Controllers
       ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name");
       ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name");
       ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name");
+
+      //DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
+      //var fromDateTime = DateTime.UtcNow;
+      //var toDateTime = fromDateTime.AddHours(1).AddMinutes(0).AddSeconds(0);
+      //ViewBag.FromDateTime = fromDateTime.ToString("dd-MMM-yyyy HH-mm-ss tt");
+      //ViewBag.ToDateTime = toDateTime.ToString("dd-MMM-yyyy HH-mm-ss tt");
+      DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
+      var fromDateTime = DateTime.UtcNow;
+      var toDateTime = fromDateTime.AddHours(1).AddMinutes(0).AddSeconds(0);
+
+      model.StartDateTime = fromDateTime;
+      model.EndDateTime = toDateTime;
+
+
+      ViewBag.FromDateTime = fromDateTime.ToString("dd-MMM-yyyy hh:mm:ss tt");
+      ViewBag.ToDateTime = toDateTime.ToString("dd-MMM-yyyy hh:mm:ss tt");
+
       return View(model);
     }
 
@@ -234,7 +254,7 @@ namespace LeaveON.Controllers
 
       // Fetch the trip details from the database
       Trip trip = await db.Trips.FindAsync(id);
-      CreateTripDto createTripDto = new CreateTripDto
+      CreateTripDto editTripDto = new CreateTripDto
       {
         DriverId = trip.DriverId,
         PassengerId = trip.PassengerId,
@@ -251,12 +271,23 @@ namespace LeaveON.Controllers
       }
 
       // Populate the ViewBag with drivers and passengers data, with selected values pre-set
-      ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false), "Id", "Name", trip.DriverId);
-      ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.IsDeleted == false), "Id", "Name", trip.PassengerId);
-      ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.IsDeleted == false), "Id", "Name", trip.PlaceId);
+      var driver = await db.Drivers.FirstOrDefaultAsync(d => d.Id == trip.DriverId);
+      var passenger = await db.Passengers.FirstOrDefaultAsync(p => p.Id == trip.PassengerId);
+      var place = await db.Places.FirstOrDefaultAsync(pl => pl.Id == trip.PlaceId);
+
+      ViewBag.DriverName = driver?.Name;
+      ViewBag.PassengerName = passenger?.Name;
+      ViewBag.PlaceName = place?.Name;
+      ViewBag.DriversId = driver?.Id;  // Add PassengerId to ViewBag
+      ViewBag.PassengersId = passenger?.Id;  // Add PassengerId to ViewBag
+      ViewBag.PlacesId = place?.Id;
+
+      ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false), "Id", "Name", editTripDto.DriverId);
+      ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.IsDeleted == false), "Id", "Name", editTripDto.PassengerId);
+      ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.IsDeleted == false), "Id", "Name", editTripDto.PlaceId);
 
       // Return the trip object to the view for editing
-      return View(createTripDto);
+      return View(editTripDto);
     }
 
     [HttpPost]
@@ -381,6 +412,36 @@ namespace LeaveON.Controllers
                       .Select(x => new { id = x.Id, text = x.Name })
                       .ToList();
       return Json(drivers, JsonRequestBehavior.AllowGet);
+    }
+    public JsonResult GetAvailableDriver(string startTripDateTime, string endTripDateTime)
+    {
+      //var currentUser = GetCurrentUserInfo();
+      //DateTime dd = Convert.ToDateTime(startTripDateTime);
+      //DateTime ddd = Convert.ToDateTime(endTripDateTime);
+      //var availableDrivers = db.Trips
+      //                .Where(x => x.IsDeleted == false && x.StartDateTime != dd && x.EndDateTime != ddd && x.CreatedBy == currentUser.UserId)
+      //                   .Select(y => new { Id = y.Driver.Id, Name = y.Driver.Name })
+      //                      .ToList()
+      //                .ToList();
+      var currentUser = GetCurrentUserInfo();
+      DateTime dd = Convert.ToDateTime(startTripDateTime);
+      DateTime ddd = Convert.ToDateTime(endTripDateTime);
+
+      // Find drivers who are available (i.e., have no overlapping trips)
+      // Find drivers who are available at the specified time window
+      var availableDrivers = db.Drivers
+          .Where(driver => !db.Trips
+              .Any(trip => trip.DriverId == driver.Id
+                  && trip.IsDeleted == false
+                  && trip.CreatedBy == currentUser.UserId
+                  // Overlap condition: the trip cannot overlap the provided time window
+                  && ((trip.StartDateTime <= ddd && trip.EndDateTime >= dd))))
+          .Select(driver => new {
+            Id = driver.Id,
+            Name = driver.Name
+          })
+          .ToList();
+      return Json(availableDrivers, JsonRequestBehavior.AllowGet);
     }
     protected override void Dispose(bool disposing)
     {
