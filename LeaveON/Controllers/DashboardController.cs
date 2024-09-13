@@ -48,9 +48,19 @@ namespace LeaveON.Controllers
       //}
       //EnterProfit();
       dashboard = new Dashboard();
+      //Old Working
+      //DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
+      //var dtStartDate = DateTime.UtcNow;
+      //var dtEndtDate = DateTime.UtcNow;
       DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
-      var dtStartDate = DateTime.UtcNow;
-      var dtEndtDate = dtStartDate.AddHours(15).AddMinutes(3).AddSeconds(0);
+      // Start date: 08:00 AM of the current day in PKT
+      var dtStartDate = new DateTime(PKDate.Year, PKDate.Month, PKDate.Day, 8, 0, 0);
+      // End date: 07:59 AM of the next day in PKT
+      var dtEndtDate = dtStartDate.AddDays(1).AddMinutes(-1);
+
+      //DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
+      //var dtStartDate = DateTime.UtcNow;
+      //var dtEndtDate = dtStartDate.AddHours(15).AddMinutes(3).AddSeconds(0);
 
       //Old working
       //var dtStartDate = new DateTime(PKDate.Year, PKDate.Month, 1);
@@ -63,18 +73,20 @@ namespace LeaveON.Controllers
         dashboard.Passengers = db.Passengers.Where(x => x.IsDeleted == false).Count();
         dashboard.Trips = db.Trips.Where(x => x.IsDeleted == false).Count();
         dashboard.AspNetUsers = db.AspNetUsers.Where(x => x.IsDeleted == false).Count();
-        dashboard.PassengerTrips = db.Trips.ToList();
+        dashboard.PassengerTrips = db.Trips.Include(t => t.Driver).Include(t => t.Passenger).Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndtDate && x.IsDeleted == false);
       }
-      else {
-        dashboard.Drivers = db.Drivers.Where(x => x.IsDeleted == false && x.CreatedBy==currentUser.UserId).Count();
+      else
+      {
+        dashboard.Drivers = db.Drivers.Where(x => x.IsDeleted == false && x.CreatedBy == currentUser.UserId).Count();
         dashboard.Passengers = db.Passengers.Where(x => x.IsDeleted == false && x.CreatedBy == currentUser.UserId).Count();
         dashboard.Trips = db.Trips.Where(x => x.IsDeleted == false && x.CreatedBy == currentUser.UserId).Count();
         dashboard.AspNetUsers = db.AspNetUsers.Where(x => x.IsDeleted == false).Count();
-        dashboard.PassengerTrips = db.Trips.Where(x => x.IsDeleted == false && x.CreatedBy == currentUser.UserId).ToList();
+        dashboard.PassengerTrips = db.Trips.Include(t => t.Driver).Include(t => t.Passenger).Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndtDate && x.CreatedBy == currentUser.UserId && x.IsDeleted == false);
+        //dashboard.PassengerTrips = db.Trips.Where(x => x.IsDeleted == false && x.CreatedBy == currentUser.UserId).ToList();
         //dashboard.AspNetUsers = db.AspNetUsers.Where(x => x.IsDeleted == false && x.CreatedBy == currentUser.UserId).Count();
       }
-      ViewBag.StartDate = dtStartDate.ToString("dd-MMM-yyyy");
-      ViewBag.EndDate = dtEndtDate.ToString("dd-MMM-yyyy");
+      ViewBag.StartDate = dtStartDate.ToString("dd-MMM-yyyy hh:mm tt");
+      ViewBag.EndDate = dtEndtDate.ToString("dd-MMM-yyyy hh:mm tt");
 
       return View(dashboard);
     }

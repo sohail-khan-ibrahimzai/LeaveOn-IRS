@@ -28,9 +28,13 @@ namespace InventoryRepo.Models
         public string Status { get; set; }
         public string CreatedBy { get; set; }
         public string UpdatedBy { get; set; }
+        public Nullable<decimal> TotalHours { get; set; }
+        public bool IsBlackListed { get; set; }
+        public Nullable<System.DateTime> DateBlackList { get; set; }
     
         public virtual Driver Driver { get; set; }
         public virtual Passenger Passenger { get; set; }
         public virtual Place Place { get; set; }
+        public virtual AspNetUser AspNetUser { get; set; }
     }
 }

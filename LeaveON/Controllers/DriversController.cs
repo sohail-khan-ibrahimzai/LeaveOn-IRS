@@ -112,21 +112,27 @@ namespace LeaveON.Controllers
     // GET: Drivers/Edit/5
     public async Task<ActionResult> Edit(int? id)
     {
-      if (id == null)
-      {
-        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-      }
+      //if (id == null)
+      //{
+      //  return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+      //}
       Driver driver = await db.Drivers.FindAsync(id);
+      //if (driver == null)
+      //{
+      //  return HttpNotFound();
+      //}
+      if (driver == null)
+      {
+        ModelState.AddModelError("", "Driver not found."); // Add error message without key
+        return View(); // Return the view with the error
+      }
       var editDriverDto = new CreateDriverDto
       {
         Id = driver.Id,
         Name = driver.Name,
         Remarks = driver.Remarks,
       };
-      if (driver == null)
-      {
-        return HttpNotFound();
-      }
+      
       return View(editDriverDto);
     }
 

@@ -32,6 +32,98 @@
     border-radius: 0.25rem;
     font-weight: 500;
   }
+
+  .scrollable-container {
+    height: 35px;
+    overflow-y: scroll;
+    position: absolute;
+    max-width: 122px;
+    /* Hide scrollbar for Webkit browsers */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+  }
+
+    .scrollable-container::-webkit-scrollbar {
+      display: none; /* Hides the scrollbar for Webkit browsers (Chrome, Safari) */
+    }
+
+  .scrollable-container {
+    -ms-overflow-style: none; /* Hides scrollbar for Internet Explorer and Edge */
+    scrollbar-width: none; /* Hides scrollbar for Firefox */
+  }
+
+  .badge-custom-danger-td {
+    background-color: #f8d7da !important;
+    color: #6c757d !important;
+  }
+
+  /*.blacklist-icon {
+    position: relative;
+    cursor: pointer;
+    color: #dc3545;*/ /* Red color for the warning icon */
+  /*}*/
+
+    /* Tooltip styling */
+    /*.blacklist-icon::after {
+      content: attr(data-tooltip);*/ /* Tooltip content */
+      /*position: absolute;
+      bottom: 100%;*/ /* Position above the icon */
+      /*left: 50%;
+      transform: translateX(-50%);
+      background-color: #333;
+      color: #fff;
+      padding: 5px;
+      border-radius: 5px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      font-size: 12px;
+      z-index: 1;
+    }*/
+
+    /* Show tooltip on hover */
+    /*.blacklist-icon:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }*/
+  .blacklist-icon {
+    position: relative;
+    cursor: pointer;
+    color: #dc3545; /* Red color for the warning icon */
+  }
+
+    /* Tooltip styling */
+    .blacklist-icon::after {
+      content: attr(data-tooltip); /* Tooltip content */
+      position: absolute;
+      bottom: 100%; /* Position above the icon */
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #333;
+      color: #fff;
+      padding: 5px;
+      border-radius: 5px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      font-size: 12px;
+      z-index: 1;
+      max-width: 200px; /* Limit the width of the tooltip */
+    }
+
+    /* Show tooltip on hover */
+    .blacklist-icon:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Adjust tooltip position if it overflows */
+    .blacklist-icon::after {
+      right: 0; /* Align tooltip to the right edge of the parent */
+      left: auto; /* Remove left alignment */
+      transform: none; /* Remove horizontal translation */
+    }
 </style>
 <div id="NewData">
   <section class="content">
@@ -43,7 +135,8 @@
               Trip
               @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
               {
-                @Html.ActionLink("Add New", "Create", new object { }, new { @class = "btn btn-warning" })
+                <a href="@Url.Content("~/Trips/Create")" class="btn btn-warning">Add New</a>
+                @*@Html.ActionLink("Add New", "Create", new object { }, new { @class = "btn btn-warning" })*@
               }
             </h3>
           </div>
@@ -60,50 +153,82 @@
                   <table id="tripTable" class="display" style="width:100%">
                     <thead>
                       <tr>
+                        <th style="display:none;">
+                          
+                        </th>
+                        <th style="width:auto;">
+                          Total Hours
+                        </th>
+                        <th style="width:auto;">
+                          @*Trip Start Date Time*@
+                          Trip Start Time
+                        </th>
+                        <th style="width: 102px;">
+                          Passenger
+                        </th>
                         <th>
+                          Driver
+                        </th>
+                        <th style="width:auto;">
+                          Location
+                        </th>
+                        <th>
+                          Comments
+                        </th>
+                        <th style="width:auto;">
                           Cost
                         </th>
-                        <th>
-                          Driver Name
-                        </th>
-                        <th>
-                          Passenger Name
-                        </th>
-                        <th>
-                          Trip Start Date Time
-                        </th>
-                        <th>
-                          Trip End Date Time
-                        </th>
-                        <th>
+                        <!--<th>-->
+                        @*Trip End Date Time*@
+                        <!--Trip Finish
+                        </th>-->
+                        <th style="width:auto;">
                           Status
                         </th>
-                        <th>Actions</th>
+                        <th style="width:auto;">Actions</th>
+                        <th></th>
                       </tr>
                     </thead>
                     @foreach (var item in Model)
                     {
-                      <tr>
-                        <td>
-                          @Html.DisplayFor(modelItem => item.Cost)
+                      var rowClass = item.IsBlackListed == true ? "badge-custom-danger-td" : "";
+                      <tr class="@rowClass">
+                        <td style="display:none">
+                          @Html.DisplayFor(modelItem => item.Id)
+                        </td>
+                        <td style="width:auto;">
+                          @Html.DisplayFor(modelItem => item.TotalHours)
                         </td>
                         <td>
-                          @Html.DisplayFor(modelItem => item.Driver.Name)
-                        </td>
-                        <td>
-                          @Html.DisplayFor(modelItem => item.Passenger.Name)
-                        </td>
-                        <td>
-                          @(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("dd/MM/yyyy HH-mm") : "")
+                          @(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("HH-mm-ss tt") : "")
+                          @*@(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss tt") : "")*@
                           @*@(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss") : "")*@
                           @*@Html.DisplayFor(modelItem => item.DateCreated != null ? item.DateCreated.ToString("dd/MM/yyyy") : "")*@
                         </td>
-                        <td>
-                          @(item.EndDateTime.HasValue ? item.EndDateTime.Value.ToString("dd/MM/yyyy HH-mm") : "")
-                          @*@(item.EndDateTime.HasValue ? item.EndDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss") : "")*@
-                          @*@Html.DisplayFor(modelItem => item.DateCreated != null ? item.DateCreated.ToString("dd/MM/yyyy") : "")*@
+                        <td style="width:auto;">
+                          @Html.DisplayFor(modelItem => item.Passenger.Name)
                         </td>
-                        <td>
+                        <td style="width:auto;">
+                          @Html.DisplayFor(modelItem => item.Driver.Name)
+                        </td>
+                        <td style="width:auto;">
+                          @Html.DisplayFor(modelItem => item.Place.Name)
+                        </td>
+                        <td class="scrollable-container">
+                          @Html.Raw(item.Remarks)
+                          @*@Html.DisplayFor(modelItem => item.Remarks)*@
+                        </td>
+                        <td style="width:auto;">
+                          @Html.DisplayFor(modelItem => item.Cost)
+                        </td>
+
+                        <!--<td>
+                        @(item.EndDateTime.HasValue ? item.EndDateTime.Value.ToString("HH-mm-ss tt") : "")-->
+                        @*@(item.EndDateTime.HasValue ? item.EndDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss tt") : "")*@
+                        @*@(item.EndDateTime.HasValue ? item.EndDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss") : "")*@
+                        @*@Html.DisplayFor(modelItem => item.DateCreated != null ? item.DateCreated.ToString("dd/MM/yyyy") : "")*@
+                        <!--</td>-->
+                        <td style="width:auto;">
                           <select class="form-control status-select" onchange="handleStatusChange(@item.Id, this.value)">
                             <option value="Success(Not Paid)" @(item.Status == "Success(Not Paid)" ? "selected" : "") class="badge-custom-danger">Success Not Paid</option>
                             <option value="Success" @(item.Status == "Success" ? "selected" : "") class="badge-custom-success">Succeeded</option>
@@ -111,25 +236,51 @@
                             <option value="Cancel" @(item.Status == "Cancel" ? "selected" : "") class="badge-custom-secondary">Cancelled</option>
                           </select>
                         </td>
-                        <td>
+                        <td style="width:auto;">
                           @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                           {
-
-                            @Html.ActionLink("Update", "Edit", new { id = item.Id }, new { @class = "btn btn-info" })
+                            <a href="@Url.Action("Edit", "Trips", new { id = item.Id })" class="btn btn-info">Update</a>
+                            @*@Html.ActionLink("Update", "Edit", new { id = item.Id }, new { @class = "btn btn-info" })*@
                           }
                           else
                           {
-                            @Html.ActionLink("View", "Edit", new { id = item.Id }, new { @class = "btn btn-info" })
+                            <a href="@Url.Action("Edit", "Trips", new { id = item.Id })" class="btn btn-info">View</a>
+                            @*@Html.ActionLink("View", "Edit", new { id = item.Id }, new { @class = "btn btn-info" })*@
                           }
-
-
                           @if (User.IsInRole("Admin"))
                           {
-                            @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-danger" })
-
-                          }
+                            <a href="@Url.Action("Delete", "Trips", new { id = item.Id })" class="btn btn-danger">Delete</a>}
+                          @*{@Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-danger" })}*@
                         </td>
+                        @*@if (item.Status == "Success(Not Paid)")*@
+                        @if (item.IsBlackListed == true)
+                        {
+                          <td style="width:auto;">
+                            <span class="blacklist-icon" data-tooltip="This location has been blacklisted">
+                              <i class="fas fa-exclamation-triangle"></i>
+                            </span>
+                          </td>
+                        }
                       </tr>
+                      @*if (item.Status == "Success(Not Paid)")
+                        {
+                          <tr>
+                            <td>
+                              <span class="blacklist-icon" data-tooltip="This location has been blacklisted">
+                                <i class="fas fa-exclamation-triangle"></i>
+                              </span>
+                            </td>
+                          </tr>
+                        }*@
+                      @* Conditionally render the warning sign below the row if the status is "Success(Not Paid)" *@
+                      <!--if (item.Status == "Success(Not Paid)")
+                      {
+                        <tr>
+                          <td colspan="9" class="text-warning">
+                            <i class="fas fa-exclamation-triangle"></i> This location has been blacklisted
+                          </td>
+                        </tr>
+                      }-->
                     }
                   </table>
                 </div>
@@ -155,24 +306,102 @@
 
 <script type="text/javascript">
   $(document).ready(function () {
-    $('#tripTable').DataTable({
-      //  "paging": false,
-      //  "lengthChange": false,
-      //  "pageLength": 100,
-      //  "searching": false,
-      //  "ordering": true,
-      //  "info": false,
-      //  "autoWidth": true,
-      //  "responsive": true,
-      //  "order": [[0, "asc"]]//,
-      //  //dom: 'Bfrtip',
-      //  //buttons: [
-      //  //  'copy', 'csv', 'excel', 'pdf', 'print'
-      //  //]
+    //Current Date with Current Time
+    //function getCurrentDayAndDate() {
+    //  var now = new Date();
+    //  var options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    //  return now.toLocaleDateString('en-US', options);
+    //}
 
-      //});
+    //Current Date with fix time
+    function getCurrentDayAndDate() {
+      var now = new Date();
+      var options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+      var dateString = now.toLocaleDateString('en-US', options);
+      //return dateString + ", 08:00 AM";  // Fixed time as 08:00 AM
+      return dateString;  
+    }
+    //$('#tripTable').DataTable({
+    //  //  "paging": false,
+    //  //  "lengthChange": false,
+    //  //  "pageLength": 100,
+    //  //  "searching": false,
+    //  //  "ordering": true,
+    //  //  "info": false,
+    //  //  "autoWidth": true,
+    //  //  "responsive": true,
+    //  //  "order": [[0, "asc"]]//,
+    //  //  //dom: 'Bfrtip',
+    //  //  //buttons: [
+    //  //  //  'copy', 'csv', 'excel', 'pdf', 'print'
+    //  //  //]
+
+    //  //});
+    //  "paging": true,
+    //  "lengthChange": true,
+    //  "pageLength": 100,
+    //  "searching": true,
+    //  "ordering": true,
+    //  "info": true,
+    //  rowReorder: {
+    //    selector: 'td:nth-child(2)'
+    //  },
+    //  "responsive": true,
+    //  "autoWidth": false,
+    //  "language": {
+    //    "emptyTable": "No data available for selected date. Please change date."
+    //  },
+    //  "order": [[0, "desc"]],
+    //  //Add lengthChange label below of the table...
+    //  /* "dom": '<"top"f>rt<"bottom"lp><"clear">',*/
+
+    //  // Add custom date/day container before search input
+    //  "dom": '<"top"<"left-info"><"right"f>>rt<"bottom"lp><"clear">',
+
+    //  //Add space between table and length/pagination controls
+    //  "createdRow": function () {
+    //    $('<style>.dataTables_wrapper .bottom { margin-top: 15px; }</style>').appendTo('head');
+    //  }
+    //  //dom: 'Bfrtip',
+    //  //buttons: [
+    //  //  {
+    //  //    extend: 'copyHtml5',
+    //  //    exportOptions: {
+    //  //      columns: [0, 1, 2, 3, 4, 5, 6]
+    //  //    }
+    //  //  },
+    //  //  {
+    //  //    extend: 'csvHtml5',
+    //  //    exportOptions: {
+    //  //      columns: [0, 1, 2, 3, 4, 5, 6]
+    //  //    }
+    //  //  },
+    //  //  {
+    //  //    extend: 'excelHtml5',
+    //  //    exportOptions: {
+    //  //      columns: [0, 1, 2, 3, 4, 5, 6]
+    //  //    }
+    //  //  },
+    //  //  {
+    //  //    extend: 'pdfHtml5',
+    //  //    orientation: 'landscape',
+    //  //    pageSize: 'LEGAL',
+    //  //    exportOptions: {
+    //  //      columns: [0, 1, 2, 3, 4, 5, 6]
+    //  //    }
+    //  //  },
+    //  //  {
+    //  //    extend: 'print',
+    //  //    exportOptions: {
+    //  //      columns: [0, 1, 2, 3, 4, 5, 6]
+    //  //    }
+    //  //  },
+    //  //  'colvis'
+    //  //]
+    //});
+    $('#tripTable').DataTable({
       "paging": true,
-      "lengthChange": true,
+      "lengthChange": true, // length change dropdown will be below the table
       "pageLength": 100,
       "searching": true,
       "ordering": true,
@@ -186,24 +415,22 @@
         "emptyTable": "No data available for selected date. Please change date."
       },
       "order": [[0, "desc"]],
-      dom: 'Bfrtip',
+
+      // Add custom date/day container, buttons under date, and length change under the table
+      "dom": '<"top"<"left-info"><"right"f>>' + // Date on the left and search on the right
+        '<"button-row"B>rt<"bottom"lp><"clear">',  // Buttons right below date/time, table, then lengthChange at bottom
+
       buttons: [
-        {
-          extend: 'copyHtml5',
-          exportOptions: {
-            columns: [0, 1, 2, 3, 4, 5, 6]
-          }
-        },
         {
           extend: 'csvHtml5',
           exportOptions: {
-            columns: [0, 1, 2, 3, 4, 5, 6]
+            columns: [0, 1, 2, 3, 4, 5, 6, 7]
           }
         },
         {
           extend: 'excelHtml5',
           exportOptions: {
-            columns: [0, 1, 2, 3, 4, 5, 6]
+            columns: [0, 1, 2, 3, 4, 5, 6, 7]
           }
         },
         {
@@ -211,19 +438,34 @@
           orientation: 'landscape',
           pageSize: 'LEGAL',
           exportOptions: {
-            columns: [0, 1, 2, 3, 4, 5, 6]
+            columns: [0, 1, 2, 3, 4, 5, 6, 7]
           }
         },
         {
           extend: 'print',
           exportOptions: {
-            columns: [0, 1, 2, 3, 4, 5, 6]
+            columns: [0, 1, 2, 3, 4, 5, 6, 7]
           }
-        },
-        'colvis'
-      ]
+        }
+      ],
 
+      // Add space between table and length/pagination controls
+      "createdRow": function () {
+        $('<style>.dataTables_wrapper .bottom { margin-top: 15px; }</style>').appendTo('head');
+      }
     });
+
+    // Inject the current day name and date-time into the .left-info div
+    $('.left-info').html('<div style="font-weight: bold;"> WORKING DAY: ' + getCurrentDayAndDate() + '</div>');
+
+    // Custom CSS for layout adjustments
+    $('<style>.dataTables_wrapper .top { display: flex; justify-content: space-between; align-items: center; } ' +
+      '.dataTables_wrapper .left-info { margin-right: auto; padding-left: 15px; } ' +
+      '.dataTables_wrapper .right { margin-left: auto; } ' +
+      '.dataTables_wrapper .button-row { margin-top: 10px; text-align: left; padding-left: 15px; } ' +  // Space for buttons below date/time
+      '.dataTables_wrapper .bottom { margin-top: 15px; }' + // Space for length/pagination controls below the table
+      '</style>').appendTo('head');
+
   });
 
   function updateSelectBackground(selectElement) {
@@ -273,22 +515,23 @@
     // - Displaying a confirmation message
     // - Updating other UI elements
     // Example AJAX call (replace with your actual API endpoint and logic):
-    
+
     $.ajax({
       url: '/Trips/UpdateStatus/',
-        method: 'POST',
-        data: {
-            id: itemId,
-            status: selectedStatus
-        },
-        success: function(response) {
-            console.log('Status updated successfully:', response);
-            // Optionally, update the UI or provide feedback to the user
-        },
-        error: function(xhr, status, error) {
-            console.error('Error updating status:', error);
-        }
+      method: 'POST',
+      data: {
+        id: itemId,
+        status: selectedStatus
+      },
+      success: function (response) {
+        console.log('Status updated successfully:', response);
+        location.reload();
+        // Optionally, update the UI or provide feedback to the user
+      },
+      error: function (xhr, status, error) {
+        console.error('Error updating status:', error);
+      }
     });
-    
+
   }
 </script>

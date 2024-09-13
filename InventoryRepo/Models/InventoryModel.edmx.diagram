@@ -33,6 +33,10 @@
         <EntityTypeShape EntityType="InventoryPortalModel.sysdiagram" Width="1.5" PointX="7.375" PointY="9.75" />
         <EntityTypeShape EntityType="InventoryPortalModel.Place" Width="1.5" PointX="5.375" PointY="12.625" />
         <AssociationConnector Association="InventoryPortalModel.FK_Trip_Places" />
+        <AssociationConnector Association="InventoryPortalModel.FK_Driver_AspNetUsers" />
+        <AssociationConnector Association="InventoryPortalModel.FK_Passenger_AspNetUsers" />
+        <AssociationConnector Association="InventoryPortalModel.FK_Places_AspNetUsers" />
+        <AssociationConnector Association="InventoryPortalModel.FK_Trip_AspNetUsers" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

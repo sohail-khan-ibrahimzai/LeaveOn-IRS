@@ -22,8 +22,10 @@ namespace LeaveON.Dtos
         public string Remarks { get; set; }
         public DateTime? StartDateTime { get; set; }
         public DateTime? EndDateTime { get; set; }
+        public decimal? TotalHours { get; set; }
         public string Status { get; set; } = "In progress";
         public string PlaceName { get; set; }
+        public bool? IsBlackListed { get; set; }
 
         public virtual Driver Driver { get; set; }
         public virtual Passenger Passenger { get; set; }

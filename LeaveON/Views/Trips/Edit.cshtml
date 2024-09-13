@@ -22,6 +22,7 @@
     user-select: none;
     -webkit-user-select: none;
   }
+
   .badge-custom-danger {
     background-color: #f8d7da; /* Light red */
     color: #721c24; /* Dark red */
@@ -53,6 +54,26 @@
     border-radius: 0.25rem;
     font-weight: 500;
   }
+  .custom-switch {
+    display: flex;
+    align-items: center;
+  }
+
+    .custom-switch .custom-control-input {
+      margin-left: 10px; /* Adjust as needed */
+    }
+  /*.custom-switch {
+    display: flex;
+    align-items: center;
+  }
+
+  .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: #28a745;*/ /* Green when checked */
+  /*}
+
+  .custom-control-label::before {
+    background-color: #dee2e6;*/ /* Default color when unchecked */
+  /*}*/
 </style>
 @*<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>*@
@@ -83,13 +104,23 @@
           <h3 class="card-title">Update Trip</h3>
         </div>
 
+        @*@using (Html.BeginForm("Edit", "Trips", FormMethod.Post, new { @id = "tripForm" }))*@
         @using (Html.BeginForm())
         {
           @Html.AntiForgeryToken()
 
           <div class="card-body">
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
+            <!-- Error message container -->
+            @*@if (ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
+              {
+                <div class="alert alert-danger">
+                  @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                  {
+                    <p>@error.ErrorMessage</p>
+                  }
+                </div>
+              }*@
             <div class="row">
               <!-- Left column with form controls -->
               <div class="col-md-6">
@@ -121,30 +152,39 @@
                   <label for="lblAutocompletePlaceId">Place</label>
                   <input type="text" name="PlaceName" value="@ViewBag.PlaceName" id="autocompletePlaceId" placeholder="Find Places..." class="form-control place-autocomplete">
                   <input type="hidden" id="PlaceId" name="PlaceId" value="@ViewBag.PlacesId" />
+                  @Html.ValidationMessageFor(model => model.PlaceName, "", new { @class = "text-danger" })
                 </div>
 
                 <div class="form-group">
-                  <label for="StartDateTime">Start Date Time</label>
+                  <label for="StartDateTime">Trip Start</label>
                   @Html.TextBoxFor(model => model.StartDateTime,
-                                                                 "{0:dd-MMM-yyyy hh:mm:ss tt}",
-                                                                 new { @class = "form-control from-date-picker", @id = "fromDateTime" })
+                                                                                                                                       "{0:dd-MMM-yyyy hh:mm:ss tt}",
+                                                                                                                                       new { @class = "form-control from-date-picker", @id = "fromDateTime" })
                   @Html.ValidationMessageFor(model => model.StartDateTime, "", new { @class = "text-danger" })
                 </div>
 
+                <div class="form-group" style="display:none;">
+                    <label for="EndDateTime">Trip Finish</label>
+                    @Html.TextBoxFor(model => model.EndDateTime,
+                                                                                                                               "{0:dd-MMM-yyyy hh:mm:ss tt}",
+                                                                                                                               new { @class = "form-control from-date-picker", @id = "toDateTime", @onchange = "handleDateTimeChange()" })
+                    @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
+                  </div>
+
                 <div class="form-group">
-                  <label for="EndDateTime">End Date Time</label>
-                  @Html.TextBoxFor(model => model.EndDateTime,
-                                                                 "{0:dd-MMM-yyyy hh:mm:ss tt}",
-                                                                 new { @class = "form-control from-date-picker", @id = "toDateTime", @onchange = "handleDateTimeChange()" })
-                  @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
+                  <label>Total Hours</label>
+                  <select class="form-control totalHours-dropdown" id="totalHoursDropdown" name="TotalHours">
+                    <!-- Options will be dynamically added here -->
+                  </select>
                 </div>
+
                 @*<div class="form-group">
-                  <label for="EndDateTime">End Date Time</label>
-                  @Html.TextBoxFor(model => model.EndDateTime,
-                                                                 "{0:dd-MMM-yyyy hh:mm:ss tt}",
-                                                                 new { @class = "form-control from-date-picker", @id = "toDateTime", @onchange = "handleDateTimeChange(this)" })
-                  @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
-                </div>*@
+                    <label for="EndDateTime">End Date Time</label>
+                    @Html.TextBoxFor(model => model.EndDateTime,
+                                                                   "{0:dd-MMM-yyyy hh:mm:ss tt}",
+                                                                   new { @class = "form-control from-date-picker", @id = "toDateTime", @onchange = "handleDateTimeChange(this)" })
+                    @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
+                  </div>*@
                 @*<div class="form-group">
                     <label>Start Date Time</label>
                     @Html.EditorFor(model => model.StartDateTime, new { htmlAttributes = new { @class = "form-control from-date-picker", @id = "fromDateTime", @Value = ViewBag.FromDateTime } })
@@ -218,14 +258,46 @@
                 <div class="form-group">
                   <label>Status</label>
                   <select class="form-control status-select" name="Status">
-                    <option value="Success(Not Paid)" class="badge-custom-danger">Success Not Paid</option>
-                    <option value="Success" class="badge-custom-success">Succeeded</option>
-                    <option value="In Progress" class="badge-custom-warning" selected>In progress</option>
-                    <option value="Cancel" class="badge-custom-secondary">Cancelled</option>
+                    <option value="Success(Not Paid)" class="badge-custom-danger" @(Model.Status == "Success(Not Paid)" ? "selected" : "")>Success Not Paid</option>
+                    <option value="Success" class="badge-custom-success" @(Model.Status == "Success" ? "selected" : "")>Succeeded</option>
+                    <option value="In Progress" class="badge-custom-warning" @(Model.Status == "In Progress" ? "selected" : "")>In Progress</option>
+                    <option value="Cancel" class="badge-custom-secondary" @(Model.Status == "Cancel" ? "selected" : "")>Cancelled</option>
                   </select>
+                  @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+                  @*<select class="form-control status-select" name="Status">
+                      <option value="Success(Not Paid)" class="badge-custom-danger">Success Not Paid</option>
+                      <option value="Success" class="badge-custom-success">Succeeded</option>
+                      <option value="In Progress" class="badge-custom-warning" selected>In progress</option>
+                      <option value="Cancel" class="badge-custom-secondary">Cancelled</option>
+                    </select>*@
                   @*@Html.DropDownListFor(model => model.Status, (SelectList)ViewBag.StatusList, "Select a Status", new { @class = "form-control status-dropdown" })
                     @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })*@
                 </div>
+                @*<div class="form-group">
+                    <div class="custom-control custom-switch">
+                      <input type="checkbox" class="custom-control-input" id="isBlackListed" name="IsBlackListed" @(Model.IsBlackListed == true ? "checked" : "") />
+                      <label class="custom-control-label" for="isBlackListed">Blacklisted</label>
+                    </div>
+                  </div>*@
+              <div class="form-group">
+                <div class="d-flex align-items-center">
+                  <!-- Label on the left -->
+                  <label class="mr-2" for="isBlackListed">Blacklisted</label>
+
+                  <!-- Checkbox on the right -->
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="isBlackListed" name="IsBlackListed" @(Model.IsBlackListed == true ? "checked" : "") />
+                    <label class="custom-control-label" for="isBlackListed"></label>
+                  </div>
+                </div>
+              </div>
+                @*<div class="form-group">
+                    <label for="isBlackListed">Blacklisted</label>
+                    <div class="custom-control custom-switch">
+                      <input type="checkbox" class="custom-control-input" id="isBlackListed" name="IsBlackListed" @(Model.IsBlackListed ? "checked" : "") />
+                      <label class="custom-control-label" for="isBlackListed">Toggle Blacklisted</label>
+                    </div>
+                  </div>*@
               </div>
 
               <!-- Right column with Remarks field -->
@@ -238,6 +310,13 @@
             </div>
 
             <!-- Form submission footer -->
+            @*<div class="card-footer">
+                <button type="submit" id="submitButton" class="btn btn-warning" style="width: 180px; margin: 0 auto; display: block;">
+                  Update
+                  <span id="spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                </button>
+              </div>*@
+
             <div class="card-footer">
               <input type="submit" value="Add" class="btn btn-warning" style="width: 180px; margin: 0 auto; display: block;" />
             </div>
@@ -257,5 +336,7 @@
   var availableDrivers = @Html.Raw(Json.Encode(ViewBag.DriverId));
   var availablePlaces = @Html.Raw(Json.Encode(ViewBag.PlaceId));
   var availablePassengers = @Html.Raw(Json.Encode(ViewBag.PassengerId));
+  var totalTripHours =@Model.TotalHours;
   console.log('Available Drivers:', availableDrivers);
+  console.log('Total Hours:', totalTripHours);
 </script>

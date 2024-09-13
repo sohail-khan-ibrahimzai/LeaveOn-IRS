@@ -4,6 +4,7 @@ using InventoryRepo.ViewModels;
 using LeaveON.Dtos;
 using Microsoft.AspNet.Identity;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
@@ -38,25 +39,48 @@ namespace LeaveON.Controllers
     {
       var currentUser = GetCurrentUserInfo();
       ///Date Format
+
+      //Old Working
+      //DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
+      //var dtStartDate = DateTime.UtcNow;
+      //var dtEndtDate = DateTime.UtcNow;
+      //ViewBag.StartDate = dtStartDate.ToString("dd-MMM-yyyy");
+      //ViewBag.EndDate = dtEndtDate.ToString("dd-MMM-yyyy");
+
       DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
-      var dtStartDate = DateTime.UtcNow;
-      var dtEndtDate = dtStartDate.AddHours(15).AddMinutes(3).AddSeconds(0);
+      // Start date: 08:00 AM of the current day in PKT
+      var dtStartDate = new DateTime(PKDate.Year, PKDate.Month, PKDate.Day, 8, 0, 0);
+      // End date: 07:59 AM of the next day in PKT
+      var dtEndDate = dtStartDate.AddDays(1).AddMinutes(-1);
+
+      // Assigning to ViewBag
+      ViewBag.StartDate = dtStartDate.ToString("dd-MMM-yyyy hh:mm tt");
+      ViewBag.EndDate = dtEndDate.ToString("dd-MMM-yyyy hh:mm tt");
+
+
+      //DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
+      //var dtStartDate = DateTime.UtcNow;
+      //var dtEndtDate = dtStartDate.AddHours(15).AddMinutes(3).AddSeconds(0);
       //Old working
       //var dtStartDate = new DateTime(PKDate.Year, PKDate.Month, 1);
       //var dtEndtDate = dtStartDate.AddMonths(1).AddSeconds(-1);
 
-      ViewBag.StartDate = dtStartDate.ToString("dd-MMM-yyyy");
-      ViewBag.EndDate = dtEndtDate.ToString("dd-MMM-yyyy");
 
       ///////Trips/////////
       if (User.IsInRole("Admin"))
       {
-        var trips = db.Trips.Include(t => t.Driver).Include(t => t.Passenger).Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndtDate && x.IsDeleted == false);
+        //var trips = db.Trips.Include(t => t.Driver).Include(t => t.Passenger).Where(x => x.IsDeleted == false);
+        //return View(await trips.ToListAsync());
+
+        var trips = db.Trips.Include(t => t.Driver).Include(t => t.Passenger).Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false);
         return View(await trips.ToListAsync());
       }
       else
       {
-        var trips = db.Trips.Include(t => t.Driver).Include(t => t.Passenger).Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndtDate && x.CreatedBy == currentUser.UserId && x.IsDeleted == false);
+        //var trips = db.Trips.Include(t => t.Driver).Include(t => t.Passenger).Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false);
+        //return View(await trips.ToListAsync());
+
+        var trips = db.Trips.Include(t => t.Driver).Include(t => t.Passenger).Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.CreatedBy == currentUser.UserId && x.IsDeleted == false);
         return View(await trips.ToListAsync());
       }
 
@@ -66,12 +90,13 @@ namespace LeaveON.Controllers
       var currentUser = GetCurrentUserInfo();
       if (User.IsInRole("Admin"))
       {
-        var blacListedLocation = db.Trips.Where(x => x.Status == TripStatus.SuccessNotPaid);
+        //var blacListedLocation = db.Trips.Where(x => x.Status == TripStatus.SuccessNotPaid);
+        var blacListedLocation = db.Trips.Where(x => x.IsBlackListed ==true);
         return View(await blacListedLocation.ToListAsync());
       }
       else
       {
-        var blacListedLocation = db.Trips.Where(x => x.Status == TripStatus.SuccessNotPaid && x.CreatedBy == currentUser.UserId);
+        var blacListedLocation = db.Trips.Where(x => x.IsBlackListed == true && x.CreatedBy == currentUser.UserId);
         return View(await blacListedLocation.ToListAsync());
       }
     }
@@ -128,9 +153,18 @@ namespace LeaveON.Controllers
       //var model = new Trip();
       var currentUser = GetCurrentUserInfo();
       var model = new CreateTripDto();
-      ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name");
-      ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name");
-      ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name");
+      if (User.IsInRole("Admin"))
+      {
+        ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false), "Id", "Name");
+        ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.IsDeleted == false), "Id", "Name");
+        ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.IsDeleted == false), "Id", "Name");
+      }
+      else
+      {
+        ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name");
+        ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name");
+        ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name");
+      }
 
       //DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
       //var fromDateTime = DateTime.UtcNow;
@@ -157,64 +191,91 @@ namespace LeaveON.Controllers
     [HttpPost]
     [ValidateAntiForgeryToken]
     //public async Task<ActionResult> Create([Bind(Include = "Id,DriverId,PassengerId,PlaceId,Cost,DateCreated,DateModified,StartDateTime,EndDateTime,Status")] Trip trip)
-    public async Task<ActionResult> Create([Bind(Include = "Id,DriverId,PassengerId,PlaceId,Cost,DateCreated,DateModified,StartDateTime,EndDateTime,Status,PlaceName,Remarks")] CreateTripDto tripDto)
+    public async Task<ActionResult> Create([Bind(Include = "Id,DriverId,PassengerId,PlaceId,Cost,DateCreated,DateModified,StartDateTime,EndDateTime,TotalHours,Status,PlaceName,Remarks")] CreateTripDto addTripDto)
     {
       var currentUser = GetCurrentUserInfo();
-      if (tripDto.Id == null || tripDto.Id == 0)
+      try
       {
-        if (tripDto.PlaceName != null)
+        if (addTripDto.Id == null || addTripDto.Id == 0)
         {
-          Place addPlace = await AddNewPlace(tripDto);
-          var addTrip = new Trip
+          if (addTripDto.PlaceName != null && addTripDto.PlaceId == null)
           {
+            Place addPlace = new Place();
+            var exisitingPlace = await db.Places.FirstOrDefaultAsync(x => x.Name == addTripDto.PlaceName);
+            if (exisitingPlace != null)
+            {
+              ModelState.AddModelError("PlaceName", "Place already exists.");
+              ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false), "Id", "Name", addTripDto.DriverId);
+              ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.IsDeleted == false), "Id", "Name", addTripDto.PassengerId);
+              ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.IsDeleted == false), "Id", "Name", addTripDto.PlaceId);
+              return View(addTripDto);
 
-            DateCreated = DateTime.Now,
-            DriverId = tripDto.DriverId,
-            PassengerId = tripDto.PassengerId,
-            PlaceId = addPlace.Id,
-            StartDateTime = tripDto.StartDateTime,
-            EndDateTime = tripDto.EndDateTime,
-            Cost = tripDto.Cost,
-            Remarks = tripDto.Remarks,
-            IsDeleted = false,
-            Status = tripDto.Status,
-            CreatedBy = currentUser.UserId
-          };
-          db.Trips.Add(addTrip);
-        }
-        else
-        {
-          var addTrip = new Trip
+            }
+            else
+            {
+              addPlace = await AddNewPlace(addTripDto);
+              addTripDto.PlaceId = addPlace.Id;
+
+              var addTrip = new Trip
+              {
+
+                DateCreated = DateTime.Now,
+                DriverId = addTripDto.DriverId,
+                PassengerId = addTripDto.PassengerId,
+                PlaceId = addTripDto.PlaceId,
+                StartDateTime = addTripDto.StartDateTime,
+                EndDateTime = addTripDto.EndDateTime,
+                TotalHours = addTripDto.TotalHours,
+                Cost = addTripDto.Cost,
+                Remarks = addTripDto.Remarks,
+                IsDeleted = false,
+                Status = addTripDto.Status,
+                CreatedBy = currentUser.UserId
+              };
+              db.Trips.Add(addTrip);
+            }
+          }
+          else
           {
-            DateCreated = DateTime.Now,
-            DriverId = tripDto.DriverId,
-            PassengerId = tripDto.PassengerId,
-            PlaceId = tripDto.PlaceId,
-            StartDateTime = tripDto.StartDateTime,
-            EndDateTime = tripDto.EndDateTime,
-            Cost = tripDto.Cost,
-            Remarks = tripDto.Remarks,
-            IsDeleted = false,
-            Status = tripDto.Status,
-            CreatedBy = currentUser.UserId
-          };
-          db.Trips.Add(addTrip);
+            var addTrip = new Trip
+            {
+              DateCreated = DateTime.Now,
+              DriverId = addTripDto.DriverId,
+              PassengerId = addTripDto.PassengerId,
+              PlaceId = addTripDto.PlaceId,
+              StartDateTime = addTripDto.StartDateTime,
+              EndDateTime = addTripDto.EndDateTime,
+              TotalHours = addTripDto.TotalHours,
+              Cost = addTripDto.Cost,
+              Remarks = addTripDto.Remarks,
+              IsDeleted = false,
+              Status = addTripDto.Status,
+              CreatedBy = currentUser.UserId
+            };
+            db.Trips.Add(addTrip);
+          }
+          await db.SaveChangesAsync();
+          return RedirectToAction("Index");
         }
-        await db.SaveChangesAsync();
-        return RedirectToAction("Index");
+
+        ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false), "Id", "Name", addTripDto.DriverId);
+        ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.IsDeleted == false), "Id", "Name", addTripDto.PassengerId);
+        ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.IsDeleted == false), "Id", "Name", addTripDto.PlaceId);
       }
-
-      ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false), "Id", "Name", tripDto.DriverId);
-      ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.IsDeleted == false), "Id", "Name", tripDto.PassengerId);
-      ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.IsDeleted == false), "Id", "Name", tripDto.PlaceId);
-      return View(tripDto);
+      catch (Exception ex)
+      {
+        ModelState.AddModelError("Error", ex);
+      }
+      return View(addTripDto);
     }
 
     private async Task<Place> AddNewPlace(CreateTripDto tripDto)
     {
+      var currentUser = GetCurrentUserInfo();
       var addPlace = new Place
       {
         DateCreated = DateTime.Now,
+        CreatedBy = currentUser.UserId,
         Name = tripDto.PlaceName,
         Remarks = "",
         IsDeleted = false
@@ -247,13 +308,23 @@ namespace LeaveON.Controllers
     //}
     public async Task<ActionResult> Edit(int? id)
     {
-      if (id == null)
-      {
-        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-      }
+      //if (id == null)
+      //{
+      //  return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+      //}
 
       // Fetch the trip details from the database
       Trip trip = await db.Trips.FindAsync(id);
+      //if (trip == null)
+      //{
+      //  ModelState.AddModelError("Name", "Trips not found.");
+      //  //return HttpNotFound();
+      //}
+      if (trip == null)
+      {
+        ModelState.AddModelError("", "Trip not found."); // Add error message without key
+        return View(); // Return the view with the error
+      }
       CreateTripDto editTripDto = new CreateTripDto
       {
         DriverId = trip.DriverId,
@@ -261,14 +332,12 @@ namespace LeaveON.Controllers
         PlaceId = trip.PlaceId,
         StartDateTime = trip.StartDateTime,
         EndDateTime = trip.EndDateTime,
+        TotalHours = trip.TotalHours,
         Cost = trip.Cost,
+        IsBlackListed = trip.IsBlackListed,
         Remarks = trip.Remarks,
         Status = trip.Status
       };
-      if (trip == null)
-      {
-        return HttpNotFound();
-      }
 
       // Populate the ViewBag with drivers and passengers data, with selected values pre-set
       var driver = await db.Drivers.FirstOrDefaultAsync(d => d.Id == trip.DriverId);
@@ -292,28 +361,65 @@ namespace LeaveON.Controllers
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Edit([Bind(Include = "Id,DriverId,PassengerId,PlaceId,Cost,DateCreated,DateModified,StartDateTime,EndDateTime,Status,Remarks")] CreateTripDto updateTripDto)
+    public async Task<ActionResult> Edit([Bind(Include = "Id,DriverId,PassengerId,PlaceId,Cost,DateCreated,DateModified,StartDateTime,EndDateTime,TotalHours,Status,PlaceName,Remarks,IsBlackListed")] CreateTripDto updateTripDto)
     {
       var currentUser = GetCurrentUserInfo();
-      if (ModelState.IsValid)
-      {
+      //if (ModelState.IsValid)
+      //{
         var trip = await db.Trips.FirstOrDefaultAsync(x => x.Id == updateTripDto.Id);
-        if (trip == null)
-          return HttpNotFound();
-        trip.DriverId = updateTripDto.DriverId;
-        trip.PassengerId = updateTripDto.PassengerId;
-        trip.PassengerId = updateTripDto.PassengerId;
-        trip.PlaceId = updateTripDto.PlaceId;
-        trip.Cost = updateTripDto.Cost;
-        trip.DateModified = DateTime.Now;
-        trip.StartDateTime = updateTripDto.StartDateTime;
-        trip.EndDateTime = updateTripDto.EndDateTime;
-        trip.Status = updateTripDto.Status;
-        trip.Remarks = updateTripDto.Remarks;
-        trip.UpdatedBy = currentUser.UserId;
-        db.Entry(trip).State = EntityState.Modified;
+        if (updateTripDto.IsBlackListed == true && trip.DateBlackList == null)
+        {
+          trip.IsBlackListed = updateTripDto.IsBlackListed ?? false;
+          trip.DateBlackList = DateTime.UtcNow;
+        }
+        if (updateTripDto.PlaceName != null && updateTripDto.PlaceId == null)
+        {
+          var exisitingPlace = await db.Places.FirstOrDefaultAsync(x => x.Name == updateTripDto.PlaceName);
+          var driver = await db.Drivers.FirstOrDefaultAsync(d => d.Id == trip.DriverId);
+          var passenger = await db.Passengers.FirstOrDefaultAsync(p => p.Id == trip.PassengerId);
+          var place = await db.Places.FirstOrDefaultAsync(pl => pl.Id == trip.PlaceId);
+          if (exisitingPlace != null)
+          {
+            ModelState.AddModelError("PlaceName", "Place already exists.");
+            ViewBag.DriverName = driver?.Name;
+            ViewBag.PassengerName = passenger?.Name;
+            ViewBag.PlaceName = place?.Name;
+            ViewBag.DriversId = driver?.Id;  // Add PassengerId to ViewBag
+            ViewBag.PassengersId = passenger?.Id;  // Add PassengerId to ViewBag
+            ViewBag.PlacesId = place?.Id;
+            ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false), "Id", "Name", updateTripDto.DriverId);
+            ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.IsDeleted == false), "Id", "Name", updateTripDto.PassengerId);
+            ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.IsDeleted == false), "Id", "Name", updateTripDto.PlaceId);
+            return View(updateTripDto);
+          }
+          else
+          {
+            Place addPlace = await AddNewPlace(updateTripDto);
+            trip.PlaceId = addPlace.Id;
+          }
+        }
+        else
+        {
+
+          if (trip == null)
+            return HttpNotFound();
+          trip.DriverId = updateTripDto.DriverId;
+          trip.PassengerId = updateTripDto.PassengerId;
+          trip.PassengerId = updateTripDto.PassengerId;
+          trip.PlaceId = updateTripDto.PlaceId;
+          trip.Cost = updateTripDto.Cost;
+          trip.DateModified = DateTime.Now;
+          trip.StartDateTime = updateTripDto.StartDateTime;
+          trip.EndDateTime = updateTripDto.EndDateTime;
+          trip.TotalHours = updateTripDto.TotalHours;
+          trip.Status = updateTripDto.Status;
+          trip.Status = updateTripDto.Status;
+          trip.IsBlackListed = updateTripDto.IsBlackListed ?? false;
+          trip.UpdatedBy = currentUser.UserId;
+          db.Entry(trip).State = EntityState.Modified;
+        }
         await db.SaveChangesAsync();
-      }
+      //}
       // Repopulate dropdowns if the model state is invalid
       //ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false), "Id", "Name", trip.DriverId);
       //ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.IsDeleted == false), "Id", "Name", trip.PassengerId);
@@ -423,25 +529,56 @@ namespace LeaveON.Controllers
       //                   .Select(y => new { Id = y.Driver.Id, Name = y.Driver.Name })
       //                      .ToList()
       //                .ToList();
-      var currentUser = GetCurrentUserInfo();
-      DateTime dd = Convert.ToDateTime(startTripDateTime);
-      DateTime ddd = Convert.ToDateTime(endTripDateTime);
 
-      // Find drivers who are available (i.e., have no overlapping trips)
-      // Find drivers who are available at the specified time window
-      var availableDrivers = db.Drivers
-          .Where(driver => !db.Trips
-              .Any(trip => trip.DriverId == driver.Id
-                  && trip.IsDeleted == false
-                  && trip.CreatedBy == currentUser.UserId
-                  // Overlap condition: the trip cannot overlap the provided time window
-                  && ((trip.StartDateTime <= ddd && trip.EndDateTime >= dd))))
-          .Select(driver => new {
-            Id = driver.Id,
-            Name = driver.Name
-          })
-          .ToList();
-      return Json(availableDrivers, JsonRequestBehavior.AllowGet);
+      try
+      {
+        var currentUser = GetCurrentUserInfo();
+
+        // Check if date parameters are provided and valid
+        if (!string.IsNullOrEmpty(startTripDateTime) && !string.IsNullOrEmpty(endTripDateTime) &&
+            DateTime.TryParse(startTripDateTime, out DateTime startDate) &&
+            DateTime.TryParse(endTripDateTime, out DateTime endDate))
+        {
+          // Find drivers who are available (i.e., have no overlapping trips)
+          var availableDrivers = db.Drivers
+              .Where(driver => !db.Trips
+                  .Any(trip => trip.DriverId == driver.Id
+                      && trip.IsDeleted == false
+                      && trip.CreatedBy == currentUser.UserId
+                      // Overlap condition: the trip cannot overlap the provided time window
+                      && ((trip.StartDateTime <= endDate && trip.EndDateTime >= startDate))))
+              .Select(driver => new
+              {
+                Id = driver.Id,
+                Name = driver.Name
+              })
+              .ToList();
+
+          // Return the available drivers as JSON
+          return Json(new { success = true, data = availableDrivers }, JsonRequestBehavior.AllowGet);
+        }
+        else
+        {
+          // If dates are not provided or invalid, return all drivers
+          var allDrivers = db.Drivers
+              .Select(driver => new
+              {
+                Id = driver.Id,
+                Name = driver.Name
+              })
+              .ToList();
+
+          // Return all drivers as JSON
+          return Json(new { success = true, data = allDrivers }, JsonRequestBehavior.AllowGet);
+        }
+      }
+      catch (Exception ex)
+      {
+        // Log the exception (you can use any logging framework here)
+        // Example: Logger.Error(ex, "Error in GetAvailableDriver method");
+        return Json(new { success = false, message = "An error occurred while retrieving available drivers. Please try again later." }, JsonRequestBehavior.AllowGet);
+      }
+
     }
     protected override void Dispose(bool disposing)
     {

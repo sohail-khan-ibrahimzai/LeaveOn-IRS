@@ -224,6 +224,9 @@
           <Property Name="Status" Type="nvarchar" MaxLength="40" />
           <Property Name="CreatedBy" Type="nvarchar" MaxLength="128" />
           <Property Name="UpdatedBy" Type="nvarchar" MaxLength="128" />
+          <Property Name="TotalHours" Type="decimal" Precision="18" Scale="2" />
+          <Property Name="IsBlackListed" Type="bit" Nullable="false" />
+          <Property Name="DateBlackList" Type="datetime" />
         </EntityType>
         <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
           <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
@@ -278,6 +281,18 @@
             </Principal>
             <Dependent Role="AspNetUserRoles">
               <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Driver_AspNetUsers">
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="0..1" />
+          <End Role="Driver" Type="Self.Driver" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Driver">
+              <PropertyRef Name="CreatedBy" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -350,6 +365,42 @@
             </Principal>
             <Dependent Role="ItemLog">
               <PropertyRef Name="ItemId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Passenger_AspNetUsers">
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="0..1" />
+          <End Role="Passenger" Type="Self.Passenger" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Passenger">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Places_AspNetUsers">
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="0..1" />
+          <End Role="Places" Type="Self.Places" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Places">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Trip_AspNetUsers">
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="0..1" />
+          <End Role="Trip" Type="Self.Trip" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Trip">
+              <PropertyRef Name="CreatedBy" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -454,6 +505,10 @@
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserRoles" EntitySet="AspNetUserRoles" />
           </AssociationSet>
+          <AssociationSet Name="FK_Driver_AspNetUsers" Association="Self.FK_Driver_AspNetUsers">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="Driver" EntitySet="Driver" />
+          </AssociationSet>
           <AssociationSet Name="FK_Item_AspNetUsers" Association="Self.FK_Item_AspNetUsers">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="Item" EntitySet="Item" />
@@ -477,6 +532,18 @@
           <AssociationSet Name="FK_ItemLog_Item" Association="Self.FK_ItemLog_Item">
             <End Role="Item" EntitySet="Item" />
             <End Role="ItemLog" EntitySet="ItemLog" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Passenger_AspNetUsers" Association="Self.FK_Passenger_AspNetUsers">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="Passenger" EntitySet="Passenger" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Places_AspNetUsers" Association="Self.FK_Places_AspNetUsers">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="Places" EntitySet="Places" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Trip_AspNetUsers" Association="Self.FK_Trip_AspNetUsers">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="Trip" EntitySet="Trip" />
           </AssociationSet>
           <AssociationSet Name="FK_Trip_Driver" Association="Self.FK_Trip_Driver">
             <End Role="Driver" EntitySet="Driver" />
@@ -590,6 +657,22 @@
             <End Role="Place" EntitySet="Places" />
             <End Role="Trip" EntitySet="Trips" />
           </AssociationSet>
+          <AssociationSet Name="FK_Driver_AspNetUsers" Association="InventoryPortalModel.FK_Driver_AspNetUsers">
+            <End Role="AspNetUser" EntitySet="AspNetUsers" />
+            <End Role="Driver" EntitySet="Drivers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Passenger_AspNetUsers" Association="InventoryPortalModel.FK_Passenger_AspNetUsers">
+            <End Role="AspNetUser" EntitySet="AspNetUsers" />
+            <End Role="Passenger" EntitySet="Passengers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Places_AspNetUsers" Association="InventoryPortalModel.FK_Places_AspNetUsers">
+            <End Role="AspNetUser" EntitySet="AspNetUsers" />
+            <End Role="Place" EntitySet="Places" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Trip_AspNetUsers" Association="InventoryPortalModel.FK_Trip_AspNetUsers">
+            <End Role="AspNetUser" EntitySet="AspNetUsers" />
+            <End Role="Trip" EntitySet="Trips" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="AspNetUser">
           <Key>
@@ -622,6 +705,10 @@
           <NavigationProperty Name="AspNetUserLogins" Relationship="InventoryPortalModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" FromRole="AspNetUser" ToRole="AspNetUserLogin" />
           <NavigationProperty Name="AspNetRoles" Relationship="InventoryPortalModel.AspNetUserRoles" FromRole="AspNetUser" ToRole="AspNetRole" />
           <Property Name="IsDeleted" Type="Boolean" />
+          <NavigationProperty Name="Drivers" Relationship="InventoryPortalModel.FK_Driver_AspNetUsers" FromRole="AspNetUser" ToRole="Driver" />
+          <NavigationProperty Name="Passengers" Relationship="InventoryPortalModel.FK_Passenger_AspNetUsers" FromRole="AspNetUser" ToRole="Passenger" />
+          <NavigationProperty Name="Places" Relationship="InventoryPortalModel.FK_Places_AspNetUsers" FromRole="AspNetUser" ToRole="Place" />
+          <NavigationProperty Name="Trips" Relationship="InventoryPortalModel.FK_Trip_AspNetUsers" FromRole="AspNetUser" ToRole="Trip" />
         </EntityType>
         <EntityType Name="DeviceType">
           <Key>
@@ -856,6 +943,7 @@
           <Property Name="AspNetUserId" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="CreatedBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="UpdatedBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="AspNetUser" Relationship="InventoryPortalModel.FK_Driver_AspNetUsers" FromRole="Driver" ToRole="AspNetUser" />
         </EntityType>
         <EntityType Name="Passenger">
           <Key>
@@ -873,6 +961,7 @@
           <Property Name="PickupAddress" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
           <Property Name="CreatedBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="UpdateBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="AspNetUser" Relationship="InventoryPortalModel.FK_Passenger_AspNetUsers" FromRole="Passenger" ToRole="AspNetUser" />
         </EntityType>
         <EntityType Name="Trip">
           <Key>
@@ -895,6 +984,10 @@
           <Property Name="Status" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
           <Property Name="CreatedBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="UpdatedBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="TotalHours" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="IsBlackListed" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="AspNetUser" Relationship="InventoryPortalModel.FK_Trip_AspNetUsers" FromRole="Trip" ToRole="AspNetUser" />
+          <Property Name="DateBlackList" Type="DateTime" Precision="3" />
         </EntityType>
         <Association Name="FK_Trip_Driver">
           <End Type="InventoryPortalModel.Driver" Role="Driver" Multiplicity="0..1" />
@@ -975,6 +1068,7 @@
           <Property Name="Address" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="CreatedBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="UpdateBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="AspNetUser" Relationship="InventoryPortalModel.FK_Places_AspNetUsers" FromRole="Place" ToRole="AspNetUser" />
         </EntityType>
         <Association Name="FK_Trip_Places">
           <End Type="InventoryPortalModel.Place" Role="Place" Multiplicity="0..1" />
@@ -985,6 +1079,54 @@
             </Principal>
             <Dependent Role="Trip">
               <PropertyRef Name="PlaceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Driver_AspNetUsers">
+          <End Type="InventoryPortalModel.AspNetUser" Role="AspNetUser" Multiplicity="0..1" />
+          <End Type="InventoryPortalModel.Driver" Role="Driver" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Driver">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Passenger_AspNetUsers">
+          <End Type="InventoryPortalModel.AspNetUser" Role="AspNetUser" Multiplicity="0..1" />
+          <End Type="InventoryPortalModel.Passenger" Role="Passenger" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Passenger">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Places_AspNetUsers">
+          <End Type="InventoryPortalModel.AspNetUser" Role="AspNetUser" Multiplicity="0..1" />
+          <End Type="InventoryPortalModel.Place" Role="Place" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Place">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Trip_AspNetUsers">
+          <End Type="InventoryPortalModel.AspNetUser" Role="AspNetUser" Multiplicity="0..1" />
+          <End Type="InventoryPortalModel.Trip" Role="Trip" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Trip">
+              <PropertyRef Name="CreatedBy" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1163,6 +1305,9 @@
           <EntitySetMapping Name="Trips">
             <EntityTypeMapping TypeName="InventoryPortalModel.Trip">
               <MappingFragment StoreEntitySet="Trip">
+                <ScalarProperty Name="DateBlackList" ColumnName="DateBlackList" />
+                <ScalarProperty Name="IsBlackListed" ColumnName="IsBlackListed" />
+                <ScalarProperty Name="TotalHours" ColumnName="TotalHours" />
                 <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
                 <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
                 <ScalarProperty Name="Status" ColumnName="Status" />

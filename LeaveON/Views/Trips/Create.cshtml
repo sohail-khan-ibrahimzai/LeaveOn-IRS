@@ -150,6 +150,7 @@
           <h3 class="card-title">Add Trip</h3>
         </div>
 
+        @*@using (Html.BeginForm("Create", "Trips", FormMethod.Post, new { @id = "tripForm" }))*@
         @using (Html.BeginForm())
         {
           @Html.AntiForgeryToken()
@@ -188,31 +189,46 @@
                   <label for="lblAutocompletePlaceId">Place</label>
                   <input type="text" name="PlaceName" id="autocompletePlaceId" placeholder="Find Places..." class="form-control place-autocomplete">
                   <input type="hidden" id="PlaceId" name="PlaceId" value="" />
+                  @Html.ValidationMessageFor(model => model.PlaceName, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group" id="placeNameContainer" style="display:none;">
+                  <label>Place Name</label>
+                  <input type="text" name="placeName" id="placeName" class="form-control" />
                 </div>
 
                 <div class="form-group">
-                  <label for="StartDateTime">Start Date Time</label>
+                  @*<label for="StartDateTime">Start Date Time</label>*@
+                  <label for="StartDateTime">Trip Start</label>
                   @Html.TextBoxFor(model => model.StartDateTime,
-                                                            "{0:dd-MMM-yyyy hh:mm:ss tt}",
-                                                            new { @class = "form-control from-date-picker", @id = "fromDateTime" })
+                                                                                               "{0:dd-MMM-yyyy hh:mm:ss tt}",
+                                                                                               new { @class = "form-control from-date-picker", @id = "fromDateTime" })
                   @Html.ValidationMessageFor(model => model.StartDateTime, "", new { @class = "text-danger" })
                 </div>
 
-                <div class="form-group">
-                  <label for="EndDateTime">End Date Time</label>
+                <div class="form-group" style="display:none;">
+                  @*<label for="EndDateTime">End Date Time</label>*@
+                  <label for="EndDateTime">Trip Finish</label>
                   @Html.TextBoxFor(model => model.EndDateTime,
-                                                            "{0:dd-MMM-yyyy hh:mm:ss tt}",
-                                                            new { @class = "form-control from-date-picker", @id = "toDateTime", @onchange = "handleDateTimeChange()" })
+                                                                                               "{0:dd-MMM-yyyy hh:mm:ss tt}",
+                                                                                               new { @class = "form-control from-date-picker", @id = "toDateTime", @onchange = "getAvailableDriversOnDateTimeChange()" })
                   @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
                 </div>
-                
+
+                <div class="form-group">
+                  <label>Total Hours</label>
+                  <select class="form-control totalHours-dropdown" id="totalHoursDropdown" name="TotalHours">
+                    <!-- Options will be dynamically added here -->
+                  </select>
+                </div>
+
                 @*<div class="form-group">
-                  <label for="EndDateTime">End Date Time</label>
-                  @Html.TextBoxFor(model => model.EndDateTime,
-                                                            "{0:dd-MMM-yyyy hh:mm:ss tt}",
-                                                            new { @class = "form-control from-date-picker", @id = "toDateTime", @onchange = "handleDateTimeChange(this)" })
-                  @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
-                </div>*@
+                    <label for="EndDateTime">End Date Time</label>
+                    @Html.TextBoxFor(model => model.EndDateTime,
+                                                              "{0:dd-MMM-yyyy hh:mm:ss tt}",
+                                                              new { @class = "form-control from-date-picker", @id = "toDateTime", @onchange = "handleDateTimeChange(this)" })
+                    @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
+                  </div>*@
 
                 @*<div class="form-group">
                     <label>Start Date Time</label>
@@ -273,11 +289,6 @@
                     <ul id="passengersList"></ul>
                   </div>*@
 
-                <div class="form-group" id="placeNameContainer" style="display:none;">
-                  <label>Place Name</label>
-                  <input type="text" name="placeName" id="placeName" class="form-control" />
-                </div>
-
                 <div class="form-group">
                   @Html.LabelFor(model => model.Cost, htmlAttributes: new { @class = "" })
                   @Html.EditorFor(model => model.Cost, new { htmlAttributes = new { @class = "form-control", @placeholder = "Cost" } })
@@ -311,6 +322,13 @@
               <input type="submit" value="Add" class="btn btn-warning" style="width: 180px; margin: 0 auto; display: block;" />
             </div>
 
+            @*<div class="card-footer">
+                <button type="submit" id="submitButton" class="btn btn-warning" style="width: 180px; margin: 0 auto; display: block;">
+                  Add
+                  <span id="spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                </button>
+              </div>*@
+
             <br />
             <div>
               @Html.ActionLink("Back to List", "Index")
@@ -326,5 +344,7 @@
   var availableDrivers = @Html.Raw(Json.Encode(ViewBag.DriverId));
   var availablePlaces = @Html.Raw(Json.Encode(ViewBag.PlaceId));
   var availablePassengers = @Html.Raw(Json.Encode(ViewBag.PassengerId));
+  var totalTripHours = null;
   console.log('Available Drivers:', availableDrivers);
+  console.log('Available Total Hours Add:', totalTripHours);
 </script>

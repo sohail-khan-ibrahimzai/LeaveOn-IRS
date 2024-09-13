@@ -1,5 +1,8 @@
 $(document).ready(function () {
-  handleDateTimeChange();
+  debugger;
+  getAvailableDriversOnDateTimeChange();
+  populateDropdown(totalTripHours);
+  
   $('#remarks').summernote({
     height: 250,
     placeholder: "Comment",
@@ -17,6 +20,10 @@ $(document).ready(function () {
     placeholder: "Select a Passenger",
     allowClear: true
   });
+  $('.totalHours-dropdown').select2({
+    placeholder: "Total Hours",
+    allowClear: true
+  });
   $('.place-dropdown').select2({
     placeholder: "Select a Place",
     allowClear: true,
@@ -26,7 +33,8 @@ $(document).ready(function () {
     placeholder: "Select Status",
     allowClear: true
   });
-  $('.passenger-dropdown').focus();
+  //$('.passenger-dropdown').focus();
+  $('.passenger-autocomplete').focus();
   $('.from-date-picker').datetimepicker({
     dateFormat: "dd-M-yy",
     timeFormat: "hh:mm tt",
@@ -43,7 +51,11 @@ $(document).ready(function () {
     buttonText: "Select date"
   });
   debugger;
-
+  $('#autocompletePassengerId, #autocompletePlaceId,#autocompleteDriverId').on('keydown', function (event) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Prevent default form submission behavior
+    }
+  });
   ////////////////////////////////////////////Working for Driver
   //console.log('Document ready');
   //console.log('Available Drivers:', availableDrivers);
@@ -67,6 +79,11 @@ $(document).ready(function () {
       console.log('Autocomplete triggered with request:', request);
       response(transformedPassengers); // Use the transformed data
     },
+    focus: function (event, ui) {
+      // When navigating through the list with the arrow keys, show the label (name) in the input field
+      $("#autocompletePassengerId").val(ui.item.label);
+      return false; // Prevent default behavior of setting the value (ID) in the input
+    },
     select: function (event, ui) {
       console.log('Selected item:', ui.item);
       $("#PassengerId").val(ui.item.value); // Store selected ID in hidden input
@@ -79,24 +96,78 @@ $(document).ready(function () {
   /////////////////////////////////Place///////////////////////////////////////
   console.log('Document ready');
   console.log('Available Places:', availablePlaces);
+  //var transformedPlaces = availablePlaces.map(function (place) {
+  //  return {
+  //    label: place.Text,  // Display this in the input field
+  //    value: place.Value  // Store this in the hidden input
+  //  };
+  //});
+  //$("#autocompletePlaceId").autocomplete({
+  //  source: function (request, response) {
+  //    console.log('Autocomplete triggered with request:', request);
+  //    response(transformedPlaces); // Use the transformed data
+  //  },
+  //  select: function (event, ui) {
+  //    console.log('Selected item:', ui.item);
+  //    $("#PlaceId").val(ui.item.value); // Store selected ID in hidden input
+  //    $("#autocompletePlaceId").val(ui.item.label); // Display the label in the input field
+  //    $("#placeNameContainer").hide(); // Hide the custom place name input
+  //    return false; // Prevent the default behavior of setting the value to the input
+  //  },
+  //  change: function (event, ui) {
+  //    if (!ui.item) {
+  //      // If no place is selected from the autocomplete
+  //      $("#PlaceId").val(''); // Set PlaceId to null
+  //      $("#placeNameContainer").show(); // Show the custom place name input
+  //      $("#placeName").val($("#autocompletePlaceId").val()); // Set the custom place name
+  //    }
+  //  }
+  //});
   var transformedPlaces = availablePlaces.map(function (place) {
     return {
-      label: place.Text,  // Display this in the input field
-      value: place.Value  // Store this in the hidden input
+      label: place.Text,  // Display this in the input field (the name)
+      value: place.Value  // Store this in the hidden input (the ID)
     };
   });
+
   $("#autocompletePlaceId").autocomplete({
     source: function (request, response) {
       console.log('Autocomplete triggered with request:', request);
       response(transformedPlaces); // Use the transformed data
     },
+    focus: function (event, ui) {
+      // When navigating through the list with the arrow keys, show the label (name) in the input field
+      $("#autocompletePlaceId").val(ui.item.label);
+      return false; // Prevent default behavior of setting the value to the input
+    },
     select: function (event, ui) {
       console.log('Selected item:', ui.item);
       $("#PlaceId").val(ui.item.value); // Store selected ID in hidden input
-      $("#autocompletePlaceId").val(ui.item.label); // Display the label in the input field
-      return false; // Prevent the default behavior of setting the value to the input
+      $("#autocompletePlaceId").val(ui.item.label); // Display the label (name) in the input field
+      $("#placeNameContainer").hide(); // Hide the custom place name input
+      return false; // Prevent default behavior of setting the value to the input
+    },
+    change: function (event, ui) {
+      if (!ui.item) {
+        // If no place is selected from the autocomplete
+        $("#PlaceId").val(''); // Set PlaceId to null
+        //$("#placeNameContainer").show(); // Show the custom place name input
+        $("#placeName").val($("#autocompletePlaceId").val()); // Set the custom place name
+      }
     }
   });
+  //$("#autocompletePlaceId").autocomplete({
+  //  source: function (request, response) {
+  //    console.log('Autocomplete triggered with request:', request);
+  //    response(transformedPlaces); // Use the transformed data
+  //  },
+  //  select: function (event, ui) {
+  //    console.log('Selected item:', ui.item);
+  //    $("#PlaceId").val(ui.item.value); // Store selected ID in hidden input
+  //    $("#autocompletePlaceId").val(ui.item.label); // Display the label in the input field
+  //    return false; // Prevent the default behavior of setting the value to the input
+  //  }
+  //});
   /////////////////////////////////Place///////////////////////////////////////
  
   /////////////////////////////////Driver///////////////////////////////////////
@@ -105,6 +176,11 @@ $(document).ready(function () {
     source: function (request, response) {
       console.log('Autocomplete triggered with request:', request);
       response(transformedDrivers); // Use the transformed data
+    },
+    focus: function (event, ui) {
+      // When navigating through the list with the arrow keys, show the label (name) in the input field
+      $("#autocompleteDriverId").val(ui.item.label);
+      return false; // Prevent default behavior of setting the value (ID) in the input
     },
     select: function (event, ui) {
       console.log('Selected item:', ui.item);
@@ -212,8 +288,67 @@ $(document).ready(function () {
   //  $('#hiddenPlaceId').val(driverId); // Set the DriverId in the hidden input field
   //  $('#placesList').empty();
   //});
+
+
+
+  ////Submit Form  With Loader////////////////////////////////
+  //$("#submitButton").on("click", function (event) {
+  //  // Prevent the default form submission behavior
+  //  event.preventDefault();
+
+  //  // Get the form, button, and spinner elements by their IDs
+  //  var $form = $("#tripForm");
+  //  var $submitButton = $("#submitButton");
+  //  var $spinner = $("#spinner");
+
+  //  // Serialize the form data
+  //  var formData = $form.serialize();
+
+  //  // Show the spinner and disable the submit button to prevent double-clicks
+  //  $spinner.show();
+  //  $submitButton.prop("disabled", true);
+
+  //  // Perform AJAX request to submit the form
+  //  $.ajax({
+  //    url: $form.attr("action"),    // Get the form's action URL
+  //    method: $form.attr("method"), // Get the form's method (POST/GET)
+  //    data: formData,               // Form data serialized
+  //    success: function (response) {
+  //      // Redirect to the Trips Index page on successful submission
+  //      window.location.href = '/Trips/Index';
+  //    },
+  //    error: function (xhr, status, error) {
+  //      // Handle error case
+  //      alert("An error occurred. Please try again.");
+  //    },
+  //    complete: function () {
+  //      // Hide the spinner and re-enable the submit button after the request completes
+  //      $spinner.hide();
+  //      $submitButton.prop("disabled", false);
+  //    }
+  //  });
+  //});
+  ////Submit Form  With Loader/////////////////////////////////////
+
+
+  //////////////////Edit case///////////////////////////////////
+  debugger
+  const checkbox = document.getElementById('isBlackListed');
+  const isBlackListed = checkbox.checked;
+  // Set the value of the checkbox to be sent
+  checkbox.value = isBlackListed;
+  document.getElementById('isBlackListed').addEventListener('change', function () {
+    const checkbox = document.getElementById('isBlackListed');
+    const isBlackListed = checkbox.checked;
+    debugger;
+    // Set the value of the checkbox to be sent
+    checkbox.value = isBlackListed;
+  });
+  /////////////////////////////////////////////////////////////
+ 
 });
-function handleDateTimeChange() {
+
+function getAvailableDriversOnDateTimeChange() {
 //function handleDateTimeChange(element) {
   debugger;
   //var aa = element.value;
@@ -225,17 +360,30 @@ function handleDateTimeChange() {
     data: { startTripDateTime: startTripDateTime, endTripDateTime: endTripDateTime },
     success: function (data) {
       debugger;
-      transformedDrivers = data.map(function (driver) {
-        return {
-          label: driver.Name,  // Display the driver's name
-          value: driver.Id  // Store the driver's ID
-        };
-      });
-      // Trigger autocomplete with the new drivers
-      $('#autocompleteDriverId').autocomplete("option", "source", transformedDrivers);
+      if (data.success) {
+        // Access the data array from the response object
+        var drivers = data.data;
+
+        // Ensure drivers is an array before calling map
+        if (Array.isArray(drivers)) {
+          var transformedDrivers = drivers.map(function (driver) {
+            return {
+              label: driver.Name,  // Display the driver's name
+              value: driver.Id     // Store the driver's ID
+            };
+          });
+
+          // Trigger autocomplete with the new drivers
+          $('#autocompleteDriverId').autocomplete("option", "source", transformedDrivers);
+        } else {
+          console.error('Expected an array of drivers, but got:', drivers);
+        }
+      } else {
+        console.error('Error fetching drivers:', data.message);
+      }
     },
-    error: function () {
-      console.log('Ajax Error')
+    error: function (xhr, status, error) {
+      console.error('AJAX error:', status, error);
     }
   });
 } 
@@ -286,3 +434,255 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
+
+//Format 1,1.30 till 24
+
+// Function to generate time slots with 30-minute intervals in the format "X hour" or "X.30 hour"
+//function generateTimeSlots() {
+//  var timeSlots = [];
+//  var maxHours = 24;
+
+//  for (var i = 1; i < maxHours; i++) {
+//    // Add whole hours
+//    timeSlots.push(i + " hour" + (i > 1 ? "s" : ""));
+//    // Add half-hours (e.g., 1.30 hour)
+//    timeSlots.push(i + ".30 hour" + (i > 1 ? "s" : ""));
+//  }
+
+//  // Add "24 hours" explicitly
+//  timeSlots.push("24 hours");
+
+//  return timeSlots;
+//}
+//function generateTimeSlots() {
+//  var timeSlots = [];
+//  var maxHours = 24;
+
+//  for (var i = 1; i <= maxHours; i++) {
+//    // Add whole hours
+//    timeSlots.push({ value: i, text: i + " hour" + (i > 1 ? "s" : "") });
+//    // Add half-hours (e.g., 1.5 hours)
+//    if (i < maxHours) {
+//      timeSlots.push({ value: i + 0.30, text: i + ".30 hours" });
+//    }
+//  }
+
+//  return timeSlots;
+//}
+
+//function populateDropdown() {
+//  var dropdown = document.getElementById("totalHoursDropdown");
+//  var timeSlots = generateTimeSlots();
+
+//  // Clear existing options (if any)
+//  dropdown.innerHTML = '';
+
+//  // Add each time slot as an option to the dropdown
+//  timeSlots.forEach(function (timeSlot) {
+//    var option = document.createElement("option");
+//    option.value = timeSlot.value; // Numeric value for binding
+//    option.text = timeSlot.text;   // Display text
+//    dropdown.appendChild(option);
+//  });
+//}
+//function generateTimeSlots() {
+//  var timeSlots = [];
+//  var maxHours = 24;
+//  debugger;
+//  for (var i = 1; i <= maxHours; i++) {
+//    // Add whole hours
+//    timeSlots.push({ value: i, text: i + " hour" + (i > 1 ? "s" : "") });
+//    // Add half-hour slots (e.g., 1.30 hours, 2.30 hours)
+//    if (i < maxHours) {
+//      timeSlots.push({ value: i + 0.30, text: i + ".30 hours" });
+//    }
+//  }
+
+//  return timeSlots;
+//}
+
+//function populateDropdown() {
+//  var dropdown = document.getElementById("totalHoursDropdown");
+//  var timeSlots = generateTimeSlots();
+
+//  // Clear existing options (if any)
+//  dropdown.innerHTML = '';
+
+//  // Add each time slot as an option to the dropdown
+//  timeSlots.forEach(function (timeSlot) {
+//    var option = document.createElement("option");
+//    option.value = timeSlot.value; // Numeric value for binding
+//    option.text = timeSlot.text;   // Display text (e.g., "1.30 hours")
+//    dropdown.appendChild(option);
+//  });
+//}
+//function generateTimeSlots() {
+//  var timeSlots = [];
+//  var maxHours = 24;
+//  debugger;
+//  for (var i = 1; i <= maxHours; i++) {
+//    // Add whole hours
+//    timeSlots.push({
+//      value: i.toFixed(2), // Format value to two decimal places
+//      text: i + " hour" + (i > 1 ? "s" : "")
+//    });
+//    // Add half-hour slots (e.g., 1.30 hours, 2.30 hours)
+//    if (i < maxHours) {
+//      timeSlots.push({
+//        value: (i + 0.30).toFixed(2), // Format value to two decimal places
+//        text: i + ".30 hours"
+//      });
+//    }
+//  }
+
+//  return timeSlots;
+//}
+//function populateDropdown(selectedValue) {
+//  debugger;
+//  var dropdown = document.getElementById("totalHoursDropdown");
+//  var timeSlots = generateTimeSlots();
+
+//  dropdown.innerHTML = ''; // Clear existing options
+
+//  timeSlots.forEach(function (timeSlot) {
+//    var option = document.createElement("option");
+//    option.value = timeSlot.value; // Numeric value formatted as a string
+//    option.text = timeSlot.text;   // Display text
+//    dropdown.appendChild(option);
+//  });
+
+//  // Set the selected value
+//  if (selectedValue) {
+//    dropdown.value = selectedValue;
+//  }
+//}
+function generateTimeSlots() {
+  var timeSlots = [];
+  var maxHours = 24;
+
+  for (var i = 1; i <= maxHours; i++) {
+    // Add whole hours
+    timeSlots.push({
+      value: i.toFixed(2), // Format value to two decimal places
+      text: i + " hour" + (i > 1 ? "s" : "")
+    });
+    // Add half-hour slots (e.g., 1.30 hours, 2.30 hours)
+    if (i < maxHours) {
+      timeSlots.push({
+        value: (i + 0.30).toFixed(2), // Format value to two decimal places
+        text: i + ".30 hours"
+      });
+    }
+  }
+
+  return timeSlots;
+}
+
+function populateDropdown(selectedValue) {
+  var dropdown = document.getElementById("totalHoursDropdown");
+  var timeSlots = generateTimeSlots();
+
+  dropdown.innerHTML = ''; // Clear existing options
+
+  timeSlots.forEach(function (timeSlot) {
+    var option = document.createElement("option");
+    option.value = timeSlot.value; // Numeric value formatted as a string
+    option.text = timeSlot.text;   // Display text
+    dropdown.appendChild(option);
+  });
+
+  // Ensure selectedValue is in the correct format
+  if (selectedValue) {
+    dropdown.value = selectedValue.toFixed(2); // Format selectedValue to match options
+  }
+}
+//function populateDropdown() {
+//  var dropdown = document.getElementById("totalHoursDropdown");
+//  var timeSlots = generateTimeSlots();
+
+//  // Clear existing options (if any)
+//  dropdown.innerHTML = '';
+
+//  // Add each time slot as an option to the dropdown
+//  timeSlots.forEach(function (timeSlot) {
+//    var option = document.createElement("option");
+//    option.value = timeSlot.value; // Numeric value formatted as a string
+//    option.text = timeSlot.text;   // Display text (e.g., "1.30 hours")
+//    dropdown.appendChild(option);
+//  });
+//}
+/////////////////////////
+// Function to populate the dropdown
+//function populateDropdown() {
+//  var dropdown = document.getElementById("totalHoursDropdown");
+//  var timeSlots = generateTimeSlots();
+
+//  // Clear existing options (if any)
+//  dropdown.innerHTML = '';
+
+//  // Add each time slot as an option to the dropdown
+//  timeSlots.forEach(function (timeSlot) {
+//    var option = document.createElement("option");
+//    option.value = timeSlot;
+//    option.text = timeSlot;
+//    dropdown.appendChild(option);
+//  });
+//}
+
+//
+
+
+
+///
+// Function to generate time slots with 30-minute intervals in the format "X hours" or "X.Y hours"
+//Format should be like 1 , 1.5 till 24
+//function generateTimeSlots() {
+//  var timeSlots = [];
+//  var maxHours = 24;
+
+//  for (var i = 1; i <= maxHours; i++) {
+//    // Add whole hours
+//    timeSlots.push(i + " hour" + (i > 1 ? "s" : ""));
+//    // Add half-hours (e.g., 1.5 hours)
+//    if (i < maxHours) {
+//      timeSlots.push(i + 0.5 + " hours");
+//    }
+//  }
+
+//  return timeSlots;
+//}
+
+//// Function to populate the dropdown
+//function populateDropdown() {
+//  var dropdown = document.getElementById("totalHoursDropdown");
+//  var timeSlots = generateTimeSlots();
+
+//  // Clear existing options (if any)
+//  dropdown.innerHTML = '';
+
+//  // Add each time slot as an option to the dropdown
+//  timeSlots.forEach(function (timeSlot) {
+//    var option = document.createElement("option");
+//    option.value = timeSlot;
+//    option.text = timeSlot;
+//    dropdown.appendChild(option);
+//  });
+//}
+
+// Function to populate the dropdown
+//function populateDropdown() {
+//  var dropdown = document.getElementById("totalHoursDropdown");
+//  var timeSlots = generateTimeSlots();
+
+//  // Clear existing options (if any)
+//  dropdown.innerHTML = '';
+
+//  // Add each time slot as an option to the dropdown
+//  timeSlots.forEach(function (timeSlot) {
+//    var option = document.createElement("option");
+//    option.value = timeSlot;
+//    option.text = timeSlot;
+//    dropdown.appendChild(option);
+//  });
+//}
+////

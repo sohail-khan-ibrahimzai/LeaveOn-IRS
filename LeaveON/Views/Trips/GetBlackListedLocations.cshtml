@@ -32,6 +32,68 @@
     border-radius: 0.25rem;
     font-weight: 500;
   }
+
+  .scrollable-container {
+    height: 23px;
+    overflow-y: scroll;
+    position: absolute;
+    max-width: 122px;
+    /* Hide scrollbar for Webkit browsers */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+  }
+
+    .scrollable-container::-webkit-scrollbar {
+      display: none; /* Hides the scrollbar for Webkit browsers (Chrome, Safari) */
+    }
+
+  .scrollable-container {
+    -ms-overflow-style: none; /* Hides scrollbar for Internet Explorer and Edge */
+    scrollbar-width: none; /* Hides scrollbar for Firefox */
+  }
+
+  .badge-custom-danger-td {
+    background-color: #f8d7da !important;
+    color: #6c757d !important;
+  }
+
+  .blacklist-icon {
+    position: relative;
+    cursor: pointer;
+    color: #dc3545; /* Red color for the warning icon */
+  }
+
+    /* Tooltip styling */
+    .blacklist-icon::after {
+      content: attr(data-tooltip); /* Tooltip content */
+      position: absolute;
+      bottom: 100%; /* Position above the icon */
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #333;
+      color: #fff;
+      padding: 5px;
+      border-radius: 5px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      font-size: 12px;
+      z-index: 1;
+      max-width: 200px; /* Limit the width of the tooltip */
+    }
+
+    /* Show tooltip on hover */
+    .blacklist-icon:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Adjust tooltip position if it overflows */
+    .blacklist-icon::after {
+      right: 0; /* Align tooltip to the right edge of the parent */
+      left: auto; /* Remove left alignment */
+      transform: none; /* Remove horizontal translation */
+    }
 </style>
 <div id="NewData">
   <section class="content">
@@ -39,13 +101,6 @@
       <div class="col-12">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">
-              Black Listed Locations
-              @*@if (User.IsInRole("Admin") || User.IsInRole("Manager"))
-              {
-                @Html.ActionLink("Add New", "Create", new object { }, new { @class = "btn btn-warning" })
-              }*@
-            </h3>
           </div>
           <div class="card-body">
             <div id="tripData_wrapper" class="dataTables_wrapper dt-bootstrap4">
@@ -56,77 +111,51 @@
               </div>
               <div class="row">
                 <div class="col-sm-12">
-                  @*<table id="items" class="table table-bordered table-hover dataTable dtr-inline" role="grid" aria-describedby="example2_info">*@
-                  <table id="blacListedLocationsTable" class="display" style="width:100%">
+                  <table id="blacklistedTripTable" class="display" style="width:100%">
                     <thead>
                       <tr>
-                        <th>
-                          Cost
+                        <th style="display:none;">
+
                         </th>
-                        <th>
-                          Driver Name
+                        <th style="width:auto;">
+                          Location
                         </th>
-                        <th>
-                          Passenger Name
-                        </th>
-                        <th>
-                          Trip Start Date Time
-                        </th>
-                        <th>
-                          Trip End Date Time
-                        </th>
-                        <th>
-                          Status
-                        </th>
-                        @*<th>Actions</th>*@
+                        <th style="width:auto;">
+                          Blacklist Date
+                        </th> 
+                        <th style="width:auto;">
+                          Client Name
+                        </th> 
+                        <th style="width:auto;">
+                          Balcklist Reason
+                        </th> 
+                        <th style="width:auto;">
+                          Client Number
+                        </th> 
                       </tr>
                     </thead>
                     @foreach (var item in Model)
                     {
-                      <tr>
-                        <td>
-                          @Html.DisplayFor(modelItem => item.Cost)
+                      var rowClass = item.IsBlackListed == true ? "badge-custom-danger-td" : "";
+                      <tr class="@rowClass">
+                        <td style="display:none">
+                          @Html.DisplayFor(modelItem => item.Id)
                         </td>
-                        <td>
-                          @Html.DisplayFor(modelItem => item.Driver.Name)
+                        <td style="width:auto;">
+                          @Html.DisplayFor(modelItem => item.Place.Name)
                         </td>
+                        <td style="width:auto;">
+                          @(item.DateBlackList.HasValue ? item.DateBlackList.Value.ToString("dd/MM/yyyy") : "")
+                        </td>  
                         <td>
                           @Html.DisplayFor(modelItem => item.Passenger.Name)
                         </td>
-                        <td>
-                          @(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("dd/MM/yyyy HH-mm") : "")
+                        <td class="scrollable-container" style="width:auto;">
+                          @Html.Raw(item.Remarks)
                         </td>
                         <td>
-                          @(item.EndDateTime.HasValue ? item.EndDateTime.Value.ToString("dd/MM/yyyy HH-mm") : "")
+                          @Html.DisplayFor(modelItem => item.Passenger.PhoneNumber)
                         </td>
-                        <td>
-                          @if (item.Status == "Success(Not Paid)")
-                          {
-                            <span class="badge-custom-danger">Success Not Paid</span>
-                          }
-                          else if (item.Status == "Cancel")
-                          {
-                            <span class="badge-custom-secondary">Cancelled</span>
-                          }
-                        </td>
-                        @*<td>
-                          @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
-                          {
-
-                            @Html.ActionLink("Update", "Edit", new { id = item.Id }, new { @class = "btn btn-info" })
-                          }
-                          else
-                          {
-                            @Html.ActionLink("View", "Edit", new { id = item.Id }, new { @class = "btn btn-info" })
-                          }
-
-
-                          @if (User.IsInRole("Admin"))
-                          {
-                            @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-danger" })
-
-                          }
-                        </td>*@
                       </tr>
                     }
                   </table>
@@ -153,9 +182,94 @@
 
 <script type="text/javascript">
   $(document).ready(function () {
-    $('#blacListedLocationsTable').DataTable({
+    //Current Date with Current Time
+    //function getCurrentDayAndDate() {
+    //  var now = new Date();
+    //  var options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    //  return now.toLocaleDateString('en-US', options);
+    //}
+
+    //$('#tripTable').DataTable({
+    //  //  "paging": false,
+    //  //  "lengthChange": false,
+    //  //  "pageLength": 100,
+    //  //  "searching": false,
+    //  //  "ordering": true,
+    //  //  "info": false,
+    //  //  "autoWidth": true,
+    //  //  "responsive": true,
+    //  //  "order": [[0, "asc"]]//,
+    //  //  //dom: 'Bfrtip',
+    //  //  //buttons: [
+    //  //  //  'copy', 'csv', 'excel', 'pdf', 'print'
+    //  //  //]
+
+    //  //});
+    //  "paging": true,
+    //  "lengthChange": true,
+    //  "pageLength": 100,
+    //  "searching": true,
+    //  "ordering": true,
+    //  "info": true,
+    //  rowReorder: {
+    //    selector: 'td:nth-child(2)'
+    //  },
+    //  "responsive": true,
+    //  "autoWidth": false,
+    //  "language": {
+    //    "emptyTable": "No data available for selected date. Please change date."
+    //  },
+    //  "order": [[0, "desc"]],
+    //  //Add lengthChange label below of the table...
+    //  /* "dom": '<"top"f>rt<"bottom"lp><"clear">',*/
+
+    //  // Add custom date/day container before search input
+    //  "dom": '<"top"<"left-info"><"right"f>>rt<"bottom"lp><"clear">',
+
+    //  //Add space between table and length/pagination controls
+    //  "createdRow": function () {
+    //    $('<style>.dataTables_wrapper .bottom { margin-top: 15px; }</style>').appendTo('head');
+    //  }
+    //  //dom: 'Bfrtip',
+    //  //buttons: [
+    //  //  {
+    //  //    extend: 'copyHtml5',
+    //  //    exportOptions: {
+    //  //      columns: [0, 1, 2, 3, 4, 5, 6]
+    //  //    }
+    //  //  },
+    //  //  {
+    //  //    extend: 'csvHtml5',
+    //  //    exportOptions: {
+    //  //      columns: [0, 1, 2, 3, 4, 5, 6]
+    //  //    }
+    //  //  },
+    //  //  {
+    //  //    extend: 'excelHtml5',
+    //  //    exportOptions: {
+    //  //      columns: [0, 1, 2, 3, 4, 5, 6]
+    //  //    }
+    //  //  },
+    //  //  {
+    //  //    extend: 'pdfHtml5',
+    //  //    orientation: 'landscape',
+    //  //    pageSize: 'LEGAL',
+    //  //    exportOptions: {
+    //  //      columns: [0, 1, 2, 3, 4, 5, 6]
+    //  //    }
+    //  //  },
+    //  //  {
+    //  //    extend: 'print',
+    //  //    exportOptions: {
+    //  //      columns: [0, 1, 2, 3, 4, 5, 6]
+    //  //    }
+    //  //  },
+    //  //  'colvis'
+    //  //]
+    //});
+    $('#blacklistedTripTable').DataTable({
       "paging": true,
-      "lengthChange": true,
+      "lengthChange": true, // length change dropdown will be below the table
       "pageLength": 100,
       "searching": true,
       "ordering": true,
@@ -169,43 +283,75 @@
         "emptyTable": "No data available for selected date. Please change date."
       },
       "order": [[0, "desc"]],
-      dom: 'Bfrtip',
-      buttons: [
-        {
-          extend: 'copyHtml5',
-          exportOptions: {
-            columns: [0, 1, 2, 3, 4, 5, 6]
-          }
-        },
-        {
-          extend: 'csvHtml5',
-          exportOptions: {
-            columns: [0, 1, 2, 3, 4, 5, 6]
-          }
-        },
-        {
-          extend: 'excelHtml5',
-          exportOptions: {
-            columns: [0, 1, 2, 3, 4, 5, 6]
-          }
-        },
-        {
-          extend: 'pdfHtml5',
-          orientation: 'landscape',
-          pageSize: 'LEGAL',
-          exportOptions: {
-            columns: [0, 1, 2, 3, 4, 5, 6]
-          }
-        },
-        {
-          extend: 'print',
-          exportOptions: {
-            columns: [0, 1, 2, 3, 4, 5, 6]
-          }
-        },
-        'colvis'
-      ]
 
     });
+
   });
+
+  function updateSelectBackground(selectElement) {
+    const value = selectElement.value;
+    switch (value) {
+      case "Success(Not Paid)":
+        selectElement.style.backgroundColor = "#f8d7da"; // Light red
+        selectElement.style.color = "#721c24"; // Dark red
+        break;
+      case "Success":
+        selectElement.style.backgroundColor = "#d4edda"; // Light green
+        selectElement.style.color = "#155724"; // Dark green
+        break;
+      case "In Progress":
+        selectElement.style.backgroundColor = "#fff3cd"; // Light yellow
+        selectElement.style.color = "#856404"; // Dark yellow
+        break;
+      case "Cancel":
+        selectElement.style.backgroundColor = "#7ba5f7"; // Light gray
+        selectElement.style.color = "#eaeef5"; // Dark gray
+        break;
+      default:
+        selectElement.style.backgroundColor = ""; // Default background
+        selectElement.style.color = ""; // Default text color
+        break;
+    }
+  }
+
+  // Initialize background color on page load
+  document.addEventListener("DOMContentLoaded", function () {
+    const selectElements = document.querySelectorAll(".status-select");
+    selectElements.forEach(function (selectElement) {
+      updateSelectBackground(selectElement);
+
+      selectElement.addEventListener("change", function () {
+        updateSelectBackground(selectElement);
+      });
+    });
+  });
+  function handleStatusChange(itemId, selectedStatus) {
+    // Logging the values for demonstration
+    console.log("Item ID:", itemId);
+    console.log("Selected Status:", selectedStatus);
+
+    // You can now use these values to perform actions such as:
+    // - Sending an AJAX request to update the status in the database
+    // - Displaying a confirmation message
+    // - Updating other UI elements
+    // Example AJAX call (replace with your actual API endpoint and logic):
+
+    $.ajax({
+      url: '/Trips/UpdateStatus/',
+      method: 'POST',
+      data: {
+        id: itemId,
+        status: selectedStatus
+      },
+      success: function (response) {
+        console.log('Status updated successfully:', response);
+        location.reload();
+        // Optionally, update the UI or provide feedback to the user
+      },
+      error: function (xhr, status, error) {
+        console.error('Error updating status:', error);
+      }
+    });
+
+  }
 </script>

@@ -88,13 +88,18 @@ namespace LeaveON.Controllers
     // GET: Locations/Edit/5
     public async Task<ActionResult> Edit(int? id)
     {
-      if (id == null)
-      {
-        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-      }
+      //if (id == null)
+      //{
+      //  return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+      //}
       Place place = await db.Places.FindAsync(id);
+      //if (place == null)
+      //  return HttpNotFound();
       if (place == null)
-        return HttpNotFound();
+      {
+        ModelState.AddModelError("", "Place not found."); // Add error message without key
+        return View(); // Return the view with the error
+      }
       var editPlaceDto = new CreatePlaceDto
       {
         Id = place.Id,

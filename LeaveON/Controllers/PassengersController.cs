@@ -105,13 +105,18 @@ namespace LeaveON.Controllers
     // GET: Passengers/Edit/5
     public async Task<ActionResult> Edit(int? id)
     {
-      if (id == null)
-      {
-        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-      }
+      //if (id == null)
+      //{
+      //  return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+      //}
       Passenger passenger = await db.Passengers.FindAsync(id);
+      //if (passenger == null)
+      //  return HttpNotFound();
       if (passenger == null)
-        return HttpNotFound();
+      {
+        ModelState.AddModelError("", "Passenger not found."); // Add error message without key
+        return View(); // Return the view with the error
+      }
       var editPassengerDto = new CreatePassengerDto
       {
         Id = passenger.Id,
