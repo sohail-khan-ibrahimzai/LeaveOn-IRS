@@ -2588,6 +2588,8 @@
     <Content Include="Views\Places\Edit.cshtml" />
     <Content Include="Views\Places\Index.cshtml" />
     <Content Include="Views\Trips\GetBlackListedLocations.cshtml" />
+    <Content Include="Views\Trips\WeeklyReports.cshtml" />
+    <Content Include="Views\Trips\_SelectedWeeklyTrips.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\SelectWeakListHtmlHelper\" />

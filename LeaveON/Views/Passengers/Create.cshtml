@@ -46,23 +46,33 @@
 
                 <div class="form-group">
                   <label>Name</label>
-                  @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control",@id="passengerName" } })
+                  @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control",@id="passengerName", @placeHolder = "Name" } })
                   @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
                 </div> 
                 <div class="form-group">
                   <label>Nick Name</label>
-                  @Html.EditorFor(model => model.NickName, new { htmlAttributes = new { @class = "form-control",@id="passengerName" } })
+                  @Html.EditorFor(model => model.NickName, new { htmlAttributes = new { @class = "form-control",@id="passengerNickName", @placeHolder = "Nick Name" } })
                   @Html.ValidationMessageFor(model => model.NickName, "", new { @class = "text-danger" })
                 </div> 
                 <div class="form-group">
                   <label>Phone Number</label>
-                  @Html.EditorFor(model => model.PhoneNumber, new { htmlAttributes = new { @class = "form-control",@id="passengerName" } })
+                  @Html.EditorFor(model => model.PhoneNumber, new { htmlAttributes = new { @class = "form-control",@id="passengerPhoneNumber", @placeHolder = "Phone Number" } })
                   @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger" })
                 </div> 
                 <div class="form-group">
                   <label>Pickup Address</label>
-                  @Html.EditorFor(model => model.PickupAddress, new { htmlAttributes = new { @class = "form-control",@id="passengerName" } })
+                  @Html.EditorFor(model => model.PickupAddress, new { htmlAttributes = new { @class = "form-control",@id="passengerPickupAddress", @placeHolder = "Address" } })
                   @Html.ValidationMessageFor(model => model.PickupAddress, "", new { @class = "text-danger" })
+                </div> 
+                <div class="form-group">
+                  <label>Deal</label>
+                  @Html.EditorFor(model => model.ManagerDeal, new { htmlAttributes = new { @class = "form-control",@id="managerDeal", @placeHolder = "Deal" } })
+                  @Html.ValidationMessageFor(model => model.ManagerDeal, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-group">
+                  <label>Manager Comission</label>
+                  @Html.EditorFor(model => model.ManagerComission, new { htmlAttributes = new { @class = "form-control",@id= "managerComission", @placeHolder = "Manager Comission" } })
+                  @Html.ValidationMessageFor(model => model.ManagerComission, "", new { @class = "text-danger" })
                 </div>
               </div>
 

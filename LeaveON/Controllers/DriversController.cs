@@ -75,7 +75,7 @@ namespace LeaveON.Controllers
     // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Create([Bind(Include = "Id,Name,DateCreated,DateModified,Remarks")] CreateDriverDto createDriverDto)
+    public async Task<ActionResult> Create([Bind(Include = "Id,Name,DateCreated,DateModified,Remarks,CostPerHour")] CreateDriverDto createDriverDto)
     {
       //var userInfo = GetCurrentUserInfo();
       var currentUser = GetCurrentUserInfo();
@@ -96,6 +96,7 @@ namespace LeaveON.Controllers
             DateCreated = DateTime.Now,
             Name = createDriverDto.Name,
             Remarks = createDriverDto.Remarks,
+            CostPerHour=createDriverDto.CostPerHour,
             IsDeleted = false,
             CreatedBy = currentUser.UserId
           };
@@ -141,7 +142,7 @@ namespace LeaveON.Controllers
     // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Edit([Bind(Include = "Id,Name,DateCreated,DateModified,Remarks")] CreateDriverDto updateDiverDto)
+    public async Task<ActionResult> Edit([Bind(Include = "Id,Name,DateCreated,DateModified,Remarks,CostPerHour")] CreateDriverDto updateDiverDto)
     {
       var currentUser = GetCurrentUserInfo();
       if (ModelState.IsValid)
@@ -153,6 +154,7 @@ namespace LeaveON.Controllers
         //driver.IsDeleted = false;
         driver.Name = updateDiverDto.Name;
         driver.Remarks = updateDiverDto.Remarks;
+        driver.CostPerHour = updateDiverDto.CostPerHour;
         driver.UpdatedBy = currentUser.UserId;
         db.Entry(driver).State = EntityState.Modified;
         await db.SaveChangesAsync();

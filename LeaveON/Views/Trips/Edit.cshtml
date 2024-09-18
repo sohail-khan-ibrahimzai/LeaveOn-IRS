@@ -54,6 +54,7 @@
     border-radius: 0.25rem;
     font-weight: 500;
   }
+
   .custom-switch {
     display: flex;
     align-items: center;
@@ -158,18 +159,23 @@
                 <div class="form-group">
                   <label for="StartDateTime">Trip Start</label>
                   @Html.TextBoxFor(model => model.StartDateTime,
-                                                                                                                                       "{0:dd-MMM-yyyy hh:mm:ss tt}",
-                                                                                                                                       new { @class = "form-control from-date-picker", @id = "fromDateTime" })
+                                                                             "{0:hh:mm:ss tt}",
+                                                                             new { @class = "form-control from-date-picker", @id = "fromDateTime" })
                   @Html.ValidationMessageFor(model => model.StartDateTime, "", new { @class = "text-danger" })
+
+                  @*@Html.TextBoxFor(model => model.StartDateTime,
+                                                                                                                                         "{0:dd-MMM-yyyy hh:mm:ss tt}",
+                                                                                                                                         new { @class = "form-control from-date-picker", @id = "fromDateTime" })
+                    @Html.ValidationMessageFor(model => model.StartDateTime, "", new { @class = "text-danger" })*@
                 </div>
 
                 <div class="form-group" style="display:none;">
-                    <label for="EndDateTime">Trip Finish</label>
-                    @Html.TextBoxFor(model => model.EndDateTime,
-                                                                                                                               "{0:dd-MMM-yyyy hh:mm:ss tt}",
-                                                                                                                               new { @class = "form-control from-date-picker", @id = "toDateTime", @onchange = "handleDateTimeChange()" })
-                    @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
-                  </div>
+                  <label for="EndDateTime">Trip Finish</label>
+                  @Html.TextBoxFor(model => model.EndDateTime,
+                                                                                                                             "{0:dd-MMM-yyyy hh:mm:ss tt}",
+                                                                                                                             new { @class = "form-control from-date-picker", @id = "toDateTime", @onchange = "handleDateTimeChange()" })
+                  @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
+                </div>
 
                 <div class="form-group">
                   <label>Total Hours</label>
@@ -279,18 +285,7 @@
                       <label class="custom-control-label" for="isBlackListed">Blacklisted</label>
                     </div>
                   </div>*@
-              <div class="form-group">
-                <div class="d-flex align-items-center">
-                  <!-- Label on the left -->
-                  <label class="mr-2" for="isBlackListed">Blacklisted</label>
 
-                  <!-- Checkbox on the right -->
-                  <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input" id="isBlackListed" name="IsBlackListed" @(Model.IsBlackListed == true ? "checked" : "") />
-                    <label class="custom-control-label" for="isBlackListed"></label>
-                  </div>
-                </div>
-              </div>
                 @*<div class="form-group">
                     <label for="isBlackListed">Blacklisted</label>
                     <div class="custom-control custom-switch">
@@ -305,6 +300,28 @@
                 <div class="form-group">
                   <label for="remarks">Comment</label>
                   @Html.TextAreaFor(model => model.Remarks, new { @class = "form-control", @name = "Remarks", @id = "remarks", @placeholder = "Enter remarks here", rows = 10 })
+                </div>
+                <div class="form-group">
+                  <div class="d-flex align-items-center">
+                    <!-- Label on the left -->
+                    <label class="mr-2" for="isBlackListed">Blacklisted</label>
+
+                    <!-- Checkbox on the right -->
+                    <div class="custom-control custom-switch">
+                      <input type="checkbox" class="custom-control-input" id="isBlackListed" name="IsBlackListed" @(Model.IsBlackListed == true ? "checked" : "") />
+                      <label class="custom-control-label" for="isBlackListed" style="margin-top: -28px; margin-left: 28px;"></label>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group isHiddenBlackListedCntrls" style="display:none">
+                  <label for="floor">Floor</label>
+                  @Html.EditorFor(model => model.Floor, new { htmlAttributes = new { @class = "form-control", @placeholder = "Floor" } })
+                  @Html.ValidationMessageFor(model => model.Floor, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-group isHiddenBlackListedCntrls" style="display:none">
+                  <label for="bell">Bell</label>
+                  @Html.EditorFor(model => model.Bell, new { htmlAttributes = new { @class = "form-control", @placeholder = "Bell" } })
+                  @Html.ValidationMessageFor(model => model.Bell, "", new { @class = "text-danger" })
                 </div>
               </div>
             </div>

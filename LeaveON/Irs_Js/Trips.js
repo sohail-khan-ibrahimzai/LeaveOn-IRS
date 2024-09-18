@@ -36,19 +36,31 @@ $(document).ready(function () {
   //$('.passenger-dropdown').focus();
   $('.passenger-autocomplete').focus();
   $('.from-date-picker').datetimepicker({
-    dateFormat: "dd-M-yy",
     timeFormat: "hh:mm tt",
     showOn: "both",
-    timeInput: true,
-    stepHour: 1,
-    stepMinute: 5,
-    oneLine: true,
-    //changeMonth: true,
-    //changeYear: true,
+    showHour: true,
+    showMinute: true,
+    timeOnly: true, // Only time picker, no date
     controlType: 'select',
+    //stepHour: 1,
+    //stepMinute: 5,
+    oneLine: true,
     buttonImageOnly: true,
     buttonImage: "http://jqueryui.com/resources/demos/datepicker/images/calendar.gif",
-    buttonText: "Select date"
+    buttonText: "Select time",
+    //dateFormat: "dd-M-yy",
+    //timeFormat: "hh:mm tt",
+    //showOn: "both",
+    //timeInput: true,
+    //stepHour: 1,
+    //stepMinute: 5,
+    //oneLine: true,
+    ////changeMonth: true,
+    ////changeYear: true,
+    //controlType: 'select',
+    //buttonImageOnly: true,
+    //buttonImage: "http://jqueryui.com/resources/demos/datepicker/images/calendar.gif",
+    //buttonText: "Select date"
   });
   debugger;
   $('#autocompletePassengerId, #autocompletePlaceId,#autocompleteDriverId').on('keydown', function (event) {
@@ -69,13 +81,19 @@ $(document).ready(function () {
   console.log('Document ready');
   console.log('Available Passengers:', availablePassengers);
   var transformedPassengers = availablePassengers.map(function (passenger) {
+    debugger;
     return {
-      label: passenger.Text,  // Display this in the input field
-      value: passenger.Value  // Store this in the hidden input
+      label: passenger.Name,  // Display this in the input field
+      value: passenger.Id,  // Store this in the hidden input
+      managerDeal: passenger.ManagerDeal,  // Manager Deal
+      managerComission: passenger.ManagerComission,  // Manager Comission
+      //label: passenger.Text,  // Display this in the input field
+      //value: passenger.Value  // Store this in the hidden input
     };
   });
   $("#autocompletePassengerId").autocomplete({
     source: function (request, response) {
+      debugger;
       console.log('Autocomplete triggered with request:', request);
       response(transformedPassengers); // Use the transformed data
     },
@@ -85,6 +103,13 @@ $(document).ready(function () {
       return false; // Prevent default behavior of setting the value (ID) in the input
     },
     select: function (event, ui) {
+      debugger;
+      if (ui.item.managerDeal != null && ui.item.managerComission != null) {
+        $('#tripCost').val(ui.item.managerDeal);
+      }
+      else {
+        $('#tripCost').val('0');
+      }
       console.log('Selected item:', ui.item);
       $("#PassengerId").val(ui.item.value); // Store selected ID in hidden input
       $("#autocompletePassengerId").val(ui.item.label); // Display the label in the input field
@@ -332,18 +357,51 @@ $(document).ready(function () {
 
 
   //////////////////Edit case///////////////////////////////////
+  
   debugger
   const checkbox = document.getElementById('isBlackListed');
-  const isBlackListed = checkbox.checked;
-  // Set the value of the checkbox to be sent
-  checkbox.value = isBlackListed;
-  document.getElementById('isBlackListed').addEventListener('change', function () {
-    const checkbox = document.getElementById('isBlackListed');
+  if (checkbox != null) {
     const isBlackListed = checkbox.checked;
-    debugger;
     // Set the value of the checkbox to be sent
     checkbox.value = isBlackListed;
-  });
+
+    // Initial state - show or hide elements based on the initial checkbox state
+    const elements = document.getElementsByClassName('isHiddenBlackListedCntrls');
+    for (let i = 0; i < elements.length; i++) {
+      elements[i].style.display = isBlackListed ? 'block' : 'none';
+    }
+
+    document.getElementById('isBlackListed').addEventListener('change', function () {
+      const isBlackListed = checkbox.checked;
+      debugger; // Keeps your debugger line
+
+      // Toggle visibility of elements based on checkbox state
+      for (let i = 0; i < elements.length; i++) {
+        elements[i].style.display = isBlackListed ? 'block' : 'none';
+      }
+
+      // Set the value of the checkbox to be sent
+      checkbox.value = isBlackListed;
+    });
+  }
+  //const checkbox = document.getElementById('isBlackListed');
+  //if (checkbox!=null) {
+  //  const isBlackListed = checkbox.checked;
+  //  // Set the value of the checkbox to be sent
+  //  checkbox.value = isBlackListed;
+  //  document.getElementById('isBlackListed').addEventListener('change', function () {
+  //    const checkbox = document.getElementById('isBlackListed');
+  //    const isBlackListed = checkbox.checked;
+  //    debugger;
+  //    const elements = document.getElementsByClassName('isHiddenBlackListedCntrls');
+
+  //    for (let i = 0; i < elements.length; i++) {
+  //      elements[i].style.display = 'block';
+  //    }
+  //    // Set the value of the checkbox to be sent
+  //    checkbox.value = isBlackListed;
+  //  });
+  //}
   /////////////////////////////////////////////////////////////
  
 });

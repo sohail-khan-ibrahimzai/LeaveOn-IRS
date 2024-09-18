@@ -68,7 +68,7 @@ namespace LeaveON.Controllers
     // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Create([Bind(Include = "Id,Name,DateCreated,DateModified,Remarks,NickName,PhoneNumber,PickupAddress")] CreatePassengerDto createPassengerDto)
+    public async Task<ActionResult> Create([Bind(Include = "Id,Name,DateCreated,DateModified,Remarks,NickName,PhoneNumber,PickupAddress,ManagerDeal,ManagerComission")] CreatePassengerDto createPassengerDto)
     {
       var currentUser = GetCurrentUserInfo();
       if (ModelState.IsValid)
@@ -92,6 +92,8 @@ namespace LeaveON.Controllers
             NickName = createPassengerDto.NickName,
             PhoneNumber = createPassengerDto.PhoneNumber,
             PickupAddress = createPassengerDto.PickupAddress,
+            ManagerDeal = createPassengerDto.ManagerDeal,
+            ManagerComission = createPassengerDto.ManagerComission,
             CreatedBy = currentUser.UserId
           };
           db.Passengers.Add(passenger);
@@ -122,6 +124,8 @@ namespace LeaveON.Controllers
         Id = passenger.Id,
         Name = passenger.Name,
         Remarks = passenger.Remarks,
+        ManagerDeal = passenger.ManagerDeal.HasValue ? passenger.ManagerDeal.Value : 0,
+        ManagerComission = passenger.ManagerComission.HasValue ? passenger.ManagerComission.Value : 0  // Set default to 0.0M if null
       };
       return View(editPassengerDto);
     }
@@ -131,7 +135,7 @@ namespace LeaveON.Controllers
     // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Edit([Bind(Include = "Id,Name,DateCreated,DateModified,Remarks,NickName,PhoneNumber,PickupAddress")] CreatePassengerDto updatePassengerDto)
+    public async Task<ActionResult> Edit([Bind(Include = "Id,Name,DateCreated,DateModified,Remarks,NickName,PhoneNumber,PickupAddress,ManagerDeal,ManagerComission")] CreatePassengerDto updatePassengerDto)
     {
       var currentUser = GetCurrentUserInfo();
       if (ModelState.IsValid)
@@ -146,6 +150,8 @@ namespace LeaveON.Controllers
         passenger.NickName = updatePassengerDto.NickName;
         passenger.PhoneNumber = updatePassengerDto.PhoneNumber;
         passenger.PickupAddress = updatePassengerDto.PickupAddress;
+        passenger.ManagerDeal = updatePassengerDto.ManagerDeal;
+        passenger.ManagerComission = updatePassengerDto.ManagerComission;
         passenger.UpdateBy = currentUser.UserId;
         db.Entry(passenger).State = EntityState.Modified;
         await db.SaveChangesAsync();

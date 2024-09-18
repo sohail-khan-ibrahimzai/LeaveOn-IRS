@@ -166,8 +166,20 @@
                         <th style="width: 102px;">
                           Passenger
                         </th>
+                        <th style="width:auto;">
+                          Cost
+                        </th>
                         <th>
                           Driver
+                        </th>
+                        <th>
+                          Driver Profit
+                        </th>
+                        <th>
+                          Manager
+                        </th>
+                        <th>
+                          Manager Profit
                         </th>
                         <th style="width:auto;">
                           Location
@@ -175,9 +187,7 @@
                         <th>
                           Comments
                         </th>
-                        <th style="width:auto;">
-                          Cost
-                        </th>
+
                         <!--<th>-->
                         @*Trip End Date Time*@
                         <!--Trip Finish
@@ -209,7 +219,33 @@
                           @Html.DisplayFor(modelItem => item.Passenger.Name)
                         </td>
                         <td style="width:auto;">
+                          @Html.DisplayFor(modelItem => item.Cost)
+                        </td>
+                        <td style="width:auto;">
                           @Html.DisplayFor(modelItem => item.Driver.Name)
+                        </td>
+                        @{
+                          // Assuming ViewBag.TotalCostFromViewBag is a decimal
+                          decimal totalCost = ViewBag.TotalCostFromViewBag != null ? Convert.ToDecimal(ViewBag.TotalCostFromViewBag) : 0;
+                          // Handle nullable CostPerHour and ManagerComission using ?? to provide a default value of 0 if they are null
+                          decimal driverCostPerHour = item.Driver.CostPerHour ?? 0;   // If null, default to 0
+                          decimal managerComission = item.Passenger.ManagerComission ?? 0; // If null, default to 0
+                          // Calculate Driver's profit (CostPerHour is a percentage of total cost)
+                          decimal totalDriverProfit = (totalCost * driverCostPerHour) / 100m;
+                          // Calculate Manager's profit (ManagerComission is a percentage of total cost)
+                          decimal totalManagerProfit = (totalCost * managerComission) / 100m;
+                          // Format both profits to show two decimal places
+                          string formattedDriverProfit = totalDriverProfit.ToString("F2");
+                          string formattedManagerProfit = totalManagerProfit.ToString("F2");
+                        }
+                        <td style="width:auto;">
+                          @formattedDriverProfit
+                        </td>
+                        <td style="width:auto;">
+                          @Html.DisplayFor(modelItem => item.AspNetUser.Name)
+                        </td>
+                        <td style="width:auto;">
+                          @formattedManagerProfit
                         </td>
                         <td style="width:auto;">
                           @Html.DisplayFor(modelItem => item.Place.Name)
@@ -218,16 +254,6 @@
                           @Html.Raw(item.Remarks)
                           @*@Html.DisplayFor(modelItem => item.Remarks)*@
                         </td>
-                        <td style="width:auto;">
-                          @Html.DisplayFor(modelItem => item.Cost)
-                        </td>
-
-                        <!--<td>
-  @(item.EndDateTime.HasValue ? item.EndDateTime.Value.ToString("HH-mm-ss tt") : "")-->
-                        @*@(item.EndDateTime.HasValue ? item.EndDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss tt") : "")*@
-                        @*@(item.EndDateTime.HasValue ? item.EndDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss") : "")*@
-                        @*@Html.DisplayFor(modelItem => item.DateCreated != null ? item.DateCreated.ToString("dd/MM/yyyy") : "")*@
-                        <!--</td>-->
                         <td style="width:auto;">
                           <select class="form-control status-select" onchange="handleStatusChange(@item.Id, this.value)">
                             <option value="Success(Not Paid)" @(item.Status == "Success(Not Paid)" ? "selected" : "") class="badge-custom-danger">Success Not Paid</option>
@@ -263,31 +289,14 @@
                         }
                         else
                         {
-                          <!-- Add an empty <td> for rows that don't have the blacklist icon -->
                           <td></td>
                         }
                       </tr>
-                      @*if (item.Status == "Success(Not Paid)")
-                        {
-                          <tr>
-                            <td>
-                              <span class="blacklist-icon" data-tooltip="This location has been blacklisted">
-                                <i class="fas fa-exclamation-triangle"></i>
-                              </span>
-                            </td>
-                          </tr>
-                        }*@
-                      @* Conditionally render the warning sign below the row if the status is "Success(Not Paid)" *@
-                      <!--if (item.Status == "Success(Not Paid)")
-                      {
-                        <tr>
-                          <td colspan="9" class="text-warning">
-                            <i class="fas fa-exclamation-triangle"></i> This location has been blacklisted
-                          </td>
-                        </tr>
-                      }-->
                     }
                   </table>
+                  <div id="total-count-container" style="margin-top: 20px;">
+                    <p><b>Total Cost for the selected week: <span id="total-cost">0</span></b></p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -311,13 +320,7 @@
 
 <script type="text/javascript">
   $(document).ready(function () {
-    //Current Date with Current Time
-    //function getCurrentDayAndDate() {
-    //  var now = new Date();
-    //  var options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-    //  return now.toLocaleDateString('en-US', options);
-    //}
-
+    var totalCostFromViewBag = @Html.Raw(ViewBag.TotalCostFromViewBag ?? "0");
     //Current Date with fix time
     function getCurrentDayAndDate() {
       var now = new Date();
@@ -326,84 +329,6 @@
       //return dateString + ", 08:00 AM";  // Fixed time as 08:00 AM
       return dateString;
     }
-    //$('#tripTable').DataTable({
-    //  //  "paging": false,
-    //  //  "lengthChange": false,
-    //  //  "pageLength": 100,
-    //  //  "searching": false,
-    //  //  "ordering": true,
-    //  //  "info": false,
-    //  //  "autoWidth": true,
-    //  //  "responsive": true,
-    //  //  "order": [[0, "asc"]]//,
-    //  //  //dom: 'Bfrtip',
-    //  //  //buttons: [
-    //  //  //  'copy', 'csv', 'excel', 'pdf', 'print'
-    //  //  //]
-
-    //  //});
-    //  "paging": true,
-    //  "lengthChange": true,
-    //  "pageLength": 100,
-    //  "searching": true,
-    //  "ordering": true,
-    //  "info": true,
-    //  rowReorder: {
-    //    selector: 'td:nth-child(2)'
-    //  },
-    //  "responsive": true,
-    //  "autoWidth": false,
-    //  "language": {
-    //    "emptyTable": "No data available for selected date. Please change date."
-    //  },
-    //  "order": [[0, "desc"]],
-    //  //Add lengthChange label below of the table...
-    //  /* "dom": '<"top"f>rt<"bottom"lp><"clear">',*/
-
-    //  // Add custom date/day container before search input
-    //  "dom": '<"top"<"left-info"><"right"f>>rt<"bottom"lp><"clear">',
-
-    //  //Add space between table and length/pagination controls
-    //  "createdRow": function () {
-    //    $('<style>.dataTables_wrapper .bottom { margin-top: 15px; }</style>').appendTo('head');
-    //  }
-    //  //dom: 'Bfrtip',
-    //  //buttons: [
-    //  //  {
-    //  //    extend: 'copyHtml5',
-    //  //    exportOptions: {
-    //  //      columns: [0, 1, 2, 3, 4, 5, 6]
-    //  //    }
-    //  //  },
-    //  //  {
-    //  //    extend: 'csvHtml5',
-    //  //    exportOptions: {
-    //  //      columns: [0, 1, 2, 3, 4, 5, 6]
-    //  //    }
-    //  //  },
-    //  //  {
-    //  //    extend: 'excelHtml5',
-    //  //    exportOptions: {
-    //  //      columns: [0, 1, 2, 3, 4, 5, 6]
-    //  //    }
-    //  //  },
-    //  //  {
-    //  //    extend: 'pdfHtml5',
-    //  //    orientation: 'landscape',
-    //  //    pageSize: 'LEGAL',
-    //  //    exportOptions: {
-    //  //      columns: [0, 1, 2, 3, 4, 5, 6]
-    //  //    }
-    //  //  },
-    //  //  {
-    //  //    extend: 'print',
-    //  //    exportOptions: {
-    //  //      columns: [0, 1, 2, 3, 4, 5, 6]
-    //  //    }
-    //  //  },
-    //  //  'colvis'
-    //  //]
-    //});
     $('#tripTable').DataTable({
       "paging": true,
       "lengthChange": true, // length change dropdown will be below the table
@@ -420,22 +345,18 @@
         "emptyTable": "No data available for selected date. Please change date."
       },
       "order": [[0, "desc"]],
-
-      // Add custom date/day container, buttons under date, and length change under the table
-      "dom": '<"top"<"left-info"><"right"f>>' + // Date on the left and search on the right
-        '<"button-row"B>rt<"bottom"lp><"clear">',  // Buttons right below date/time, table, then lengthChange at bottom
-
+      dom: 'Bfrtip',
       buttons: [
         {
           extend: 'csvHtml5',
           exportOptions: {
-            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
           }
         },
         {
           extend: 'excelHtml5',
           exportOptions: {
-            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
           }
         },
         {
@@ -443,34 +364,23 @@
           orientation: 'landscape',
           pageSize: 'LEGAL',
           exportOptions: {
-            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
           }
         },
         {
           extend: 'print',
           exportOptions: {
-            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,]
+            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
           }
         }
       ],
-
-      // Add space between table and length/pagination controls
-      "createdRow": function () {
-        $('<style>.dataTables_wrapper .bottom { margin-top: 15px; }</style>').appendTo('head');
+      "drawCallback": function (settings) {
+        debugger;
+        var totalCost = 0;
+        totalCost += parseFloat(totalCostFromViewBag);
+        $('#total-cost').text(totalCost.toFixed(2));
       }
     });
-
-    // Inject the current day name and date-time into the .left-info div
-    $('.left-info').html('<div style="font-weight: bold;"> WORKING DAY: ' + getCurrentDayAndDate() + '</div>');
-
-    // Custom CSS for layout adjustments
-    $('<style>.dataTables_wrapper .top { display: flex; justify-content: space-between; align-items: center; } ' +
-      '.dataTables_wrapper .left-info { margin-right: auto; padding-left: 15px; } ' +
-      '.dataTables_wrapper .right { margin-left: auto; } ' +
-      '.dataTables_wrapper .button-row { margin-top: 10px; text-align: left; padding-left: 15px; } ' +  // Space for buttons below date/time
-      '.dataTables_wrapper .bottom { margin-top: 15px; }' + // Space for length/pagination controls below the table
-      '</style>').appendTo('head');
-
   });
 
   function updateSelectBackground(selectElement) {

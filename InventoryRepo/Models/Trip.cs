@@ -31,6 +31,8 @@ namespace InventoryRepo.Models
         public Nullable<decimal> TotalHours { get; set; }
         public bool IsBlackListed { get; set; }
         public Nullable<System.DateTime> DateBlackList { get; set; }
+        public string Floor { get; set; }
+        public string Bell { get; set; }
     
         public virtual Driver Driver { get; set; }
         public virtual Passenger Passenger { get; set; }

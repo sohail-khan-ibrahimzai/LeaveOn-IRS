@@ -200,8 +200,11 @@
                 <div class="form-group">
                   @*<label for="StartDateTime">Start Date Time</label>*@
                   <label for="StartDateTime">Trip Start</label>
-                  @Html.TextBoxFor(model => model.StartDateTime,
+                  @*@Html.TextBoxFor(model => model.StartDateTime,
                                                                                                "{0:dd-MMM-yyyy hh:mm:ss tt}",
+                                                                                               new { @class = "form-control from-date-picker", @id = "fromDateTime" })*@ 
+                  @Html.TextBoxFor(model => model.StartDateTime,
+                                                                                               "{0:hh:mm:ss tt}",
                                                                                                new { @class = "form-control from-date-picker", @id = "fromDateTime" })
                   @Html.ValidationMessageFor(model => model.StartDateTime, "", new { @class = "text-danger" })
                 </div>
@@ -291,7 +294,7 @@
 
                 <div class="form-group">
                   @Html.LabelFor(model => model.Cost, htmlAttributes: new { @class = "" })
-                  @Html.EditorFor(model => model.Cost, new { htmlAttributes = new { @class = "form-control", @placeholder = "Cost" } })
+                  @Html.EditorFor(model => model.Cost, new { htmlAttributes = new { @class = "form-control", @id="tripCost", @placeholder = "Cost" } })
                   @Html.ValidationMessageFor(model => model.Cost, "", new { @class = "text-danger" })
                 </div>
 
@@ -340,6 +343,7 @@
   </div>
 </div>
 <script type="text/javascript">
+  debugger;
   // Pass ViewBag data to JavaScript
   var availableDrivers = @Html.Raw(Json.Encode(ViewBag.DriverId));
   var availablePlaces = @Html.Raw(Json.Encode(ViewBag.PlaceId));

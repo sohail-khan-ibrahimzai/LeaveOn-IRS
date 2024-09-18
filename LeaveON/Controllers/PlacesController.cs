@@ -55,7 +55,7 @@ namespace LeaveON.Controllers
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "Admin,Manager")]
-    public async Task<ActionResult> Create([Bind(Include = "Id,Name,Remarks,DateCreated,DateUpdated,Remarks")] CreatePlaceDto createPlaceDto)
+    public async Task<ActionResult> Create([Bind(Include = "Id,Name,Remarks,DateCreated,DateUpdated,Remarks,Address")] CreatePlaceDto createPlaceDto)
     {
       var currentUser = GetCurrentUserInfo();
       if (ModelState.IsValid)
@@ -74,6 +74,7 @@ namespace LeaveON.Controllers
           DateCreated = DateTime.Now,
           Name = createPlaceDto.Name,
           Remarks = createPlaceDto.Remarks,
+          Address = createPlaceDto.Address,
           IsDeleted = false,
           CreatedBy = currentUser.UserId
         };
@@ -115,7 +116,7 @@ namespace LeaveON.Controllers
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "Admin,Manager")]
-    public async Task<ActionResult> Edit([Bind(Include = "Id,Name,DateCreated,DateUpdated,Remarks")] CreatePlaceDto updatePlaceDto)
+    public async Task<ActionResult> Edit([Bind(Include = "Id,Name,DateCreated,DateUpdated,Remarks,Address")] CreatePlaceDto updatePlaceDto)
     {
       var currentUser = GetCurrentUserInfo();
       if (ModelState.IsValid)
@@ -126,6 +127,7 @@ namespace LeaveON.Controllers
         place.DateUpdated = DateTime.Now;
         place.Name = updatePlaceDto.Name;
         place.Remarks = updatePlaceDto.Remarks;
+        place.Address = updatePlaceDto.Address;
         place.UpdateBy = currentUser.UserId;
         db.Entry(place).State = EntityState.Modified;
         await db.SaveChangesAsync();
@@ -164,7 +166,8 @@ namespace LeaveON.Controllers
       }
       else
       {
-        db.Places.Remove(place);
+        place.IsDeleted = true;
+        //db.Places.Remove(place);
       }
       await db.SaveChangesAsync();
       return RedirectToAction("Index");
