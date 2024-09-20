@@ -301,6 +301,16 @@
     <Compile Include="Models\UserRoleModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
+    <Compile Include="Resources\ResourceEn.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ResourceEn.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\ResourceEr.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ResourceEr.resx</DependentUpon>
+    </Compile>
     <Compile Include="Results\ChallengeResult.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="UtilityClasses\LoginFilter.cs" />
@@ -534,6 +544,7 @@
     <Content Include="Global.asax" />
     <Content Include="Images\Ripple_1s_200px_Transparent.gif" />
     <Content Include="Images\Ripple_1s_200px_White.gif" />
+    <Content Include="Irs_Js\Shared.js" />
     <Content Include="Irs_Js\Trips.js" />
     <Content Include="Irs_Js\Places.js" />
     <Content Include="Irs_Js\Passengers.js" />
@@ -2624,6 +2635,14 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202011230802383_IsActive added and depId, CtryId nullable.resx">
       <DependentUpon>202011230802383_IsActive added and depId, CtryId nullable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\ResourceEn.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ResourceEn.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\ResourceEr.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ResourceEr.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
