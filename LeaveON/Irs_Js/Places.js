@@ -18,3 +18,16 @@ $(document).ready(function () {
     }
   });
 });
+//function manualTranslateInput(elementId) {
+//  var lang = $('html').attr('lang') || 'en'; // Get the current language
+//  var inputElement = document.getElementById(elementId);
+//  var originalText = inputElement.value;
+//  alert('Language:' + lang + 'Text: ' + originalText);
+//}
+function manualTranslateInput(elementId) {
+  var lang = $('html').attr('lang') || 'en'; // Get current language (default to 'en')
+  var inputElement = document.getElementById(elementId);
+  var originalText = inputElement.value;
+
+  alert('Language: ' + lang + ', Text: ' + originalText);
+}
