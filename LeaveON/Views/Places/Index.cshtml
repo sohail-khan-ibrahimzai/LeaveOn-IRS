@@ -4,6 +4,16 @@
   ViewBag.Title = "Index";
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+  .custom-switch {
+    display: flex;
+    align-items: center;
+  }
+
+    .custom-switch .custom-control-input {
+      margin-left: 10px; /* Adjust as needed */
+    }
+</style>
 <section class="content">
   <div class="row">
     <div class="col-12">
@@ -33,6 +43,9 @@
                       <th>
                         Name
                       </th>
+                      <th>
+                        Blacklisted
+                      </th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -41,6 +54,28 @@
                     <tr>
                       <td>
                         @Html.DisplayFor(modelItem => item.Name)
+                      </td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <!-- Checkbox on the right -->
+                          <div class="custom-control custom-switch">
+                            @*<input type="checkbox" class="custom-control-input" id="isBlackListed" name="IsBlackListed" @(item.IsBlackListed == true ? "checked" : "") />
+                              <label class="custom-control-label" for="isBlackListed" style="margin-top: -28px; margin-left: 28px;"></label>*@
+                            <input type="checkbox"
+                                   class="custom-control-input"
+                                   id="isEnabled_@item.Id"
+                                   name="IsEnabled_@item.Id"
+                                   @(item.IsBlackListed == true ? "checked" : "") />
+                            <label class="custom-control-label"
+                                   for="isEnabled_@item.Id"
+                                   style="margin-top: -28px; margin-left: 28px;">
+                            </label>
+                          </div>
+                        </div>                        @*<label class="switch">
+                            <input type="checkbox" @(item.IsBlackListed==true ? "checked" : "")>
+                            <span class="slider round"></span>
+                          </label>*@
+                        @*@Html.DisplayFor(modelItem => item.IsBlackListed)*@
                       </td>
                       <td>
                         @if (User.IsInRole("Admin") || User.IsInRole("Manager"))

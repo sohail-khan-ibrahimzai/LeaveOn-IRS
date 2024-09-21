@@ -30,6 +30,7 @@ namespace InventoryRepo.Models
         public string CreatedBy { get; set; }
         public string UpdatedBy { get; set; }
         public Nullable<decimal> CostPerHour { get; set; }
+        public Nullable<bool> IsFiveHoursPlusEnabled { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Trip> Trips { get; set; }

@@ -68,20 +68,21 @@ namespace LeaveON.Controllers
           // Add a model state error
           ModelState.AddModelError("Name", "Place already exists.");
         }
-        else { 
-        var place = new Place
+        else
         {
-          DateCreated = DateTime.Now,
-          Name = createPlaceDto.Name,
-          Remarks = createPlaceDto.Remarks,
-          Address = createPlaceDto.Address,
-          IsDeleted = false,
-          CreatedBy = currentUser.UserId
-        };
-        db.Places.Add(place);
-        await db.SaveChangesAsync();
-        return RedirectToAction("Index");
-      }
+          var place = new Place
+          {
+            DateCreated = DateTime.Now,
+            Name = createPlaceDto.Name,
+            Remarks = createPlaceDto.Remarks,
+            Address = createPlaceDto.Address,
+            IsDeleted = false,
+            CreatedBy = currentUser.UserId
+          };
+          db.Places.Add(place);
+          await db.SaveChangesAsync();
+          return RedirectToAction("Index");
+        }
       }
       return View(createPlaceDto);
     }
@@ -106,6 +107,10 @@ namespace LeaveON.Controllers
         Id = place.Id,
         Name = place.Name,
         Remarks = place.Remarks,
+        Address = place.Address,
+        Floor = place.Floor,
+        Bell = place.Bell,
+        IsBlackListed = place.IsBlackListed,
       };
       return View(editPlaceDto);
     }
@@ -116,21 +121,51 @@ namespace LeaveON.Controllers
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "Admin,Manager")]
-    public async Task<ActionResult> Edit([Bind(Include = "Id,Name,DateCreated,DateUpdated,Remarks,Address")] CreatePlaceDto updatePlaceDto)
+    public async Task<ActionResult> Edit([Bind(Include = "Id,Name,DateCreated,DateUpdated,Remarks,Address,IsBlackListed,Floor,Bell")] CreatePlaceDto updatePlaceDto)
     {
       var currentUser = GetCurrentUserInfo();
       if (ModelState.IsValid)
       {
         var place = await db.Places.FirstOrDefaultAsync(x => x.Id == updatePlaceDto.Id);
+        //if (updatePlaceDto.IsBlackListed == true && place.BlacklistedDate == null)
+        //{
+        //  place.IsBlackListed = updatePlaceDto.IsBlackListed ?? false;
+        //  place.BlacklistedDate = DateTime.UtcNow;
+        //}
         if (place == null)
           return HttpNotFound();
         place.DateUpdated = DateTime.Now;
         place.Name = updatePlaceDto.Name;
         place.Remarks = updatePlaceDto.Remarks;
         place.Address = updatePlaceDto.Address;
+        place.Floor = updatePlaceDto.Floor;
+        place.Bell = updatePlaceDto.Bell;
         place.UpdateBy = currentUser.UserId;
+        // Update Blacklist properties if needed
+        if (updatePlaceDto.IsBlackListed == true)
+        {
+          if (place.BlacklistedDate == null)
+          {
+            place.BlacklistedDate = DateTime.UtcNow;
+            place.IsBlackListed = true;
+          }
+
+          // Update trips associated with this place
+          var trips = await db.Trips.Where(t => t.PlaceId == place.Id).ToListAsync();
+          foreach (var trip in trips)
+          {
+            trip.IsBlackListed = true;
+            trip.DateBlackList = DateTime.UtcNow;
+          }
+        }
+
+        // Save changes to the place
         db.Entry(place).State = EntityState.Modified;
+
+        // Save changes to the trips if there are any updates
         await db.SaveChangesAsync();
+        //db.Entry(place).State = EntityState.Modified;
+        //await db.SaveChangesAsync();
       }
       return RedirectToAction("Index");
     }

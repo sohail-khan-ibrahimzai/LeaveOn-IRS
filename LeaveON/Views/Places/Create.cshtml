@@ -48,7 +48,7 @@
                 <div class="form-group">
                   <label>Name</label>
                   @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", @id = "placeName" } })
-                <button type="button" onclick="manualTranslateInput('placeName')">Translate</button>
+                @*<button type="button" onclick="manualTranslateInput('placeName')">Translate</button>*@
                   @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
                 </div>
 
@@ -63,7 +63,6 @@
                   @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control", @id = "placeAddress" } })
                   @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
                 </div>
-
                 <a href="#" id="openMapLink" target="_blank" class="btn btn-primary">Open in Google Maps</a>
               </div>
 

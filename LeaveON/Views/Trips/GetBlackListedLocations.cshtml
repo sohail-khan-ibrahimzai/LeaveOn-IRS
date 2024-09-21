@@ -192,10 +192,12 @@
                           @Html.DisplayFor(modelItem => item.Place.Address)
                         </td>
                         <td>
-                          @Html.DisplayFor(modelItem => item.Floor)
+                          @*@Html.DisplayFor(modelItem => item.Floor)*@
+                          @Html.DisplayFor(modelItem => item.Place.Floor)
                         </td>
                         <td>
-                          @Html.DisplayFor(modelItem => item.Bell)
+                          @Html.DisplayFor(modelItem => item.Place.Bell)
+                          @*@Html.DisplayFor(modelItem => item.Bell)*@
                         </td>
                       </tr>
                     }
@@ -349,7 +351,7 @@
       "order": [[0, "desc"]],
 
     });
-    $('#openAddressInGoogleMap').on('click', function () {
+    $('.openAddressInGoogleMaps').on('click', function () {
       // Get the address from the data attribute
       var address = $(this).data('address');
       $('#addressToOpen').text(address); // Set the address in the modal

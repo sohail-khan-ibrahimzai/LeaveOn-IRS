@@ -38,10 +38,14 @@
                   <thead>
                     <tr>
                       <th>
-
                         Name
+                      </th> 
+                      <th>
+                        Manager's Deal Cost/Hour
+                      </th> 
+                      <th>
+                        Manager Comission/Hour
                       </th>
-
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -50,6 +54,12 @@
                     <tr>
                       <td>
                         @Html.DisplayFor(modelItem => item.Name)
+                      </td>
+                      <td>
+                        @Html.DisplayFor(modelItem => item.ManagerDeal)
+                      </td> 
+                      <td>
+                        @Html.DisplayFor(modelItem => item.ManagerComission)
                       </td>
                       <td>
 

@@ -4,7 +4,16 @@
   ViewBag.Title = "Index";
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+  .custom-switch {
+    display: flex;
+    align-items: center;
+  }
 
+    .custom-switch .custom-control-input {
+      margin-left: 10px; /* Adjust as needed */
+    }
+</style>
 <section class="content">
   <div class="row">
     <div class="col-12">
@@ -38,10 +47,14 @@
                   <thead>
                     <tr>
                       <th>
-
                         Name
                       </th>
-
+                      <th>
+                        Cost/Hr
+                      </th>
+                      <th>
+                        Five Hours ++
+                      </th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -50,6 +63,27 @@
                     <tr>
                       <td>
                         @Html.DisplayFor(modelItem => item.Name)
+                      </td>
+                      <td>
+                        @Html.DisplayFor(modelItem => item.CostPerHour)
+                      </td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <!-- Checkbox on the right -->
+                          <div class="custom-control custom-switch">
+                            @*<input type="checkbox" class="custom-control-input" id="isFiveHoursPlusEnabled" name="IsFiveHoursPlusEnabled" @(item.IsFiveHoursPlusEnabled == true ? "checked" : "") />
+                              <label class="custom-control-label" for="isFiveHoursPlusEnabled" style="margin-top: -28px; margin-left: 28px;"></label>*@
+                            <input type="checkbox"
+                                   class="custom-control-input"
+                                   id="isEnabled_@item.Id"
+                                   name="IsEnabled_@item.Id"
+                                   @(item.IsFiveHoursPlusEnabled == true ? "checked" : "") />
+                            <label class="custom-control-label"
+                                   for="isEnabled_@item.Id"
+                                   style="margin-top: -28px; margin-left: 28px;">
+                            </label>
+                          </div>
+                        </div>
                       </td>
                       <td>
 

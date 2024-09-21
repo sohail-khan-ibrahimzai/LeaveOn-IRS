@@ -119,6 +119,11 @@
     border-radius: 0.25rem;
     font-weight: 500;
   }
+
+  .blacklisted-place {
+    background-color: #f8d7da; /* Light red background for blacklisted places */
+    color: #721c24; /* Dark red text for contrast */
+  }
 </style>
 <!-- Include Select2 CSS -->
 @*<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
@@ -137,9 +142,12 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
 
+<!--Blacklist popup-->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!--Blacklist popup-->
+
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.js"></script>
-
 <script src="~/Irs_Js/Trips.js"></script>
 
 <div class="container">
@@ -185,6 +193,13 @@
                     @Html.ValidationMessageFor(model => model.PlaceId, "", new { @class = "text-danger" })
                   </div>*@
 
+                @*<div class="form-group">
+                    <label for="lblAutocompletePlaceId">Place</label>
+                    <input type="text" name="PlaceName" id="autocompletePlaceId" placeholder="Find Places..." class="form-control place-autocomplete">
+                    <input type="hidden" id="PlaceId" name="PlaceId" value="" />
+                    @Html.ValidationMessageFor(model => model.PlaceName, "", new { @class = "text-danger" })
+                  </div>*@
+
                 <div class="form-group">
                   <label for="lblAutocompletePlaceId">Place</label>
                   <input type="text" name="PlaceName" id="autocompletePlaceId" placeholder="Find Places..." class="form-control place-autocomplete">
@@ -201,11 +216,11 @@
                   @*<label for="StartDateTime">Start Date Time</label>*@
                   <label for="StartDateTime">Trip Start</label>
                   @*@Html.TextBoxFor(model => model.StartDateTime,
-                                                                                               "{0:dd-MMM-yyyy hh:mm:ss tt}",
-                                                                                               new { @class = "form-control from-date-picker", @id = "fromDateTime" })*@ 
+                    "{0:dd-MMM-yyyy hh:mm:ss tt}",
+                    new { @class = "form-control from-date-picker", @id = "fromDateTime" })*@
                   @Html.TextBoxFor(model => model.StartDateTime,
-                                                                                               "{0:hh:mm:ss tt}",
-                                                                                               new { @class = "form-control from-date-picker", @id = "fromDateTime" })
+                                                                                                                                  "{0:hh:mm:ss tt}",
+                                                                                                                                  new { @class = "form-control from-date-picker", @id = "fromDateTime" })
                   @Html.ValidationMessageFor(model => model.StartDateTime, "", new { @class = "text-danger" })
                 </div>
 
@@ -213,8 +228,8 @@
                   @*<label for="EndDateTime">End Date Time</label>*@
                   <label for="EndDateTime">Trip Finish</label>
                   @Html.TextBoxFor(model => model.EndDateTime,
-                                                                                               "{0:dd-MMM-yyyy hh:mm:ss tt}",
-                                                                                               new { @class = "form-control from-date-picker", @id = "toDateTime", @onchange = "getAvailableDriversOnDateTimeChange()" })
+                                                                                                                                  "{0:dd-MMM-yyyy hh:mm:ss tt}",
+                                                                                                                                  new { @class = "form-control from-date-picker", @id = "toDateTime", @onchange = "getAvailableDriversOnDateTimeChange()" })
                   @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
                 </div>
 
@@ -294,7 +309,7 @@
 
                 <div class="form-group">
                   @Html.LabelFor(model => model.Cost, htmlAttributes: new { @class = "" })
-                  @Html.EditorFor(model => model.Cost, new { htmlAttributes = new { @class = "form-control", @id="tripCost", @placeholder = "Cost" } })
+                  @Html.EditorFor(model => model.Cost, new { htmlAttributes = new { @class = "form-control", @id = "tripCost", @placeholder = "Cost" } })
                   @Html.ValidationMessageFor(model => model.Cost, "", new { @class = "text-danger" })
                 </div>
 
@@ -342,6 +357,47 @@
     </div>
   </div>
 </div>
+<!-- Blacklist Warning Modal -->
+<!--<div class="modal fade" id="blacklistModal" tabindex="-1" role="dialog" aria-labelledby="blacklistModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="blacklistModalLabel">Warning: Blacklisted Place</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="blacklistMessage"></p>-->
+ <!-- This will hold the blacklist message -->
+<!--</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>-->
+<!-- Modal HTML -->
+<div class="modal fade" id="blacklistModal" tabindex="-1" role="dialog" aria-labelledby="blacklistModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="blacklistModalLabel">Warning: Blacklisted Place</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Textarea to be converted to Summernote -->
+        <textarea id="blacklistCommentEditor"></textarea> <!-- Summernote editor will go here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script type="text/javascript">
   debugger;
   // Pass ViewBag data to JavaScript

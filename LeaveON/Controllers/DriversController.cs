@@ -75,7 +75,7 @@ namespace LeaveON.Controllers
     // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Create([Bind(Include = "Id,Name,DateCreated,DateModified,Remarks,CostPerHour")] CreateDriverDto createDriverDto)
+    public async Task<ActionResult> Create([Bind(Include = "Id,Name,DateCreated,DateModified,Remarks,CostPerHour,IsFiveHoursPlusEnabled")] CreateDriverDto createDriverDto)
     {
       //var userInfo = GetCurrentUserInfo();
       var currentUser = GetCurrentUserInfo();
@@ -97,6 +97,7 @@ namespace LeaveON.Controllers
             Name = createDriverDto.Name,
             Remarks = createDriverDto.Remarks,
             CostPerHour=createDriverDto.CostPerHour,
+            IsFiveHoursPlusEnabled = createDriverDto.IsFiveHoursPlusEnabled,
             IsDeleted = false,
             CreatedBy = currentUser.UserId
           };
@@ -132,6 +133,7 @@ namespace LeaveON.Controllers
         Id = driver.Id,
         Name = driver.Name,
         Remarks = driver.Remarks,
+        IsFiveHoursPlusEnabled = driver.IsFiveHoursPlusEnabled,
       };
       
       return View(editDriverDto);
@@ -142,7 +144,7 @@ namespace LeaveON.Controllers
     // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Edit([Bind(Include = "Id,Name,DateCreated,DateModified,Remarks,CostPerHour")] CreateDriverDto updateDiverDto)
+    public async Task<ActionResult> Edit([Bind(Include = "Id,Name,DateCreated,DateModified,Remarks,CostPerHour,IsFiveHoursPlusEnabled")] CreateDriverDto updateDiverDto)
     {
       var currentUser = GetCurrentUserInfo();
       if (ModelState.IsValid)
@@ -155,6 +157,7 @@ namespace LeaveON.Controllers
         driver.Name = updateDiverDto.Name;
         driver.Remarks = updateDiverDto.Remarks;
         driver.CostPerHour = updateDiverDto.CostPerHour;
+        driver.IsFiveHoursPlusEnabled = updateDiverDto.IsFiveHoursPlusEnabled;
         driver.UpdatedBy = currentUser.UserId;
         db.Entry(driver).State = EntityState.Modified;
         await db.SaveChangesAsync();

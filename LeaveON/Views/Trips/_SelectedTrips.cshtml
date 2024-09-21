@@ -191,7 +191,8 @@
                     </thead>
                     @foreach (var item in Model)
                     {
-                      var rowClass = item.IsBlackListed == true ? "badge-custom-danger-td" : "";
+                      //var rowClass = item.IsBlackListed == true ? "badge-custom-danger-td" : "";
+                      var rowClass = item.Place.IsBlackListed == true ? "badge-custom-danger-td" : "";
                       <tr class="@rowClass">
                         <td style="display:none">
                           @Html.DisplayFor(modelItem => item.Id)
@@ -200,7 +201,7 @@
                           @Html.DisplayFor(modelItem => item.TotalHours)
                         </td>
                         <td>
-                          @(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("HH-mm-ss tt") : "")
+                          @(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("HH:mm:ss tt") : "")
                           @*@(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss tt") : "")*@
                           @*@(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss") : "")*@
                           @*@Html.DisplayFor(modelItem => item.DateCreated != null ? item.DateCreated.ToString("dd/MM/yyyy") : "")*@

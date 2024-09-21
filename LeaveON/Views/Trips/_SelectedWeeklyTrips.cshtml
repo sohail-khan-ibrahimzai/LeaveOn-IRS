@@ -210,7 +210,7 @@
                           @Html.DisplayFor(modelItem => item.TotalHours)
                         </td>
                         <td>
-                          @(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("HH-mm-ss tt") : "")
+                          @(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("HH:mm:ss tt") : "")
                           @*@(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss tt") : "")*@
                           @*@(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss") : "")*@
                           @*@Html.DisplayFor(modelItem => item.DateCreated != null ? item.DateCreated.ToString("dd/MM/yyyy") : "")*@

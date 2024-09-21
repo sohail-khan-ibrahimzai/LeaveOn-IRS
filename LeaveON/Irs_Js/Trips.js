@@ -2,7 +2,7 @@ $(document).ready(function () {
   debugger;
   getAvailableDriversOnDateTimeChange();
   populateDropdown(totalTripHours);
-  
+
   $('#remarks').summernote({
     height: 250,
     placeholder: "Comment",
@@ -148,39 +148,181 @@ $(document).ready(function () {
   //    }
   //  }
   //});
+  console.log('Document ready');
+  console.log('Available Places:', availablePlaces);
+
+  // Transform the available places data
   var transformedPlaces = availablePlaces.map(function (place) {
     return {
-      label: place.Text,  // Display this in the input field (the name)
-      value: place.Value  // Store this in the hidden input (the ID)
+      label: place.Name,
+      value: place.Id,
+      isBlacklistedPlace: place.IsBlacklistedPlace,  // include this custom property
+      commentReason: place.Comment  // include this custom property
     };
   });
-
+  // Initialize the autocomplete
   $("#autocompletePlaceId").autocomplete({
     source: function (request, response) {
-      console.log('Autocomplete triggered with request:', request);
-      response(transformedPlaces); // Use the transformed data
+      var results = $.ui.autocomplete.filter(transformedPlaces, request.term);
+      response(results);
     },
     focus: function (event, ui) {
-      // When navigating through the list with the arrow keys, show the label (name) in the input field
       $("#autocompletePlaceId").val(ui.item.label);
-      return false; // Prevent default behavior of setting the value to the input
+      return false;
     },
     select: function (event, ui) {
-      console.log('Selected item:', ui.item);
-      $("#PlaceId").val(ui.item.value); // Store selected ID in hidden input
-      $("#autocompletePlaceId").val(ui.item.label); // Display the label (name) in the input field
-      $("#placeNameContainer").hide(); // Hide the custom place name input
-      return false; // Prevent default behavior of setting the value to the input
-    },
-    change: function (event, ui) {
-      if (!ui.item) {
-        // If no place is selected from the autocomplete
-        $("#PlaceId").val(''); // Set PlaceId to null
-        //$("#placeNameContainer").show(); // Show the custom place name input
-        $("#placeName").val($("#autocompletePlaceId").val()); // Set the custom place name
+      // Check if the selected item is blacklisted
+      if (ui.item.isBlacklistedPlace === true) {
+        var message = ui.item.commentReason;
+        //var message = 'This place is blacklisted. Reason: ' + ui.item.commentReason;
+
+        // Initialize or update the Summernote editor with the blacklist message
+        $('#blacklistCommentEditor').summernote({
+          height: 250,
+          placeholder: "Blacklist Comment",
+          dialogsInBody: true,
+          focus: true
+        }).summernote('code', message); // Set the content in Summernote editor
+
+        // Show the modal
+        $('#blacklistModal').modal('show');
       }
+
+      $("#PlaceId").val(ui.item.value);
+      $("#autocompletePlaceId").val(ui.item.label);
+      return false;
+    },
+    open: function () {
+      var menuItems = $("ul.ui-autocomplete li");
+
+      menuItems.each(function () {
+        var itemData = $(this).data("ui-autocomplete-item");
+
+        if (itemData && itemData.isBlacklistedPlace === true) {
+          $(this).addClass("blacklisted-place");
+        }
+      });
     }
+    //$("#autocompletePlaceId").autocomplete({
+    //  source: function (request, response) {
+    //    // Filter places based on user input
+    //    var results = $.ui.autocomplete.filter(transformedPlaces, request.term);
+    //    response(results);
+    //  },
+    //  focus: function (event, ui) {
+    //    $("#autocompletePlaceId").val(ui.item.label);
+    //    return false;
+    //  },
+    //  select: function (event, ui) {
+    //    debugger;
+    //    // Check if the selected item is blacklisted
+    //    if (ui.item.isBlacklistedPlace === true) {
+    //      var message = 'This place is blacklisted. Reason: ' + ui.item.commentReason;
+    //      $('#blacklistMessage').text(message);
+    //      $('#blacklistModal').modal('show');
+    //    }
+    //    $("#PlaceId").val(ui.item.value);
+    //    $("#autocompletePlaceId").val(ui.item.label);
+    //    return false;
+    //  },
+    //  open: function () {
+    //    // Once the menu is opened, find the items in the dropdown and apply custom styles
+    //    var menuItems = $("ul.ui-autocomplete li");
+
+    //    menuItems.each(function () {
+    //      var itemData = $(this).data("ui-autocomplete-item");
+
+    //      // If the place is blacklisted, apply a custom class
+    //      if (itemData && itemData.isBlacklistedPlace === true) {
+    //        $(this).addClass("blacklisted-place");  // Add a custom class for styling
+    //      }
+    //    });
+    //  }
+
+    // Initialize the autocomplete
+    //$("#autocompletePlaceId").autocomplete({
+    //  source: function (request, response) {
+    //    console.log('Autocomplete triggered with request:', request);
+    //    response(transformedPlaces); // Provide transformed data including isBlacklistedPlace
+    //  },
+    //  focus: function (event, ui) {
+    //    // When navigating through the list with arrow keys, show the label in the input field
+    //    $("#autocompletePlaceId").val(ui.item.label);
+    //    return false; // Prevent default behavior of setting the value (ID) in the input
+    //  },
+    //  select: function (event, ui) {
+    //    debugger;
+    //    // Check if the selected item has the isBlacklistedPlace property
+    //    if (ui.item.isBlacklistedPlace === true) {
+    //      // Set the message in the modal
+    //      var message = 'This place is blacklisted. Reason: ' + ui.item.commentReason;
+    //      $('#blacklistMessage').text(message); // Set the blacklist reason text in the modal
+    //      $('#blacklistModal').modal('show');   // Show the modal
+    //    } else {
+    //      console.log('Selected place is not blacklisted.');
+    //    }
+    //    console.log('Selected item:', ui.item);
+
+    //    // Set values based on the selection
+    //    $("#PlaceId").val(ui.item.value); // Set the hidden field with the selected place ID
+    //    $("#autocompletePlaceId").val(ui.item.label); // Set the autocomplete input field with the selected place name
+
+    //    return false; // Prevent default behavior
+    //  }
+
+    //select: function (event, ui) {
+    //  debugger;
+    //  // Check if the selected item has the isBlacklistedPlace property
+    //  if (ui.item.isBlacklistedPlace === true) {
+    //    alert('This place is blacklisted.' + ui.item.commentReason);
+    //  } else {
+    //    console.log('Selected place is not blacklisted.');
+    //  }
+    //  console.log('Selected item:', ui.item);
+
+    //  // Set values based on the selection
+    //  $("#PlaceId").val(ui.item.value); // Set the hidden field with the selected place ID
+    //  $("#autocompletePlaceId").val(ui.item.label); // Set the autocomplete input field with the selected place name
+
+    //  return false; // Prevent default behavior
+    //}
   });
+  //////
+  //var transformedPlaces = availablePlaces.map(function (place) {
+  //  return {
+  //    label: place.Text,  // Display this in the input field (the name)
+  //    value: place.Value  // Store this in the hidden input (the ID)
+  //  };
+  //});
+
+  //$("#autocompletePlaceId").autocomplete({
+  //  source: function (request, response) {
+  //    console.log('Autocomplete triggered with request:', request);
+  //    response(transformedPlaces); // Use the transformed data
+  //  },
+  //  focus: function (event, ui) {
+  //    // When navigating through the list with the arrow keys, show the label (name) in the input field
+  //    $("#autocompletePlaceId").val(ui.item.label);
+  //    return false; // Prevent default behavior of setting the value to the input
+  //  },
+  //  select: function (event, ui) {
+  //    console.log('Selected item:', ui.item);
+  //    $("#PlaceId").val(ui.item.value); // Store selected ID in hidden input
+  //    $("#autocompletePlaceId").val(ui.item.label); // Display the label (name) in the input field
+  //    $("#placeNameContainer").hide(); // Hide the custom place name input
+  //    return false; // Prevent default behavior of setting the value to the input
+  //  },
+  //  change: function (event, ui) {
+  //    if (!ui.item) {
+  //      // If no place is selected from the autocomplete
+  //      $("#PlaceId").val(''); // Set PlaceId to null
+  //      //$("#placeNameContainer").show(); // Show the custom place name input
+  //      $("#placeName").val($("#autocompletePlaceId").val()); // Set the custom place name
+  //    }
+  //  }
+  //});
+  ////////
+
   //$("#autocompletePlaceId").autocomplete({
   //  source: function (request, response) {
   //    console.log('Autocomplete triggered with request:', request);
@@ -194,9 +336,9 @@ $(document).ready(function () {
   //  }
   //});
   /////////////////////////////////Place///////////////////////////////////////
- 
+
   /////////////////////////////////Driver///////////////////////////////////////
-  var transformedDrivers = []; 
+  var transformedDrivers = [];
   $("#autocompleteDriverId").autocomplete({
     source: function (request, response) {
       console.log('Autocomplete triggered with request:', request);
@@ -208,6 +350,20 @@ $(document).ready(function () {
       return false; // Prevent default behavior of setting the value (ID) in the input
     },
     select: function (event, ui) {
+      debugger;
+      var getTotlaHoursTime = $('#totalHoursDropdown').val();
+      var totalHours = parseFloat(getTotlaHoursTime);
+      if (ui.item.isFiveHoursPlusEnabled == true) {
+        if (totalHours >= 5 && totalHours <= 8) {
+          $('#tripCost').val(100).attr('disabled', true);
+        } else if (totalHours >= 9 && totalHours <= 12) {
+          $('#tripCost').val(150).attr('disabled', true);
+        } else if (totalHours >= 13 && totalHours <= 24) {
+          $('#tripCost').val(200).attr('disabled', true);
+        } else {
+          $('#tripCost').val(0).attr('disabled', false);
+        }
+      }
       console.log('Selected item:', ui.item);
       $("#DriverId").val(ui.item.value); // Store selected ID in hidden input
       $("#autocompleteDriverId").val(ui.item.label); // Display the label in the input field
@@ -357,7 +513,7 @@ $(document).ready(function () {
 
 
   //////////////////Edit case///////////////////////////////////
-  
+
   debugger
   const checkbox = document.getElementById('isBlackListed');
   if (checkbox != null) {
@@ -403,11 +559,11 @@ $(document).ready(function () {
   //  });
   //}
   /////////////////////////////////////////////////////////////
- 
+
 });
 
 function getAvailableDriversOnDateTimeChange() {
-//function handleDateTimeChange(element) {
+  //function handleDateTimeChange(element) {
   debugger;
   //var aa = element.value;
   var startTripDateTime = $('#fromDateTime').val();
@@ -424,10 +580,17 @@ function getAvailableDriversOnDateTimeChange() {
 
         // Ensure drivers is an array before calling map
         if (Array.isArray(drivers)) {
+          debugger;
           var transformedDrivers = drivers.map(function (driver) {
+            //return {
+            //  label: driver.Name,  // Display the driver's name
+            //  value: driver.Id     // Store the driver's ID
+            //};
             return {
               label: driver.Name,  // Display the driver's name
-              value: driver.Id     // Store the driver's ID
+              value: driver.Id,    // Store the driver's ID
+              isFiveHoursPlusEnabled: driver.IsFiveHoursPlusEnabled,  // Include IsFiveHoursPlusEnabled
+              comment: driver.Comment  // Include Comment
             };
           });
 
@@ -444,7 +607,7 @@ function getAvailableDriversOnDateTimeChange() {
       console.error('AJAX error:', status, error);
     }
   });
-} 
+}
 //////////////////////////////////////////Driver///////////////////////////////////////
 function onPlaceChange(dropdown) {
   debugger

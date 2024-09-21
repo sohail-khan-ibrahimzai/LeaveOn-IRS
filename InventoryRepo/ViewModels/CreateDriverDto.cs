@@ -12,6 +12,7 @@ namespace InventoryRepo.ViewModels
         public int Id { get; set; }
         public string Name { get; set; }
         public decimal CostPerHour { get; set; }
+        public bool? IsFiveHoursPlusEnabled { get; set; }
         [AllowHtml]
         public string Remarks { get; set; }
     }

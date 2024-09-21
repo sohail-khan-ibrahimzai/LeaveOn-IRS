@@ -100,13 +100,15 @@ namespace LeaveON.Controllers
       ViewBag.EndDate = dtEndDate.ToString("dd-MMM-yyyy hh:mm tt");
       if (User.IsInRole("Admin"))
       {
+        //var aa = await db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true).ToListAsync();
         //var blacListedLocation = db.Trips.Where(x => x.Status == TripStatus.SuccessNotPaid);
-        var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true);
+        //var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true);
+        var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true && x.Place.IsBlackListed == true);
         return View(await blacListedLocation.ToListAsync());
       }
       else
       {
-        var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true && x.CreatedBy == currentUser.UserId);
+        var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true && x.Place.IsBlackListed == true && x.CreatedBy == currentUser.UserId);
         return View(await blacListedLocation.ToListAsync());
       }
     }
@@ -214,10 +216,32 @@ namespace LeaveON.Controllers
                     ManagerDeal = x.ManagerDeal,
                     ManagerComission = x.ManagerComission
                   }).ToList();
-        ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false), "Id", "Name");
+        var places = db.Places
+                 .Where(x => x.IsDeleted == false)
+                 .Select(x => new
+                 {
+                   Id = x.Id,
+                   Name = x.Name,
+                   IsBlacklistedPlace = x.IsBlackListed,
+                   Comment = x.Remarks,
+                 }).ToList();
+
+        var drivers = db.Drivers
+                 .Where(x => x.IsDeleted == false)
+                 .Select(x => new
+                 {
+                   Id = x.Id,
+                   Name = x.Name,
+                   IsFiveHoursPlusEnabled = x.IsFiveHoursPlusEnabled,
+                   Comment = x.Remarks,
+                 }).ToList();
+
+        ViewBag.DriverId = drivers;
         ViewBag.PassengerId = passengers;
+        ViewBag.PlaceId = places;
+        //ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false), "Id", "Name");
         //ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.IsDeleted == false), "Id", "Name");
-        ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.IsDeleted == false), "Id", "Name");
+        //ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.IsDeleted == false), "Id", "Name");
       }
       else
       {
@@ -230,10 +254,32 @@ namespace LeaveON.Controllers
                     ManagerDeal = x.ManagerDeal,
                     ManagerComission = x.ManagerComission
                   }).ToList();
-        ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name");
+        var places = db.Places
+                  .Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false)
+                  .Select(x => new
+                  {
+                    Id = x.Id,
+                    Name = x.Name,
+                    IsBlacklistedPlace = x.IsBlackListed,
+                    Comment = x.Remarks,
+                  }).ToList();
+
+        var drivers = db.Drivers
+               .Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false)
+               .Select(x => new
+               {
+                 Id = x.Id,
+                 Name = x.Name,
+                 IsFiveHoursPlusEnabled = x.IsFiveHoursPlusEnabled,
+                 Comment = x.Remarks,
+               }).ToList();
+
+        ViewBag.DriverId = drivers;
         ViewBag.PassengerId = passengers;
+        ViewBag.PlaceId = places;
+        //ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name");
         //ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name");
-        ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name");
+        //ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name");
       }
 
       //DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
@@ -406,8 +452,10 @@ namespace LeaveON.Controllers
         TotalHours = trip.TotalHours,
         Cost = trip.Cost,
         IsBlackListed = trip.IsBlackListed,
-        Floor = trip.Floor,
-        Bell = trip.Bell,
+        //Floor = trip.Floor,
+        //Bell = trip.Bell,
+        Floor = trip.Place.Floor,
+        Bell = trip.Place.Bell,
         Remarks = trip.Remarks,
         Status = trip.Status
       };
@@ -435,10 +483,20 @@ namespace LeaveON.Controllers
                     ManagerDeal = x.ManagerDeal,
                     ManagerComission = x.ManagerComission
                   }).ToList();
+        var places = db.Places
+                 .Where(x => x.IsDeleted == false)
+                 .Select(x => new
+                 {
+                   Id = x.Id,
+                   Name = x.Name,
+                   IsBlacklistedPlace = x.IsBlackListed,
+                   Comment = x.Remarks,
+                 }).ToList();
         ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false), "Id", "Name");
         ViewBag.PassengerId = passengers;
         //ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.IsDeleted == false), "Id", "Name");
-        ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.IsDeleted == false), "Id", "Name");
+        //ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.IsDeleted == false), "Id", "Name");
+        ViewBag.PlaceId = places;
       }
       else
       {
@@ -451,10 +509,20 @@ namespace LeaveON.Controllers
                     ManagerDeal = x.ManagerDeal,
                     ManagerComission = x.ManagerComission
                   }).ToList();
+        var places = db.Places
+                 .Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false)
+                 .Select(x => new
+                 {
+                   Id = x.Id,
+                   Name = x.Name,
+                   IsBlacklistedPlace = x.IsBlackListed,
+                   Comment = x.Remarks,
+                 }).ToList();
         ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name", editTripDto.DriverId);
         ViewBag.PassengerId = passengers;
         //ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name");
-        ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name", editTripDto.PlaceId);
+        //ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name", editTripDto.PlaceId);
+        ViewBag.PlaceId = places;
       }
       //ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false), "Id", "Name", editTripDto.DriverId);
       //ViewBag.PassengerId = passengers;
@@ -473,17 +541,22 @@ namespace LeaveON.Controllers
       //if (ModelState.IsValid)
       //{
       var trip = await db.Trips.FirstOrDefaultAsync(x => x.Id == updateTripDto.Id);
-      if (updateTripDto.IsBlackListed == true && trip.DateBlackList == null)
+      var exisitingPlace = await db.Places.FirstOrDefaultAsync(x => x.Name == updateTripDto.PlaceName);
+      var driver = await db.Drivers.FirstOrDefaultAsync(d => d.Id == trip.DriverId);
+      var passenger = await db.Passengers.FirstOrDefaultAsync(p => p.Id == trip.PassengerId);
+      var place = await db.Places.FirstOrDefaultAsync(pl => pl.Id == trip.PlaceId);
+      if (updateTripDto.IsBlackListed == true && trip.DateBlackList == null && place.IsBlackListed == false && place.BlacklistedDate == null)
       {
         trip.IsBlackListed = updateTripDto.IsBlackListed ?? false;
         trip.DateBlackList = DateTime.UtcNow;
+        place.IsBlackListed = updateTripDto.IsBlackListed ?? false;
+        place.BlacklistedDate = DateTime.UtcNow;
+        place.Floor = updateTripDto.Floor;
+        place.Bell = updateTripDto.Bell;
       }
       if (updateTripDto.PlaceName != null && updateTripDto.PlaceId == null)
       {
-        var exisitingPlace = await db.Places.FirstOrDefaultAsync(x => x.Name == updateTripDto.PlaceName);
-        var driver = await db.Drivers.FirstOrDefaultAsync(d => d.Id == trip.DriverId);
-        var passenger = await db.Passengers.FirstOrDefaultAsync(p => p.Id == trip.PassengerId);
-        var place = await db.Places.FirstOrDefaultAsync(pl => pl.Id == trip.PlaceId);
+
         if (exisitingPlace != null)
         {
           ModelState.AddModelError("PlaceName", "Place already exists.");
@@ -520,11 +593,12 @@ namespace LeaveON.Controllers
         trip.TotalHours = updateTripDto.TotalHours;
         trip.Status = updateTripDto.Status;
         trip.Remarks = updateTripDto.Remarks;
-        trip.IsBlackListed = updateTripDto.IsBlackListed ?? false;
-        trip.Floor = updateTripDto.Floor;
-        trip.Bell = updateTripDto.Bell;
+        //trip.IsBlackListed = updateTripDto.IsBlackListed ?? false;
+        //trip.Floor = updateTripDto.Floor;
+        //trip.Bell = updateTripDto.Bell;
         trip.UpdatedBy = currentUser.UserId;
         db.Entry(trip).State = EntityState.Modified;
+        db.Entry(place).State = EntityState.Modified;
       }
       await db.SaveChangesAsync();
       //}
@@ -658,7 +732,9 @@ namespace LeaveON.Controllers
               .Select(driver => new
               {
                 Id = driver.Id,
-                Name = driver.Name
+                Name = driver.Name,
+                IsFiveHoursPlusEnabled = driver.IsFiveHoursPlusEnabled,
+                Comment = driver.Remarks,
               })
               .ToList();
 

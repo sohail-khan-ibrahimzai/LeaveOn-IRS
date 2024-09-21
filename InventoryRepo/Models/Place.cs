@@ -30,6 +30,9 @@ namespace InventoryRepo.Models
         public string Address { get; set; }
         public string CreatedBy { get; set; }
         public string UpdateBy { get; set; }
+        public Nullable<System.DateTime> BlacklistedDate { get; set; }
+        public string Floor { get; set; }
+        public string Bell { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Trip> Trips { get; set; }

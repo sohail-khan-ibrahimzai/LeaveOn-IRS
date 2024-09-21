@@ -4,6 +4,17 @@
   ViewBag.Title = "Edit";
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+
+  .custom-switch {
+    display: flex;
+    align-items: center;
+  }
+
+    .custom-switch .custom-control-input {
+      margin-left: 10px; /* Adjust as needed */
+    }
+</style>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -52,6 +63,18 @@
                   <label>Cost Per Hour</label>
                   @Html.EditorFor(model => model.CostPerHour, new { htmlAttributes = new { @class = "form-control", @id = "driverCostPerHour", @placeHolder = "Cost Per Hour" } })
                   @Html.ValidationMessageFor(model => model.CostPerHour, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group" style="margin-top: -16px;">
+                  <div class="d-flex align-items-center">
+                    <!-- Label on the left -->
+                    <label class="mr-2" for="isFiveHrsPlusEnabled">FiveHrs</label>
+                    <!-- Checkbox on the right -->
+                    <div class="custom-control custom-switch">
+                      <input type="checkbox" class="custom-control-input" id="isFiveHrsPlusEnabled" name="IsFiveHoursPlusEnabled" @(Model.IsFiveHoursPlusEnabled == true ? "checked" : "") />
+                      <label class="custom-control-label" for="isFiveHrsPlusEnabled" style="margin-top: -28px; margin-left: 28px;"></label>
+                    </div>
+                  </div>
                 </div>
               </div>
 

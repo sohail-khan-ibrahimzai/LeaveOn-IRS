@@ -110,6 +110,7 @@
           <Property Name="CreatedBy" Type="nvarchar" MaxLength="128" />
           <Property Name="UpdatedBy" Type="nvarchar" MaxLength="128" />
           <Property Name="CostPerHour" Type="decimal" Precision="18" Scale="2" />
+          <Property Name="IsFiveHoursPlusEnabled" Type="bit" />
         </EntityType>
         <EntityType Name="Item">
           <Key>
@@ -189,6 +190,9 @@
           <Property Name="Address" Type="nvarchar(max)" />
           <Property Name="CreatedBy" Type="nvarchar" MaxLength="128" />
           <Property Name="UpdateBy" Type="nvarchar" MaxLength="128" />
+          <Property Name="BlacklistedDate" Type="datetime" />
+          <Property Name="Floor" Type="nvarchar" MaxLength="200" />
+          <Property Name="Bell" Type="nvarchar" MaxLength="200" />
         </EntityType>
         <EntityType Name="Status">
           <Key>
@@ -952,6 +956,7 @@
           <Property Name="UpdatedBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="AspNetUser" Relationship="InventoryPortalModel.FK_Driver_AspNetUsers" FromRole="Driver" ToRole="AspNetUser" />
           <Property Name="CostPerHour" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="IsFiveHoursPlusEnabled" Type="Boolean" />
         </EntityType>
         <EntityType Name="Passenger">
           <Key>
@@ -1081,6 +1086,9 @@
           <Property Name="CreatedBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="UpdateBy" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="AspNetUser" Relationship="InventoryPortalModel.FK_Places_AspNetUsers" FromRole="Place" ToRole="AspNetUser" />
+          <Property Name="BlacklistedDate" Type="DateTime" Precision="3" />
+          <Property Name="Floor" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="Bell" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
         </EntityType>
         <Association Name="FK_Trip_Places">
           <End Type="InventoryPortalModel.Place" Role="Place" Multiplicity="0..1" />
@@ -1286,6 +1294,7 @@
           <EntitySetMapping Name="Drivers">
             <EntityTypeMapping TypeName="InventoryPortalModel.Driver">
               <MappingFragment StoreEntitySet="Driver">
+                <ScalarProperty Name="IsFiveHoursPlusEnabled" ColumnName="IsFiveHoursPlusEnabled" />
                 <ScalarProperty Name="CostPerHour" ColumnName="CostPerHour" />
                 <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
                 <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
@@ -1401,6 +1410,9 @@
           <EntitySetMapping Name="Places">
             <EntityTypeMapping TypeName="InventoryPortalModel.Place">
               <MappingFragment StoreEntitySet="Places">
+                <ScalarProperty Name="Bell" ColumnName="Bell" />
+                <ScalarProperty Name="Floor" ColumnName="Floor" />
+                <ScalarProperty Name="BlacklistedDate" ColumnName="BlacklistedDate" />
                 <ScalarProperty Name="UpdateBy" ColumnName="UpdateBy" />
                 <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
                 <ScalarProperty Name="Address" ColumnName="Address" />
