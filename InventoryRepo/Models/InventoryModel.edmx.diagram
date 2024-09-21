@@ -23,21 +23,21 @@
         <AssociationConnector Association="InventoryPortalModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" />
         <AssociationConnector Association="InventoryPortalModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" />
         <AssociationConnector Association="InventoryPortalModel.AspNetUserRoles" />
-        <EntityTypeShape EntityType="InventoryPortalModel.Driver" Width="1.5" PointX="5.375" PointY="6.25" />
-        <EntityTypeShape EntityType="InventoryPortalModel.Passenger" Width="1.5" PointX="5.375" PointY="9.25" />
-        <EntityTypeShape EntityType="InventoryPortalModel.Trip" Width="1.5" PointX="7.625" PointY="6" />
-        <AssociationConnector Association="InventoryPortalModel.FK_Trip_Driver" />
-        <AssociationConnector Association="InventoryPortalModel.FK_Trip_Passenger" />
         <EntityTypeShape EntityType="InventoryPortalModel.C__MigrationHistory" Width="1.5" PointX="7.375" PointY="0.75" />
         <EntityTypeShape EntityType="InventoryPortalModel.AnnualOffDay" Width="1.5" PointX="9.375" PointY="0.75" />
         <EntityTypeShape EntityType="InventoryPortalModel.sysdiagram" Width="1.5" PointX="7.375" PointY="9.75" />
-        <EntityTypeShape EntityType="InventoryPortalModel.Place" Width="1.5" PointX="5.375" PointY="12.625" />
-        <AssociationConnector Association="InventoryPortalModel.FK_Trip_Places" />
+        <EntityTypeShape EntityType="InventoryPortalModel.Driver" Width="1.5" PointX="3" PointY="18.75" />
+        <EntityTypeShape EntityType="InventoryPortalModel.Passenger" Width="1.5" PointX="3" PointY="23" />
+        <EntityTypeShape EntityType="InventoryPortalModel.Place" Width="1.5" PointX="3" PointY="14.125" />
+        <EntityTypeShape EntityType="InventoryPortalModel.Trip" Width="1.5" PointX="5.25" PointY="13.25" />
         <AssociationConnector Association="InventoryPortalModel.FK_Driver_AspNetUsers" />
         <AssociationConnector Association="InventoryPortalModel.FK_Passenger_AspNetUsers" />
         <AssociationConnector Association="InventoryPortalModel.FK_Places_AspNetUsers" />
         <AssociationConnector Association="InventoryPortalModel.FK_Trip_AspNetUsers" />
-      </Diagram>
+        <AssociationConnector Association="InventoryPortalModel.FK_Trip_Driver" />
+        <AssociationConnector Association="InventoryPortalModel.FK_Trip_Passenger" />
+        <AssociationConnector Association="InventoryPortalModel.FK_Trip_Places" />
+        </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
 </edmx:Edmx>

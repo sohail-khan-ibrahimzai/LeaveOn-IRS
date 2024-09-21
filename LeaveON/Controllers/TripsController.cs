@@ -72,6 +72,7 @@ namespace LeaveON.Controllers
         //var trips = db.Trips.Include(t => t.Driver).Include(t => t.Passenger).Where(x => x.IsDeleted == false);
         //return View(await trips.ToListAsync());
 
+        //var trips = db.Trips.Include(t => t.Driver).Include(t => t.Passenger).Where(x => x.IsDeleted == false);
         var trips = db.Trips.Include(t => t.Driver).Include(t => t.Passenger).Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false);
         return View(await trips.ToListAsync());
       }
@@ -80,6 +81,7 @@ namespace LeaveON.Controllers
         //var trips = db.Trips.Include(t => t.Driver).Include(t => t.Passenger).Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false);
         //return View(await trips.ToListAsync());
 
+        //var trips = db.Trips.Include(t => t.Driver).Include(t => t.Passenger).Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false);
         var trips = db.Trips.Include(t => t.Driver).Include(t => t.Passenger).Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.CreatedBy == currentUser.UserId && x.IsDeleted == false);
         return View(await trips.ToListAsync());
       }
@@ -451,9 +453,10 @@ namespace LeaveON.Controllers
         EndDateTime = trip.EndDateTime,
         TotalHours = trip.TotalHours,
         Cost = trip.Cost,
-        IsBlackListed = trip.IsBlackListed,
+        //IsBlackListed = trip.IsBlackListed,
         //Floor = trip.Floor,
         //Bell = trip.Bell,
+        IsBlackListed = trip.Place.IsBlackListed,
         Floor = trip.Place.Floor,
         Bell = trip.Place.Bell,
         Remarks = trip.Remarks,

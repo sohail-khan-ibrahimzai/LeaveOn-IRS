@@ -20,11 +20,11 @@ namespace InventoryRepo.Models
         public Nullable<decimal> Cost { get; set; }
         public Nullable<System.DateTime> DateCreated { get; set; }
         public Nullable<System.DateTime> DateModified { get; set; }
+        public Nullable<System.DateTime> StartDateTime { get; set; }
+        public Nullable<System.DateTime> EndDateTime { get; set; }
         public Nullable<bool> IsDeleted { get; set; }
         public Nullable<int> PlaceId { get; set; }
         public string Remarks { get; set; }
-        public Nullable<System.DateTime> StartDateTime { get; set; }
-        public Nullable<System.DateTime> EndDateTime { get; set; }
         public string Status { get; set; }
         public string CreatedBy { get; set; }
         public string UpdatedBy { get; set; }
@@ -34,9 +34,9 @@ namespace InventoryRepo.Models
         public string Floor { get; set; }
         public string Bell { get; set; }
     
+        public virtual AspNetUser AspNetUser { get; set; }
         public virtual Driver Driver { get; set; }
         public virtual Passenger Passenger { get; set; }
         public virtual Place Place { get; set; }
-        public virtual AspNetUser AspNetUser { get; set; }
     }
 }

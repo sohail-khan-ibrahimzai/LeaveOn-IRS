@@ -222,6 +222,7 @@
                                                                                                                                   "{0:hh:mm:ss tt}",
                                                                                                                                   new { @class = "form-control from-date-picker", @id = "fromDateTime" })
                   @Html.ValidationMessageFor(model => model.StartDateTime, "", new { @class = "text-danger" })
+                <input type="hidden" id="fullDateTime" name="StartDateTime" />
                 </div>
 
                 <div class="form-group" style="display:none;">
@@ -307,11 +308,13 @@
                     <ul id="passengersList"></ul>
                   </div>*@
 
-                <div class="form-group">
-                  @Html.LabelFor(model => model.Cost, htmlAttributes: new { @class = "" })
-                  @Html.EditorFor(model => model.Cost, new { htmlAttributes = new { @class = "form-control", @id = "tripCost", @placeholder = "Cost" } })
-                  @Html.ValidationMessageFor(model => model.Cost, "", new { @class = "text-danger" })
-                </div>
+              <div class="form-group">
+                @Html.LabelFor(model => model.Cost, htmlAttributes: new { @class = "" })
+                @Html.EditorFor(model => model.Cost, new { htmlAttributes = new { @class = "form-control", @id = "tripCost", @placeholder = "Cost" } })
+                @Html.ValidationMessageFor(model => model.Cost, "", new { @class = "text-danger" })
+                <!-- Add a hidden field to store the cost for submission -->
+                <input type="hidden" id="tripCostHidden" name="Cost" value="@Model.Cost" />
+              </div>
 
                 <div class="form-group">
                   <label>Status</label>

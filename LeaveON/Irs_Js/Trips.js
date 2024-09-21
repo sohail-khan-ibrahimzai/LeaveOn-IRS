@@ -2,7 +2,6 @@ $(document).ready(function () {
   debugger;
   getAvailableDriversOnDateTimeChange();
   populateDropdown(totalTripHours);
-
   $('#remarks').summernote({
     height: 250,
     placeholder: "Comment",
@@ -42,26 +41,51 @@ $(document).ready(function () {
     showMinute: true,
     timeOnly: true, // Only time picker, no date
     controlType: 'select',
-    //stepHour: 1,
-    //stepMinute: 5,
     oneLine: true,
     buttonImageOnly: true,
     buttonImage: "http://jqueryui.com/resources/demos/datepicker/images/calendar.gif",
     buttonText: "Select time",
-    //dateFormat: "dd-M-yy",
-    //timeFormat: "hh:mm tt",
-    //showOn: "both",
-    //timeInput: true,
-    //stepHour: 1,
-    //stepMinute: 5,
-    //oneLine: true,
-    ////changeMonth: true,
-    ////changeYear: true,
-    //controlType: 'select',
-    //buttonImageOnly: true,
-    //buttonImage: "http://jqueryui.com/resources/demos/datepicker/images/calendar.gif",
-    //buttonText: "Select date"
+    onClose: function (timeText, inst) {
+      // Get the selected time
+      const selectedTime = timeText;
+
+      // Get the current date (or any default date if required)
+      const currentDate = new Date().toLocaleDateString('en-US'); // This will give MM/DD/YYYY format
+
+      // Combine date and time
+      const fullDateTime = currentDate + ' ' + selectedTime;
+
+      // Set the combined value in the hidden field
+      $('#fullDateTime').val(fullDateTime);
+    }
   });
+  //$('.from-date-picker').datetimepicker({
+  //  timeFormat: "hh:mm tt",
+  //  showOn: "both",
+  //  showHour: true,
+  //  showMinute: true,
+  //  timeOnly: true, // Only time picker, no date
+  //  controlType: 'select',
+  //  //stepHour: 1,
+  //  //stepMinute: 5,
+  //  oneLine: true,
+  //  buttonImageOnly: true,
+  //  buttonImage: "http://jqueryui.com/resources/demos/datepicker/images/calendar.gif",
+  //  buttonText: "Select time",
+  //  //dateFormat: "dd-M-yy",
+  //  //timeFormat: "hh:mm tt",
+  //  //showOn: "both",
+  //  //timeInput: true,
+  //  //stepHour: 1,
+  //  //stepMinute: 5,
+  //  //oneLine: true,
+  //  ////changeMonth: true,
+  //  ////changeYear: true,
+  //  //controlType: 'select',
+  //  //buttonImageOnly: true,
+  //  //buttonImage: "http://jqueryui.com/resources/demos/datepicker/images/calendar.gif",
+  //  //buttonText: "Select date"
+  //});
   debugger;
   $('#autocompletePassengerId, #autocompletePlaceId,#autocompleteDriverId').on('keydown', function (event) {
     if (event.key === 'Enter') {
@@ -354,14 +378,19 @@ $(document).ready(function () {
       var getTotlaHoursTime = $('#totalHoursDropdown').val();
       var totalHours = parseFloat(getTotlaHoursTime);
       if (ui.item.isFiveHoursPlusEnabled == true) {
+        debugger
         if (totalHours >= 5 && totalHours <= 8) {
-          $('#tripCost').val(100).attr('disabled', true);
+          $('#tripCost').val('100').attr('disabled', true);
+          $('#tripCostHidden').val('100'); // Update hidden field
         } else if (totalHours >= 9 && totalHours <= 12) {
-          $('#tripCost').val(150).attr('disabled', true);
+          $('#tripCost').val('150').attr('disabled', true);
+          $('#tripCostHidden').val('150'); // Update hidden field
         } else if (totalHours >= 13 && totalHours <= 24) {
-          $('#tripCost').val(200).attr('disabled', true);
+          $('#tripCost').val('200').attr('disabled', true);
+          $('#tripCostHidden').val('200'); // Update hidden field
         } else {
-          $('#tripCost').val(0).attr('disabled', false);
+          $('#tripCost').val('0').attr('disabled', false);
+          $('#tripCostHidden').val('0'); // Update hidden field
         }
       }
       console.log('Selected item:', ui.item);

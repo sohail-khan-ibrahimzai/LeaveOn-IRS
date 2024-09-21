@@ -55,7 +55,7 @@ namespace LeaveON.Controllers
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "Admin,Manager")]
-    public async Task<ActionResult> Create([Bind(Include = "Id,Name,Remarks,DateCreated,DateUpdated,Remarks,Address")] CreatePlaceDto createPlaceDto)
+    public async Task<ActionResult> Create([Bind(Include = "Id,Name,Remarks,DateCreated,DateUpdated,Remarks,Address,IsBlackListed")] CreatePlaceDto createPlaceDto)
     {
       var currentUser = GetCurrentUserInfo();
       if (ModelState.IsValid)
@@ -76,6 +76,7 @@ namespace LeaveON.Controllers
             Name = createPlaceDto.Name,
             Remarks = createPlaceDto.Remarks,
             Address = createPlaceDto.Address,
+            IsBlackListed = createPlaceDto.IsBlackListed,
             IsDeleted = false,
             CreatedBy = currentUser.UserId
           };

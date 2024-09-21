@@ -224,7 +224,7 @@
                         </td>
 
                         <!--<td>
-  @(item.EndDateTime.HasValue ? item.EndDateTime.Value.ToString("HH-mm-ss tt") : "")-->
+                        @(item.EndDateTime.HasValue ? item.EndDateTime.Value.ToString("HH-mm-ss tt") : "")-->
                         @*@(item.EndDateTime.HasValue ? item.EndDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss tt") : "")*@
                         @*@(item.EndDateTime.HasValue ? item.EndDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss") : "")*@
                         @*@Html.DisplayFor(modelItem => item.DateCreated != null ? item.DateCreated.ToString("dd/MM/yyyy") : "")*@
@@ -511,6 +511,7 @@
       });
     });
   });
+
   function handleStatusChange(itemId, selectedStatus) {
     // Logging the values for demonstration
     console.log("Item ID:", itemId);
