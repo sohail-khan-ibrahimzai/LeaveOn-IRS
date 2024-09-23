@@ -1,5 +1,6 @@
 $(document).ready(function () {
   debugger;
+  // Cache the input fields using jQuery selectors
   getAvailableDriversOnDateTimeChange();
   populateDropdown(totalTripHours);
   $('#remarks').summernote({
@@ -381,17 +382,26 @@ $(document).ready(function () {
         debugger
         if (totalHours >= 5 && totalHours <= 8) {
           $('#tripCost').val('100').attr('disabled', true);
+          $('#tripTotalCost').val('100').attr('disabled', true);
           $('#tripCostHidden').val('100'); // Update hidden field
         } else if (totalHours >= 9 && totalHours <= 12) {
           $('#tripCost').val('150').attr('disabled', true);
+          $('#tripTotalCost').val('150').attr('disabled', true);
           $('#tripCostHidden').val('150'); // Update hidden field
         } else if (totalHours >= 13 && totalHours <= 24) {
           $('#tripCost').val('200').attr('disabled', true);
+          $('#tripTotalCost').val('200').attr('disabled', true);
           $('#tripCostHidden').val('200'); // Update hidden field
         } else {
           $('#tripCost').val('0').attr('disabled', false);
+          $('#tripTotalCost').val('0').attr('disabled', false);
           $('#tripCostHidden').val('0'); // Update hidden field
         }
+      }
+      else {
+        $('#tripCost').val('0').attr('disabled', false);
+        $('#tripCostHidden').val('0'); // Update hidden field
+        $('#tripTotalCost').val('0');
       }
       console.log('Selected item:', ui.item);
       $("#DriverId").val(ui.item.value); // Store selected ID in hidden input
@@ -400,6 +410,10 @@ $(document).ready(function () {
     }
   });
   ////////////////////////////////////
+
+  /////
+
+  /////
 
   //$('#autocompleteDriverId').on('input', function () {
   //  let query = $(this).val();
@@ -588,7 +602,20 @@ $(document).ready(function () {
   //  });
   //}
   /////////////////////////////////////////////////////////////
-
+  $('#tripCost').on('keyup', function () {
+    debugger;
+    var tripCost = $('#tripCost').val();
+    var _tripCost = parseFloat(tripCost);
+    var totalHours = $('#totalHoursDropdown').val();
+    var _totalHours = parseFloat(totalHours);
+    var totalTripCost = _tripCost * _totalHours;
+    if (!isNaN(totalTripCost)) {
+      $('#tripTotalCost').val(totalTripCost.toFixed(0));
+    }
+    else {
+      $('#tripTotalCost').val('0');
+    }
+  });
 });
 
 function getAvailableDriversOnDateTimeChange() {
@@ -936,3 +963,4 @@ function populateDropdown(selectedValue) {
 //  });
 //}
 ////
+

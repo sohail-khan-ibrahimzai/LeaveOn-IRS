@@ -252,13 +252,23 @@
                   <label>Place Name</label>
                   <input type="text" name="placeName" id="placeName" class="form-control" />
                 </div>
-
                 <div class="form-group">
-                  @Html.LabelFor(model => model.Cost, htmlAttributes: new { @class = "" })
-                  @Html.EditorFor(model => model.Cost, new { htmlAttributes = new { @class = "form-control", @placeholder = "Cost" } })
+                  <label>Cost/Hour</label>
+                  @Html.EditorFor(model => model.Cost, new { htmlAttributes = new { @class = "form-control", @id = "tripCost", @placeholder = "Cost" } })
                   @Html.ValidationMessageFor(model => model.Cost, "", new { @class = "text-danger" })
                   <input type="hidden" id="tripCostHidden" name="Cost" value="@Model.Cost" />
                 </div>
+
+                <div class="form-group">
+                  <label>Total Cost</label>
+                  <input type="text" class="form-control" id="tripTotalCost" name="TotalCost" value="0" />
+                </div>
+                @*<div class="form-group">
+                    @Html.LabelFor(model => model.Cost, htmlAttributes: new { @class = "" })
+                    @Html.EditorFor(model => model.Cost, new { htmlAttributes = new { @class = "form-control", @placeholder = "Cost" } })
+                    @Html.ValidationMessageFor(model => model.Cost, "", new { @class = "text-danger" })
+                    <input type="hidden" id="tripCostHidden" name="Cost" value="@Model.Cost" />
+                  </div>*@
 
                 <div class="form-group">
                   <label>Status</label>
@@ -379,7 +389,7 @@
       </div>
       <div class="modal-body">
         <p id="blacklistMessage"></p>-->
- <!-- This will hold the blacklist message -->
+<!-- This will hold the blacklist message -->
 <!--</div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

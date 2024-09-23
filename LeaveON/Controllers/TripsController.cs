@@ -105,12 +105,14 @@ namespace LeaveON.Controllers
         //var aa = await db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true).ToListAsync();
         //var blacListedLocation = db.Trips.Where(x => x.Status == TripStatus.SuccessNotPaid);
         //var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true);
-        var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true && x.Place.IsBlackListed == true);
+        //var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true && x.Place.IsBlackListed == true);
+        var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.Place.IsBlackListed == true);
         return View(await blacListedLocation.ToListAsync());
       }
       else
       {
-        var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true && x.Place.IsBlackListed == true && x.CreatedBy == currentUser.UserId);
+        var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.Place.IsBlackListed == true && x.CreatedBy == currentUser.UserId);
+        //var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true && x.Place.IsBlackListed == true && x.CreatedBy == currentUser.UserId);
         return View(await blacListedLocation.ToListAsync());
       }
     }
@@ -135,16 +137,145 @@ namespace LeaveON.Controllers
       // Filter the data based on the role
       if (User.IsInRole("Admin"))
       {
-        var weeklyTrips = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false);
-        ViewBag.TotalCostFromViewBag = weeklyTrips.Sum(x => x.Cost);
-        return View(await weeklyTrips.ToListAsync());
+        //var weeklyTripsQuery = db.Trips
+        //.Where(x => x.DateCreated >= dtStartDate
+        //             && x.DateCreated <= dtEndDate
+        //             && x.IsDeleted == false);
+
+        //var weeklyTrips = await weeklyTripsQuery
+        //    .Select(trip => new
+        //    {
+        //      trip,
+        //      Driver = db.Drivers.FirstOrDefault(d => d.Id == trip.DriverId),
+        //      Manager = db.AspNetUsers.Include(x=>x.Passengers).FirstOrDefault(d => d.Id == trip.CreatedBy),
+        //    })
+        //    .ToListAsync();
+
+        //// Create a list of TripViewModel
+        //var result = weeklyTrips.Select(t => new TripListDto
+        //{
+        //  Trip = t.trip,
+        //  Driver = t.Driver,
+        //  //Manager = t.Manager,
+        //  TripCost = CalculateTripCost(t.trip),
+        //  ManagerComission = CalculateManagerTripComission(t.trip)
+        //}).ToList();
+
+        //ViewBag.TotalCostFromViewBag = result.Sum(x => x.TripCost);
+
+        //return View(result);
+        var weeklyTripsQuery = db.Trips
+    .Where(x => x.DateCreated >= dtStartDate
+                 && x.DateCreated <= dtEndDate
+                 && x.IsDeleted == false);
+
+        var weeklyTrips = await weeklyTripsQuery
+            .Select(trip => new
+            {
+              trip,
+              Driver = db.Drivers.FirstOrDefault(d => d.Id == trip.DriverId),
+              Manager = db.AspNetUsers.FirstOrDefault(u => u.Id == trip.CreatedBy), // Manager from AspNetUsers
+              Passenger = db.Passengers.FirstOrDefault(p => p.Id == trip.PassengerId), // Passenger details
+              Place = db.Places.FirstOrDefault(pl => pl.Id == trip.PlaceId) // Place details (adjust the FK name if necessary)
+            })
+            .ToListAsync();
+
+        // Create a list of TripListDto
+        var result = weeklyTrips.Select(t => new TripListDto
+        {
+          Trip = t.trip,
+          Driver = t.Driver,
+          Manager = t.Manager, // This is the Manager's name from AspNetUser
+          Passenger = t.Passenger, // Passenger details
+          Place = t.Place, // Place details
+          TripCost = CalculateTripCost(t.trip), // Call your existing method to calculate cost
+          //ManagerComission = CalculateManagerTripComission(t.trip) // Call your method for manager commission
+          ManagerComission = t.Passenger.ManagerComission ?? 0 // Call your method for manager commission
+        }).ToList();
+
+        ViewBag.TotalCostFromViewBag = result.Sum(x => x.TripCost);
+
+        return View(result);  // Pass the list of TripListDto to the view
+
+        //var weeklyTrips = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false);
+        //ViewBag.TotalCostFromViewBag = weeklyTrips.Sum(x => x.Cost);
+        //return View(await weeklyTrips.ToListAsync());
       }
       else
       {
-        var weeklyTrips = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.CreatedBy == currentUser.UserId);
-        ViewBag.TotalCostFromViewBag = weeklyTrips.Sum(x => x.Cost);
-        return View(await weeklyTrips.ToListAsync());
+        var weeklyTripsQuery = db.Trips
+   .Where(x => x.DateCreated >= dtStartDate
+                && x.DateCreated <= dtEndDate
+                && x.IsDeleted == false && x.CreatedBy == currentUser.UserId);
+
+        var weeklyTrips = await weeklyTripsQuery
+            .Select(trip => new
+            {
+              trip,
+              Driver = db.Drivers.FirstOrDefault(d => d.Id == trip.DriverId),
+              Manager = db.AspNetUsers.FirstOrDefault(u => u.Id == trip.CreatedBy), // Manager from AspNetUsers
+              Passenger = db.Passengers.FirstOrDefault(p => p.Id == trip.PassengerId), // Passenger details
+              Place = db.Places.FirstOrDefault(pl => pl.Id == trip.PlaceId) // Place details (adjust the FK name if necessary)
+            })
+            .ToListAsync();
+
+        // Create a list of TripListDto
+        var result = weeklyTrips.Select(t => new TripListDto
+        {
+          Trip = t.trip,
+          Driver = t.Driver,
+          Manager = t.Manager, // This is the Manager's name from AspNetUser
+          Passenger = t.Passenger, // Passenger details
+          Place = t.Place, // Place details
+          TripCost = CalculateTripCost(t.trip), // Call your existing method to calculate cost
+          ManagerComission = t.Passenger.ManagerComission ?? 0 // Call your method for manager commission
+          //ManagerComission = CalculateManagerTripComission(t.trip) // Call your method for manager commission
+        }).ToList();
+
+        ViewBag.TotalCostFromViewBag = result.Sum(x => x.TripCost);
+
+        return View(result);  // Pass the list of TripListDto to the view
+        //var weeklyTrips = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.CreatedBy == currentUser.UserId);
+        //ViewBag.TotalCostFromViewBag = weeklyTrips.Sum(x => x.Cost);
+        //return View(await weeklyTrips.ToListAsync());
       }
+    }
+    private decimal CalculateTripCost(Trip trip)
+    {
+      var driver = db.Drivers.FirstOrDefault(d => d.Id == trip.DriverId);
+      decimal totalHours = trip.TotalHours ?? 0;
+      if (driver == null) return 0; // Handle case where driver is not found
+
+      if (driver.IsFiveHoursPlusEnabled == true)
+      {
+        // Default to 0 if TotalHours is null
+
+        if (totalHours >= 5.30m && totalHours < 8.00m) // Compare as decimal
+        {
+          return 100;
+        }
+        else if (totalHours >= 9.00m && totalHours < 12.00m)
+        {
+          return 150;
+        }
+        else if (totalHours >= 13.00m && totalHours < 24.00m)
+        {
+          return 200;
+        }
+      }
+
+      // Use null-coalescing operator to provide a default value if Cost is null
+      decimal cost = trip.Cost ?? 0; // Default to 0 if Cost is null
+      return cost * totalHours; // Multiply the cost with total hours
+    }
+    private decimal CalculateManagerTripComission(Trip trip)
+    {
+      var passenger = db.Passengers.FirstOrDefault(d => d.Id == trip.PassengerId);
+      var driver = db.Drivers.FirstOrDefault(d => d.Id == trip.DriverId);
+      decimal managerComission = trip.Passenger.ManagerComission ?? 0;
+      if (passenger == null) return 0; // Handle case where driver is not found
+      decimal cost = trip.Cost ?? 0; // Default to 0 if Cost is null
+      return cost * managerComission / 100.00m; // Multiply the cost with total hours
     }
     public ActionResult SearchData(string startDate, string endDate)
     {

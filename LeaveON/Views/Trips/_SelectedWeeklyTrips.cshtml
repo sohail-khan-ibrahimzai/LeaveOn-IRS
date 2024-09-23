@@ -1,4 +1,5 @@
-@model IEnumerable<InventoryRepo.Models.Trip>
+@*@model IEnumerable<InventoryRepo.Models.Trip>*@
+@model IEnumerable<InventoryRepo.ViewModels.TripListDto>  
 
 <style>
   .badge-custom-danger {
@@ -154,14 +155,15 @@
                     <thead>
                       <tr>
                         <th style="display:none;">
-
+                          
                         </th>
                         <th style="width:auto;">
                           Total Hours
                         </th>
                         <th style="width:auto;">
                           @*Trip Start Date Time*@
-                          Trip Start Time
+                          @*Trip Start Time*@
+                          Start Time
                         </th>
                         <th style="width: 102px;">
                           Passenger
@@ -191,7 +193,7 @@
                         <!--<th>-->
                         @*Trip End Date Time*@
                         <!--Trip Finish
-                        </th>-->
+      </th>-->
                         <th style="width:auto;">
                           Status
                         </th>
@@ -199,104 +201,89 @@
                         <th></th>
                       </tr>
                     </thead>
-                    @foreach (var item in Model)
-                    {
-                      var rowClass = item.IsBlackListed == true ? "badge-custom-danger-td" : "";
-                      <tr class="@rowClass">
-                        <td style="display:none">
-                          @Html.DisplayFor(modelItem => item.Id)
-                        </td>
-                        <td style="width:auto;">
-                          @Html.DisplayFor(modelItem => item.TotalHours)
-                        </td>
-                        <td>
-                          @(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("HH:mm:ss tt") : "")
-                          @*@(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss tt") : "")*@
-                          @*@(item.StartDateTime.HasValue ? item.StartDateTime.Value.ToString("dd/MM/yyyy HH-mm-ss") : "")*@
-                          @*@Html.DisplayFor(modelItem => item.DateCreated != null ? item.DateCreated.ToString("dd/MM/yyyy") : "")*@
-                        </td>
-                        <td style="width:auto;">
-                          @Html.DisplayFor(modelItem => item.Passenger.Name)
-                        </td>
-                        <td style="width:auto;">
-                          @Html.DisplayFor(modelItem => item.Cost)
-                        </td>
-                        <td style="width:auto;">
-                          @Html.DisplayFor(modelItem => item.Driver.Name)
-                        </td>
-                        @{
-                          // Assuming ViewBag.TotalCostFromViewBag is a decimal
-                          decimal totalCost = ViewBag.TotalCostFromViewBag != null ? Convert.ToDecimal(ViewBag.TotalCostFromViewBag) : 0;
-                          // Handle nullable CostPerHour and ManagerComission using ?? to provide a default value of 0 if they are null
-                          decimal driverCostPerHour = item.Driver.CostPerHour ?? 0;   // If null, default to 0
-                          decimal managerComission = item.Passenger.ManagerComission ?? 0; // If null, default to 0
-                          // Calculate Driver's profit (CostPerHour is a percentage of total cost)
-                          decimal totalDriverProfit = (totalCost * driverCostPerHour) / 100m;
-                          // Calculate Manager's profit (ManagerComission is a percentage of total cost)
-                          decimal totalManagerProfit = (totalCost * managerComission) / 100m;
-                          // Format both profits to show two decimal places
-                          string formattedDriverProfit = totalDriverProfit.ToString("F2");
-                          string formattedManagerProfit = totalManagerProfit.ToString("F2");
-                        }
-                        <td style="width:auto;">
-                          @formattedDriverProfit
-                        </td>
-                        <td style="width:auto;">
-                          @Html.DisplayFor(modelItem => item.AspNetUser.Name)
-                        </td>
-                        <td style="width:auto;">
-                          @formattedManagerProfit
-                        </td>
-                        <td style="width:auto;">
-                          @Html.DisplayFor(modelItem => item.Place.Name)
-                        </td>
-                        <td class="scrollable-container">
-                          @Html.Raw(item.Remarks)
-                          @*@Html.DisplayFor(modelItem => item.Remarks)*@
-                        </td>
-                        <td style="width:auto;">
-                          <select class="form-control status-select" onchange="handleStatusChange(@item.Id, this.value)">
-                            <option value="Success(Not Paid)" @(item.Status == "Success(Not Paid)" ? "selected" : "") class="badge-custom-danger">Success Not Paid</option>
-                            <option value="Success" @(item.Status == "Success" ? "selected" : "") class="badge-custom-success">Succeeded</option>
-                            <option value="In Progress" @(item.Status == "In Progress" ? "selected" : "") class="badge-custom-warning">In progress</option>
-                            <option value="Cancel" @(item.Status == "Cancel" ? "selected" : "") class="badge-custom-secondary">Cancelled</option>
-                          </select>
-                        </td>
-                        <td style="width:auto;">
-                          @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
-                          {
-                            <a href="@Url.Action("Edit", "Trips", new { id = item.Id })" class="btn btn-info">Update</a>
-                            @*@Html.ActionLink("Update", "Edit", new { id = item.Id }, new { @class = "btn btn-info" })*@
-                          }
-                          else
-                          {
-                            <a href="@Url.Action("Edit", "Trips", new { id = item.Id })" class="btn btn-info">View</a>
-                            @*@Html.ActionLink("View", "Edit", new { id = item.Id }, new { @class = "btn btn-info" })*@
-                          }
-                          @if (User.IsInRole("Admin"))
-                          {
-                            <a href="@Url.Action("Delete", "Trips", new { id = item.Id })" class="btn btn-danger">Delete</a>}
-                          @*{@Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-danger" })}*@
-                        </td>
-                        @*@if (item.Status == "Success(Not Paid)")*@
-                        @if (item.IsBlackListed == true)
-                        {
-                          <td style="width:auto;">
-                            <span class="blacklist-icon" data-tooltip="This location has been blacklisted">
-                              <i class="fas fa-exclamation-triangle"></i>
-                            </span>
+                    <tbody>
+                      @foreach (var item in Model)
+                      {
+                        var rowClass = item.Trip.IsBlackListed == true ? "badge-custom-danger-td" : "";
+                        <tr class="@rowClass">
+                          <td style="display:none">
+                            @Html.DisplayFor(modelItem => item.Trip.Id)
                           </td>
-                        }
-                        else
-                        {
+                          <td style="width:auto;">
+                            @Html.DisplayFor(modelItem => item.Trip.TotalHours)
+                          </td>
+                          <td>
+                            @(item.Trip.StartDateTime.HasValue ? item.Trip.StartDateTime.Value.ToString("HH:mm:ss tt") : "")
+                          </td>
+                          <td style="width:auto;">
+                            @Html.DisplayFor(modelItem => item.Passenger.Name)
+                          </td>
+                          <td style="width:auto;">
+                            @Html.DisplayFor(modelItem => item.Trip.Cost)
+                          </td>
+                          <td style="width:auto;">
+                            @Html.DisplayFor(modelItem => item.Driver.Name)
+                          </td>
+                          <td style="width:auto;">
+                            @Html.DisplayFor(modelItem => item.TripCost)
+                          </td>
+                          <td style="width:auto;">
+                            @Html.DisplayFor(modelItem => item.Manager.Name)
+                          </td>
+                          <td style="width:auto;">
+                            @Html.DisplayFor(modelItem => item.ManagerComission)
+                          </td>
+                          <td style="width:auto;">
+                            @Html.DisplayFor(modelItem => item.Place.Name)
+                          </td>
+                          <td class="scrollable-container">
+                            @Html.Raw(item.Trip.Remarks)
+                          </td>
+                          <td style="width:auto;">
+                            <select class="form-control status-select" onchange="handleStatusChange(@item.Trip.Id, this.value)">
+                              <option value="Success(Not Paid)" @(item.Trip.Status == "Success(Not Paid)" ? "selected" : "") class="badge-custom-danger">Success Not Paid</option>
+                              <option value="Success" @(item.Trip.Status == "Success" ? "selected" : "") class="badge-custom-success">Succeeded</option>
+                              <option value="In Progress" @(item.Trip.Status == "In Progress" ? "selected" : "") class="badge-custom-warning">In progress</option>
+                              <option value="Cancel" @(item.Trip.Status == "Cancel" ? "selected" : "") class="badge-custom-secondary">Cancelled</option>
+                            </select>
+                          </td>
+                          <td style="width:auto;">
+                            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                            {
+                              <a href="@Url.Action("Edit", "Trips", new { id = item.Trip.Id })" class="btn btn-info">Update</a>
+                              @*@Html.ActionLink("Update", "Edit", new { id = item.Id }, new { @class = "btn btn-info" })*@
+                            }
+                            else
+                            {
+                              <a href="@Url.Action("Edit", "Trips", new { id = item.Trip.Id })" class="btn btn-info">View</a>
+                              @*@Html.ActionLink("View", "Edit", new { id = item.Id }, new { @class = "btn btn-info" })*@
+                            }
+                            @if (User.IsInRole("Admin"))
+                            {
+                              <a href="@Url.Action("Delete", "Trips", new { id = item.Trip.Id })" class="btn btn-danger">Delete</a>}
+                            @*{@Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-danger" })}*@
+                          </td>
+                          @*@if (item.Status == "Success(Not Paid)")*@
                           <td></td>
-                        }
+                        </tr>
+                      }
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        @*<th colspan="3" style="text-align:right">Totals:</th>*@
+                        <th colspan="3" style="text-align:right"></th>
+                        <th id="total-cost-footer">0</th> <!-- Total Cost -->
+                        <th></th>
+                        <th id="total-driver-profit">0</th> <!-- Total Driver Profit -->
+                        <th></th>
+                        <th id="total-manager-profit">0</th> <!-- Total Manager Profit -->
+                        <th colspan="4"></th> <!-- Skip remaining columns -->
                       </tr>
-                    }
+                    </tfoot>
                   </table>
-                  <div id="total-count-container" style="margin-top: 20px;">
-                    <p><b>Total Cost for the selected week: <span id="total-cost">0</span></b></p>
-                  </div>
+                  <!--<div id="total-count-container" style="margin-top: 20px;">-->
+                    @*<p><b>Total Cost for the selected week: <span id="total-cost">0</span></b></p>*@
+                  <!--</div>-->
                 </div>
               </div>
             </div>
@@ -320,7 +307,84 @@
 
 <script type="text/javascript">
   $(document).ready(function () {
-    var totalCostFromViewBag = @Html.Raw(ViewBag.TotalCostFromViewBag ?? "0");
+var totalCostFromViewBag = @Html.Raw(ViewBag.TotalCostFromViewBag ?? "0");
+
+    var table = $('#tripTable').DataTable({
+      "paging": true,
+      "lengthChange": true,
+      "pageLength": 100,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "responsive": true,
+      "autoWidth": false,
+      "order": [[0, "desc"]],
+      "language": {
+        "emptyTable": "No data available for selected date. Please change date."
+      },
+      "drawCallback": function (settings) {
+        var api = this.api();
+
+        // Initialize totals
+        var totalCost = 0;
+        var totalDriverProfit = 0;
+        var totalManagerProfit = 0;
+
+        // Loop through all visible rows to calculate totals
+        api.rows({ page: 'current' }).every(function () {
+          var data = this.data();
+          // Assuming data[4] is the cost, data[6] is the driver profit, and data[8] is the manager profit
+          var tripCost = parseFloat(data[6].replace(/[^0-9.]/g, '')) || 0;  // 111.60
+          var managerProfit = parseFloat(data[8].replace(/[^0-9.]/g, '')) || 0;  // 120.00
+          var cost = parseFloat(data[4].replace(/[^0-9.]/g, '')) || 0;  // 12.00
+
+          //console.log(tripCost);  // 111.60
+          //console.log(managerProfit);  // 120.00
+          //console.log(cost);  // 12.00
+
+          // Accumulate the totals
+          totalCost += cost;
+          totalDriverProfit += tripCost;
+          totalManagerProfit += managerProfit;
+        });
+
+        // Update footer totals
+        $('#total-cost-footer').text(totalCost.toFixed(2));
+        $('#total-driver-profit').text(totalDriverProfit.toFixed(2));
+        $('#total-manager-profit').text(totalManagerProfit.toFixed(2));
+      },
+      dom: 'Bfrtip',
+      buttons: [
+        {
+          extend: 'csvHtml5',
+          exportOptions: {
+            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+          }
+        },
+        {
+          extend: 'excelHtml5',
+          exportOptions: {
+            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+          }
+        },
+        {
+          extend: 'pdfHtml5',
+          orientation: 'landscape',
+          pageSize: 'LEGAL',
+          exportOptions: {
+            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+          }
+        },
+        {
+          extend: 'print',
+          exportOptions: {
+            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+          }
+        }
+      ]
+    });
+
+    @*var totalCostFromViewBag = @Html.Raw(ViewBag.TotalCostFromViewBag ?? "0");
     //Current Date with fix time
     function getCurrentDayAndDate() {
       var now = new Date();
@@ -380,7 +444,7 @@
         totalCost += parseFloat(totalCostFromViewBag);
         $('#total-cost').text(totalCost.toFixed(2));
       }
-    });
+    });*@
   });
 
   function updateSelectBackground(selectElement) {

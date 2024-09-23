@@ -309,11 +309,17 @@
                   </div>*@
 
               <div class="form-group">
-                @Html.LabelFor(model => model.Cost, htmlAttributes: new { @class = "" })
+                <label>Cost/Hour</label>
+                @*@Html.LabelFor(model => model.Cost, htmlAttributes: new { @class = "" })*@
                 @Html.EditorFor(model => model.Cost, new { htmlAttributes = new { @class = "form-control", @id = "tripCost", @placeholder = "Cost" } })
                 @Html.ValidationMessageFor(model => model.Cost, "", new { @class = "text-danger" })
                 <!-- Add a hidden field to store the cost for submission -->
                 <input type="hidden" id="tripCostHidden" name="Cost" value="@Model.Cost" />
+              </div>   
+                
+              <div class="form-group">
+                <label>Total Cost</label>
+                <input type="text" class = "form-control" id="tripTotalCost" name="TotalCost" value="0" />
               </div>
 
                 <div class="form-group">

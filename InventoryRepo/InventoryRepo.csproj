@@ -153,6 +153,7 @@
     <Compile Include="ViewModels\CreateDriverDto.cs" />
     <Compile Include="ViewModels\CreateTripDto.cs" />
     <Compile Include="ViewModels\Dashboard.cs" />
+    <Compile Include="ViewModels\TripListDto.cs" />
     <Compile Include="ViewModels\UserInfoDto.cs" />
   </ItemGroup>
   <ItemGroup>
