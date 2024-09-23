@@ -18,8 +18,7 @@ $(document).ready(function () {
     }
   });
   //////////////////Edit case///////////////////////////////////
-
-  debugger
+  
   const checkbox = document.getElementById('isBlackListed');
   if (checkbox != null) {
     const isBlackListed = checkbox.checked;
@@ -32,10 +31,8 @@ $(document).ready(function () {
       elements[i].style.display = isBlackListed ? 'block' : 'none';
     }
     document.getElementById('isBlackListed').addEventListener('change', function () {
-      debugger;
       const isBlackListed = checkbox.checked;
-      debugger; // Keeps your debugger line
-
+      // Keeps your debugger line
       // Toggle visibility of elements based on checkbox state
       for (let i = 0; i < elements.length; i++) {
         elements[i].style.display = isBlackListed ? 'block' : 'none';

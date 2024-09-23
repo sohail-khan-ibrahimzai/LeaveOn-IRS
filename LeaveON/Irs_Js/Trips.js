@@ -1,5 +1,4 @@
 $(document).ready(function () {
-  debugger;
   // Cache the input fields using jQuery selectors
   getAvailableDriversOnDateTimeChange();
   populateDropdown(totalTripHours);
@@ -88,7 +87,6 @@ $(document).ready(function () {
   //  //buttonImage: "http://jqueryui.com/resources/demos/datepicker/images/calendar.gif",
   //  //buttonText: "Select date"
   //});
-  debugger;
   $('#autocompletePassengerId, #autocompletePlaceId,#autocompleteDriverId').on('keydown', function (event) {
     if (event.key === 'Enter') {
       event.preventDefault(); // Prevent default form submission behavior
@@ -107,7 +105,6 @@ $(document).ready(function () {
   console.log('Document ready');
   console.log('Available Passengers:', availablePassengers);
   var transformedPassengers = availablePassengers.map(function (passenger) {
-    debugger;
     return {
       label: passenger.Name,  // Display this in the input field
       value: passenger.Id,  // Store this in the hidden input
@@ -119,7 +116,6 @@ $(document).ready(function () {
   });
   $("#autocompletePassengerId").autocomplete({
     source: function (request, response) {
-      debugger;
       console.log('Autocomplete triggered with request:', request);
       response(transformedPassengers); // Use the transformed data
     },
@@ -129,7 +125,6 @@ $(document).ready(function () {
       return false; // Prevent default behavior of setting the value (ID) in the input
     },
     select: function (event, ui) {
-      debugger;
       if (ui.item.managerDeal != null && ui.item.managerComission != null) {
         $('#tripCost').val(ui.item.managerDeal);
       }
@@ -376,11 +371,9 @@ $(document).ready(function () {
       return false; // Prevent default behavior of setting the value (ID) in the input
     },
     select: function (event, ui) {
-      debugger;
       var getTotlaHoursTime = $('#totalHoursDropdown').val();
       var totalHours = parseFloat(getTotlaHoursTime);
       if (ui.item.isFiveHoursPlusEnabled == true) {
-        debugger
         if (totalHours > 5 && totalHours <= 8) {
           $('#tripCost').val('100').attr('disabled', true);
           $('#tripTotalCost').val('100').attr('disabled', true);
@@ -558,7 +551,6 @@ $(document).ready(function () {
 
   //////////////////Edit case///////////////////////////////////
 
-  debugger
   const checkbox = document.getElementById('isBlackListed');
   if (checkbox != null) {
     const isBlackListed = checkbox.checked;
@@ -573,7 +565,7 @@ $(document).ready(function () {
 
     document.getElementById('isBlackListed').addEventListener('change', function () {
       const isBlackListed = checkbox.checked;
-      debugger; // Keeps your debugger line
+      // Keeps your debugger line
 
       // Toggle visibility of elements based on checkbox state
       for (let i = 0; i < elements.length; i++) {
@@ -604,7 +596,6 @@ $(document).ready(function () {
   //}
   /////////////////////////////////////////////////////////////
   $('#tripCost').on('keyup', function () {
-    debugger;
     var tripCost = $('#tripCost').val();
     var _tripCost = parseFloat(tripCost);
     var totalHours = $('#totalHoursDropdown').val();
@@ -621,7 +612,6 @@ $(document).ready(function () {
 
 function getAvailableDriversOnDateTimeChange() {
   //function handleDateTimeChange(element) {
-  debugger;
   //var aa = element.value;
   var startTripDateTime = $('#fromDateTime').val();
   var endTripDateTime = $('#toDateTime').val();
@@ -630,14 +620,12 @@ function getAvailableDriversOnDateTimeChange() {
     method: 'GET',
     data: { startTripDateTime: startTripDateTime, endTripDateTime: endTripDateTime },
     success: function (data) {
-      debugger;
       if (data.success) {
         // Access the data array from the response object
         var drivers = data.data;
 
         // Ensure drivers is an array before calling map
         if (Array.isArray(drivers)) {
-          debugger;
           var transformedDrivers = drivers.map(function (driver) {
             //return {
             //  label: driver.Name,  // Display the driver's name
@@ -667,7 +655,6 @@ function getAvailableDriversOnDateTimeChange() {
 }
 //////////////////////////////////////////Driver///////////////////////////////////////
 function onPlaceChange(dropdown) {
-  debugger
   var selectedValue = dropdown.target.value;
   if (selectedValue === "" || isNaN(selectedValue)) {
     $('#placeName').val(selectedValue);

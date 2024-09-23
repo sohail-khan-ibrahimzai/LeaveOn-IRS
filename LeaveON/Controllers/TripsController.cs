@@ -862,7 +862,8 @@ namespace LeaveON.Controllers
                       && trip.IsDeleted == false
                       && trip.CreatedBy == currentUser.UserId
                       // Overlap condition: the trip cannot overlap the provided time window
-                      && ((trip.StartDateTime <= endDate && trip.EndDateTime >= startDate))))
+                      //&& ((trip.StartDateTime <= endDate && trip.EndDateTime >= startDate))))
+                      && ((startDate >= trip.StartDateTime))))
               .Select(driver => new
               {
                 Id = driver.Id,
