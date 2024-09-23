@@ -220,7 +220,7 @@
                     new { @class = "form-control from-date-picker", @id = "fromDateTime" })*@
                   @Html.TextBoxFor(model => model.StartDateTime,
                                                                                                                                   "{0:hh:mm:ss tt}",
-                                                                                                                                  new { @class = "form-control from-date-picker", @id = "fromDateTime" })
+                                                                                                                                  new { @class = "form-control from-date-picker", @id = "fromDateTime", @onchange = "getAvailableDriversOnDateTimeChange()" })
                   @Html.ValidationMessageFor(model => model.StartDateTime, "", new { @class = "text-danger" })
                 <input type="hidden" id="fullDateTime" name="StartDateTime" />
                 </div>

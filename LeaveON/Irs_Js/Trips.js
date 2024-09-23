@@ -60,6 +60,7 @@ $(document).ready(function () {
       $('#fullDateTime').val(fullDateTime);
     }
   });
+
   //$('.from-date-picker').datetimepicker({
   //  timeFormat: "hh:mm tt",
   //  showOn: "both",
@@ -380,15 +381,15 @@ $(document).ready(function () {
       var totalHours = parseFloat(getTotlaHoursTime);
       if (ui.item.isFiveHoursPlusEnabled == true) {
         debugger
-        if (totalHours >= 5 && totalHours <= 8) {
+        if (totalHours > 5 && totalHours <= 8) {
           $('#tripCost').val('100').attr('disabled', true);
           $('#tripTotalCost').val('100').attr('disabled', true);
           $('#tripCostHidden').val('100'); // Update hidden field
-        } else if (totalHours >= 9 && totalHours <= 12) {
+        } else if (totalHours > 8 && totalHours <= 12) {
           $('#tripCost').val('150').attr('disabled', true);
           $('#tripTotalCost').val('150').attr('disabled', true);
           $('#tripCostHidden').val('150'); // Update hidden field
-        } else if (totalHours >= 13 && totalHours <= 24) {
+        } else if (totalHours > 12 && totalHours <= 24) {
           $('#tripCost').val('200').attr('disabled', true);
           $('#tripTotalCost').val('200').attr('disabled', true);
           $('#tripCostHidden').val('200'); // Update hidden field

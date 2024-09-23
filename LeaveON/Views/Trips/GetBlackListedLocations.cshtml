@@ -167,7 +167,7 @@
                     </thead>
                     @foreach (var item in Model)
                     {
-                      var rowClass = item.IsBlackListed == true ? "badge-custom-danger-td" : "";
+                      var rowClass = item.Place.IsBlackListed == true ? "badge-custom-danger-td" : "";
                       <tr class="@rowClass">
                         <td style="display:none">
                           @Html.DisplayFor(modelItem => item.Id)
