@@ -85,7 +85,7 @@ namespace LeaveON.Controllers
         var driverExists = await db.Drivers
            .FirstOrDefaultAsync(x => x.Name == createDriverDto.Name);
 
-        if (driverExists !=null)
+        if (driverExists != null)
         {
           ModelState.AddModelError("Name", "Driver already exists.");
         }
@@ -96,7 +96,7 @@ namespace LeaveON.Controllers
             DateCreated = DateTime.Now,
             Name = createDriverDto.Name,
             Remarks = createDriverDto.Remarks,
-            CostPerHour=createDriverDto.CostPerHour,
+            CostPerHour = createDriverDto.CostPerHour,
             IsFiveHoursPlusEnabled = createDriverDto.IsFiveHoursPlusEnabled,
             IsDeleted = false,
             CreatedBy = currentUser.UserId
@@ -132,10 +132,11 @@ namespace LeaveON.Controllers
       {
         Id = driver.Id,
         Name = driver.Name,
+        CostPerHour = driver.CostPerHour ?? 0,
         Remarks = driver.Remarks,
         IsFiveHoursPlusEnabled = driver.IsFiveHoursPlusEnabled,
       };
-      
+
       return View(editDriverDto);
     }
 
