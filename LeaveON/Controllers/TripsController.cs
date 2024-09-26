@@ -37,25 +37,42 @@ namespace LeaveON.Controllers
     // GET: Trips
     public async Task<ActionResult> Index()
     {
+
       var currentUser = GetCurrentUserInfo();
-      ///Date Format
 
-      //Old Working
-      //DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
-      //var dtStartDate = DateTime.UtcNow;
-      //var dtEndtDate = DateTime.UtcNow;
-      //ViewBag.StartDate = dtStartDate.ToString("dd-MMM-yyyy");
-      //ViewBag.EndDate = dtEndtDate.ToString("dd-MMM-yyyy");
+      // Convert the current UTC time to Greece time (GTB Standard Time)
+      DateTime GRDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("GTB Standard Time"));
 
-      DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
-      // Start date: 08:00 AM of the current day in PKT
-      var dtStartDate = new DateTime(PKDate.Year, PKDate.Month, PKDate.Day, 8, 0, 0);
-      // End date: 07:59 AM of the next day in PKT
+      // Start date: 08:00 AM of the current day in Greece time
+      var dtStartDate = new DateTime(GRDate.Year, GRDate.Month, GRDate.Day, 8, 0, 0);
+
+      // End date: 07:59 AM of the next day in Greece time
       var dtEndDate = dtStartDate.AddDays(1).AddMinutes(-1);
 
-      // Assigning to ViewBag
+      // Assigning to ViewBag with time in Greece
       ViewBag.StartDate = dtStartDate.ToString("dd-MMM-yyyy hh:mm tt");
       ViewBag.EndDate = dtEndDate.ToString("dd-MMM-yyyy hh:mm tt");
+
+      //var currentUser = GetCurrentUserInfo();
+      /////Date Format
+
+      ////Old Working
+      ////DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
+      ////var dtStartDate = DateTime.UtcNow;
+      ////var dtEndtDate = DateTime.UtcNow;
+      ////ViewBag.StartDate = dtStartDate.ToString("dd-MMM-yyyy");
+      ////ViewBag.EndDate = dtEndtDate.ToString("dd-MMM-yyyy");
+
+      //DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
+      //// Start date: 08:00 AM of the current day in PKT
+      //var dtStartDate = new DateTime(PKDate.Year, PKDate.Month, PKDate.Day, 8, 0, 0);
+      //// End date: 07:59 AM of the next day in PKT
+      //var dtEndDate = dtStartDate.AddDays(1).AddMinutes(-1);
+
+      //// Assigning to ViewBag
+      //ViewBag.StartDate = dtStartDate.ToString("dd-MMM-yyyy hh:mm tt");
+      //ViewBag.EndDate = dtEndDate.ToString("dd-MMM-yyyy hh:mm tt");
+
 
 
       //DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
