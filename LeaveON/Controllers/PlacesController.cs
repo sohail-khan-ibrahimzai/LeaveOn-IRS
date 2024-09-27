@@ -46,7 +46,8 @@ namespace LeaveON.Controllers
     [Authorize(Roles = "Admin,Manager")]
     public ActionResult Create()
     {
-      return View();
+      CreatePlaceDto createPlaceDto = new CreatePlaceDto();
+      return View(createPlaceDto);
     }
 
     // POST: Locations/Create

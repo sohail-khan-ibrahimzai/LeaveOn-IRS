@@ -60,7 +60,8 @@ namespace LeaveON.Controllers
     // GET: Passengers/Create
     public ActionResult Create()
     {
-      return View();
+      CreatePassengerDto createPassengerDto = new CreatePassengerDto();
+      return View(createPassengerDto);
     }
 
     // POST: Passengers/Create

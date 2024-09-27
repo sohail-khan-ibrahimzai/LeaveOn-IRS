@@ -67,7 +67,8 @@ namespace LeaveON.Controllers
     // GET: Drivers/Create
     public ActionResult Create()
     {
-      return View();
+      var createDriverDto = new CreateDriverDto(); // Ensure the model is initialized
+      return View(createDriverDto);
     }
 
     // POST: Drivers/Create
