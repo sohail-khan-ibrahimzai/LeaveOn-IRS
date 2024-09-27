@@ -59,7 +59,21 @@ $(document).ready(function () {
       $('#fullDateTime').val(fullDateTime);
     }
   });
-
+  debugger;
+  var tripTotalTime = document.getElementById('totalHoursDropdown');
+  if (tripTotalTime) {
+    // Get the selected value and parse it to a float
+    var selectedHours = parseFloat(tripTotalTime.value);
+    // Get the cost per hour
+    var tripCost = parseFloat(document.getElementById('tripCost').value);
+    // Calculate the total cost
+    var totalCost = selectedHours * tripCost;
+    // Alert the total cost
+    //alert(totalCost.toFixed(2)); // Show two decimal places
+    $('#tripTotalCost').val(totalCost);
+    // Alert the total cost
+    //alert(totalCost);
+  }
   //$('.from-date-picker').datetimepicker({
   //  timeFormat: "hh:mm tt",
   //  showOn: "both",
@@ -550,6 +564,7 @@ $(document).ready(function () {
 
 
   //////////////////Edit case///////////////////////////////////
+
 
   const checkbox = document.getElementById('isBlackListed');
   if (checkbox != null) {

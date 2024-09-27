@@ -125,6 +125,9 @@ namespace LeaveON.Controllers
         Id = passenger.Id,
         Name = passenger.Name,
         Remarks = passenger.Remarks,
+        NickName = passenger.NickName,
+        PhoneNumber = passenger.PhoneNumber,
+        PickupAddress = passenger.PickupAddress,
         ManagerDeal = passenger.ManagerDeal.HasValue ? passenger.ManagerDeal.Value : 0,
         ManagerComission = passenger.ManagerComission.HasValue ? passenger.ManagerComission.Value : 0  // Set default to 0.0M if null
       };
