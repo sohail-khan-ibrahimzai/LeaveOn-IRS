@@ -73,7 +73,7 @@ namespace LeaveON.Controllers
         {
           var place = new Place
           {
-            DateCreated = DateTime.Now,
+            DateCreated = DateTime.UtcNow,
             Name = createPlaceDto.Name,
             Remarks = createPlaceDto.Remarks,
             Address = createPlaceDto.Address,
@@ -136,7 +136,7 @@ namespace LeaveON.Controllers
         //}
         if (place == null)
           return HttpNotFound();
-        place.DateUpdated = DateTime.Now;
+        place.DateUpdated = DateTime.UtcNow;
         place.Name = updatePlaceDto.Name;
         place.Remarks = updatePlaceDto.Remarks;
         place.Address = updatePlaceDto.Address;

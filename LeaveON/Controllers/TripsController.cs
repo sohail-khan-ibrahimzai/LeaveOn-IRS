@@ -2,6 +2,7 @@ using InventoryRepo.Enums;
 using InventoryRepo.Models;
 using InventoryRepo.ViewModels;
 using LeaveON.Dtos;
+using LeaveON.Helpers;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
@@ -136,13 +137,12 @@ namespace LeaveON.Controllers
     public async Task<ActionResult> WeeklyReports()
     {
       var currentUser = GetCurrentUserInfo();
-
-      // Get current date in Pakistan Standard Time (PKT)
-      DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
+      // Convert the current UTC time to Greece time (GTB Standard Time)
+      DateTime GRDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("GTB Standard Time"));
 
       // Calculate the most recent Sunday (start of the week)
-      int daysToLastSunday = ((int)PKDate.DayOfWeek == 0) ? 0 : 7 - (int)PKDate.DayOfWeek;  // Calculate number of days to the last Sunday (0 = Sunday)
-      DateTime dtStartDate = new DateTime(PKDate.Year, PKDate.Month, PKDate.Day, 8, 0, 0).AddDays(-daysToLastSunday);  // Sunday 08:00 AM
+      int daysToLastSunday = ((int)GRDate.DayOfWeek == 0) ? 0 : 7 - (int)GRDate.DayOfWeek;  // Calculate number of days to the last Sunday (0 = Sunday)
+      DateTime dtStartDate = new DateTime(GRDate.Year, GRDate.Month, GRDate.Day, 8, 0, 0).AddDays(-daysToLastSunday);  // Sunday 08:00 AM
 
       // Calculate next Sunday 07:59 AM as the end of the week
       DateTime dtEndDate = dtStartDate.AddDays(7).AddMinutes(-1);  // Saturday 07:59 AM of the next week
@@ -460,6 +460,14 @@ namespace LeaveON.Controllers
     public async Task<ActionResult> Create([Bind(Include = "Id,DriverId,PassengerId,PlaceId,Cost,DateCreated,DateModified,StartDateTime,EndDateTime,TotalHours,Status,PlaceName,Remarks")] CreateTripDto addTripDto)
     {
       var currentUser = GetCurrentUserInfo();
+
+      // Get the current UTC time
+      DateTime utcNow = DateTime.UtcNow;
+      // Retrieve the default time zone (Greece)
+      TimeZoneInfo greeceTimeZone = GreeceTimeZoneHelper.GetDefaultGreeceTimeZone();
+      // Convert UTC to Greece local time
+      DateTime localTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, greeceTimeZone);
+
       try
       {
         if (addTripDto.Id == null || addTripDto.Id == 0)
@@ -485,7 +493,8 @@ namespace LeaveON.Controllers
               var addTrip = new Trip
               {
 
-                DateCreated = DateTime.Now,
+                //DateCreated = DateTime.UtcNow,
+                DateCreated = localTime,
                 DriverId = addTripDto.DriverId,
                 PassengerId = addTripDto.PassengerId,
                 PlaceId = addTripDto.PlaceId,
@@ -505,7 +514,8 @@ namespace LeaveON.Controllers
           {
             var addTrip = new Trip
             {
-              DateCreated = DateTime.Now,
+              //DateCreated = DateTime.UtcNow,
+              DateCreated = localTime,
               DriverId = addTripDto.DriverId,
               PassengerId = addTripDto.PassengerId,
               PlaceId = addTripDto.PlaceId,
@@ -540,7 +550,7 @@ namespace LeaveON.Controllers
       var currentUser = GetCurrentUserInfo();
       var addPlace = new Place
       {
-        DateCreated = DateTime.Now,
+        DateCreated = DateTime.UtcNow,
         CreatedBy = currentUser.UserId,
         Name = tripDto.PlaceName,
         Remarks = "",

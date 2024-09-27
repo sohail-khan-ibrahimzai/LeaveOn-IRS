@@ -74,7 +74,7 @@ namespace LeaveON.Controllers
     [Authorize(Roles = "Admin,Manager")]
     public async Task<ActionResult> Edit([Bind(Include = "Id,Type,Remarks,DateCreated,DateModified")] DeviceType deviceType)
     {
-      deviceType.DateModified = DateTime.Now;
+      deviceType.DateModified = DateTime.UtcNow;
       if (ModelState.IsValid)
       {
         db.Entry(deviceType).State = EntityState.Modified;

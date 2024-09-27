@@ -253,6 +253,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\GreeceTimeZoneHelper.cs" />
     <Compile Include="Migrations\202004151034042_InitialCreate.cs" />
     <Compile Include="Migrations\202004151034042_InitialCreate.Designer.cs">
       <DependentUpon>202004151034042_InitialCreate.cs</DependentUpon>

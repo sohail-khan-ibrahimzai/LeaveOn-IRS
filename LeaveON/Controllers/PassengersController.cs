@@ -86,7 +86,7 @@ namespace LeaveON.Controllers
         {
           var passenger = new Passenger
           {
-            DateCreated = DateTime.Now,
+            DateCreated = DateTime.UtcNow,
             Name = createPassengerDto.Name,
             Remarks = createPassengerDto.Remarks,
             IsDeleted = false,
@@ -147,7 +147,7 @@ namespace LeaveON.Controllers
         var passenger = await db.Passengers.FirstOrDefaultAsync(x => x.Id == updatePassengerDto.Id);
         if (passenger == null)
           return HttpNotFound();
-        passenger.DateModified = DateTime.Now;
+        passenger.DateModified = DateTime.UtcNow;
         //driver.IsDeleted = false;
         passenger.Name = updatePassengerDto.Name;
         passenger.Remarks = updatePassengerDto.Remarks;

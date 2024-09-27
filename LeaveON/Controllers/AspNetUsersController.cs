@@ -131,7 +131,8 @@ namespace LeaveON.Controllers
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> Edit(string UserType, [Bind(Include = "Id,Hometown,Email,EmailConfirmed,PasswordHash,SecurityStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEndDateUtc,LockoutEnabled,AccessFailedCount,UserName,DateCreated,DateModified,Remarks,DepartmentId,CountryId,UserLeavePolicyId,BioStarEmpNum")] AspNetUser aspNetUser)//,int CountryId)
     {
-      aspNetUser.DateModified = DateTime.Now;
+      //aspNetUser.DateModified = DateTime.Now;
+      aspNetUser.DateModified = DateTime.UtcNow;
 
       if (ModelState.IsValid)
       {
