@@ -263,15 +263,14 @@ namespace LeaveON.Controllers
       decimal totalHours = trip.TotalHours ?? 0;
       if (driver == null) return 0; // Handle case where driver is not found
 
+      // If the driver has "Five Hours Plus" enabled
       if (driver.IsFiveHoursPlusEnabled == true)
       {
-        // Default to 0 if TotalHours is null
-
-        if (totalHours >= 5.30m && totalHours < 8.00m) // Compare as decimal
+        if (totalHours >= 5.30m && totalHours < 8.00m)
         {
           return 100;
         }
-        else if (totalHours >= 9.00m && totalHours < 12.00m)
+        else if (totalHours >= 8.00m && totalHours < 12.00m)
         {
           return 150;
         }
@@ -281,9 +280,35 @@ namespace LeaveON.Controllers
         }
       }
 
-      // Use null-coalescing operator to provide a default value if Cost is null
-      decimal cost = trip.Cost ?? 0; // Default to 0 if Cost is null
-      return cost * totalHours; // Multiply the cost with total hours
+      // If not eligible for fixed rates, use the driver's cost per hour
+      decimal hourlyRate = driver.CostPerHour ?? 0; // Get cost per hour from driver table
+      decimal cost = totalHours * hourlyRate; // Multiply the hourly rate by total hours
+      return cost;
+      //var driver = db.Drivers.FirstOrDefault(d => d.Id == trip.DriverId);
+      //decimal totalHours = trip.TotalHours ?? 0;
+      //if (driver == null) return 0; // Handle case where driver is not found
+
+      //if (driver.IsFiveHoursPlusEnabled == true)
+      //{
+      //  // Default to 0 if TotalHours is null
+
+      //  if (totalHours >= 5.30m && totalHours < 8.00m) // Compare as decimal
+      //  {
+      //    return 100;
+      //  }
+      //  else if (totalHours >= 9.00m && totalHours < 12.00m)
+      //  {
+      //    return 150;
+      //  }
+      //  else if (totalHours >= 13.00m && totalHours < 24.00m)
+      //  {
+      //    return 200;
+      //  }
+      //}
+
+      //// Use null-coalescing operator to provide a default value if Cost is null
+      //decimal cost = trip.Cost ?? 0; // Default to 0 if Cost is null
+      //return cost * totalHours; // Multiply the cost with total hours
     }
     private decimal CalculateManagerTripComission(Trip trip)
     {

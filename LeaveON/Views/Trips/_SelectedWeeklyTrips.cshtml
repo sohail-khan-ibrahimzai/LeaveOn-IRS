@@ -204,7 +204,7 @@
                     <tbody>
                       @foreach (var item in Model)
                       {
-                        var rowClass = item.Trip.IsBlackListed == true ? "badge-custom-danger-td" : "";
+                        var rowClass = item.Place.IsBlackListed == true ? "badge-custom-danger-td" : "";
                         <tr class="@rowClass">
                           <td style="display:none">
                             @Html.DisplayFor(modelItem => item.Trip.Id)
@@ -227,6 +227,18 @@
                           <td style="width:auto;">
                             @Html.DisplayFor(modelItem => item.TripCost)
                           </td>
+                          @*@if (item.Driver.IsFiveHoursPlusEnabled == true)
+                          {
+                            <td style="width:auto;">
+                              @Html.DisplayFor(modelItem => item.TripCost)
+                            </td>
+                          }
+                          else
+                          {
+                            <td style="width:auto;">
+                              0.00
+                            </td>
+                          }*@
                           <td style="width:auto;">
                             @Html.DisplayFor(modelItem => item.Manager.Name)
                           </td>
