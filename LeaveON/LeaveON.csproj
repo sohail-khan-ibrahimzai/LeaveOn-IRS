@@ -545,6 +545,8 @@
     <Content Include="Global.asax" />
     <Content Include="Images\Ripple_1s_200px_Transparent.gif" />
     <Content Include="Images\Ripple_1s_200px_White.gif" />
+    <Content Include="Irs_Js\PassengerList.js" />
+    <Content Include="Irs_Js\DriverList.js" />
     <Content Include="Irs_Js\Shared.js" />
     <Content Include="Irs_Js\Trips.js" />
     <Content Include="Irs_Js\Places.js" />
@@ -2602,6 +2604,7 @@
     <Content Include="Views\Trips\GetBlackListedLocations.cshtml" />
     <Content Include="Views\Trips\WeeklyReports.cshtml" />
     <Content Include="Views\Trips\_SelectedWeeklyTrips.cshtml" />
+    <Content Include="Views\Passengers\UpdatePassengersManagers.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\SelectWeakListHtmlHelper\" />

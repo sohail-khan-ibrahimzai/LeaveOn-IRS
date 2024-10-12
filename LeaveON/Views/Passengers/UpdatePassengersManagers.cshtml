@@ -1,0 +1,68 @@
+@model InventoryRepo.ViewModels.PassengerMgrUpdateDto
+
+@{
+  ViewBag.Title = "Edit";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card card-warning">
+        <div class="card-header">
+          <h3 class="card-title">Update Passenger</h3>
+        </div>
+        @using (Html.BeginForm())
+        {
+          @Html.AntiForgeryToken()
+
+      <div class="card-body">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <!-- Headers -->
+        <div class="row">
+          <div class="col-md-6">
+            <strong>Passenger Name</strong>
+          </div>
+          <div class="col-md-6">
+            <strong>Manager Name</strong>
+          </div>
+        </div>
+        @for (int i = 0; i < Model.Passengers.Count; i++)
+        {
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                @*<label>Passenger Name</label>*@
+                @Html.EditorFor(model => model.Passengers[i].Name, new { htmlAttributes = new { @class = "form-control", @placeholder = "Name" } })
+                @Html.ValidationMessageFor(model => model.Passengers[i].Name, "", new { @class = "text-danger" })
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                @*<label>Manager Name</label>*@
+                @Html.DropDownList($"Passengers[{i}].SelectedManagerId",
+                                   new SelectList(Model.Managers, "UserId", "Name", Model.Passengers[i].SelectedManagerId),
+                                   "Select a Manager",
+                                   new { @class = "form-control" })
+              </div>
+            </div>
+          </div>
+          <!-- Add a hidden field for Id -->
+          @Html.Hidden($"Passengers[{i}].Id", Model.Passengers[i].Id)
+        }
+
+        <!-- Form submission footer -->
+        <div class="card-footer">
+          <input type="submit" value="Update" class="btn btn-warning" style="width: 180px; margin: 0 auto; display: block;" />
+        </div>
+
+        <br />
+        <div>
+          @Html.ActionLink("Back to List", "Index")
+        </div>
+      </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

@@ -33,6 +33,7 @@ namespace InventoryRepo.Models
         public string UpdateBy { get; set; }
         public Nullable<decimal> ManagerDeal { get; set; }
         public Nullable<decimal> ManagerComission { get; set; }
+        public Nullable<bool> IsActive { get; set; }
     
         public virtual AspNetUser AspNetUser { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

@@ -111,6 +111,7 @@
           <Property Name="UpdatedBy" Type="nvarchar" MaxLength="128" />
           <Property Name="CostPerHour" Type="decimal" Precision="18" Scale="2" />
           <Property Name="IsFiveHoursPlusEnabled" Type="bit" />
+          <Property Name="IsActive" Type="bit" />
         </EntityType>
         <EntityType Name="Item">
           <Key>
@@ -175,6 +176,7 @@
           <Property Name="UpdateBy" Type="nvarchar" MaxLength="128" />
           <Property Name="ManagerDeal" Type="decimal" Precision="18" Scale="2" />
           <Property Name="ManagerComission" Type="decimal" Precision="18" Scale="2" />
+          <Property Name="IsActive" Type="bit" />
         </EntityType>
         <EntityType Name="Places">
           <Key>
@@ -190,9 +192,9 @@
           <Property Name="Address" Type="nvarchar(max)" />
           <Property Name="CreatedBy" Type="nvarchar" MaxLength="128" />
           <Property Name="UpdateBy" Type="nvarchar" MaxLength="128" />
+          <Property Name="BlacklistedDate" Type="datetime" />
           <Property Name="Floor" Type="nvarchar" MaxLength="200" />
           <Property Name="Bell" Type="nvarchar" MaxLength="200" />
-          <Property Name="BlacklistedDate" Type="datetime" />
         </EntityType>
         <EntityType Name="Status">
           <Key>
@@ -997,6 +999,7 @@
           <Property Name="IsFiveHoursPlusEnabled" Type="Boolean" />
           <NavigationProperty Name="AspNetUser" Relationship="InventoryPortalModel.FK_Driver_AspNetUsers" FromRole="Driver" ToRole="AspNetUser" />
           <NavigationProperty Name="Trips" Relationship="InventoryPortalModel.FK_Trip_Driver" FromRole="Driver" ToRole="Trip" />
+          <Property Name="IsActive" Type="Boolean" />
         </EntityType>
         <EntityType Name="Passenger">
           <Key>
@@ -1017,6 +1020,7 @@
           <Property Name="ManagerComission" Type="Decimal" Precision="18" Scale="2" />
           <NavigationProperty Name="AspNetUser" Relationship="InventoryPortalModel.FK_Passenger_AspNetUsers" FromRole="Passenger" ToRole="AspNetUser" />
           <NavigationProperty Name="Trips" Relationship="InventoryPortalModel.FK_Trip_Passenger" FromRole="Passenger" ToRole="Trip" />
+          <Property Name="IsActive" Type="Boolean" />
         </EntityType>
         <EntityType Name="Place">
           <Key>
@@ -1349,6 +1353,7 @@
           <EntitySetMapping Name="Drivers">
             <EntityTypeMapping TypeName="InventoryPortalModel.Driver">
               <MappingFragment StoreEntitySet="Driver">
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
                 <ScalarProperty Name="IsFiveHoursPlusEnabled" ColumnName="IsFiveHoursPlusEnabled" />
                 <ScalarProperty Name="CostPerHour" ColumnName="CostPerHour" />
                 <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
@@ -1366,6 +1371,7 @@
           <EntitySetMapping Name="Passengers">
             <EntityTypeMapping TypeName="InventoryPortalModel.Passenger">
               <MappingFragment StoreEntitySet="Passenger">
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
                 <ScalarProperty Name="ManagerComission" ColumnName="ManagerComission" />
                 <ScalarProperty Name="ManagerDeal" ColumnName="ManagerDeal" />
                 <ScalarProperty Name="UpdateBy" ColumnName="UpdateBy" />

@@ -190,9 +190,9 @@ namespace LeaveON.Controllers
             .Select(trip => new
             {
               trip,
-              Driver = db.Drivers.FirstOrDefault(d => d.Id == trip.DriverId),
+              Driver = db.Drivers.FirstOrDefault(d => d.Id == trip.DriverId && d.IsActive == true),
               Manager = db.AspNetUsers.FirstOrDefault(u => u.Id == trip.CreatedBy), // Manager from AspNetUsers
-              Passenger = db.Passengers.FirstOrDefault(p => p.Id == trip.PassengerId), // Passenger details
+              Passenger = db.Passengers.FirstOrDefault(p => p.Id == trip.PassengerId && p.IsActive == true), // Passenger details
               Place = db.Places.FirstOrDefault(pl => pl.Id == trip.PlaceId) // Place details (adjust the FK name if necessary)
             })
             .ToListAsync();
@@ -229,9 +229,9 @@ namespace LeaveON.Controllers
             .Select(trip => new
             {
               trip,
-              Driver = db.Drivers.FirstOrDefault(d => d.Id == trip.DriverId),
+              Driver = db.Drivers.FirstOrDefault(d => d.Id == trip.DriverId && d.IsActive == true),
               Manager = db.AspNetUsers.FirstOrDefault(u => u.Id == trip.CreatedBy), // Manager from AspNetUsers
-              Passenger = db.Passengers.FirstOrDefault(p => p.Id == trip.PassengerId), // Passenger details
+              Passenger = db.Passengers.FirstOrDefault(p => p.Id == trip.PassengerId && p.IsActive == true), // Passenger details
               Place = db.Places.FirstOrDefault(pl => pl.Id == trip.PlaceId) // Place details (adjust the FK name if necessary)
             })
             .ToListAsync();
@@ -259,7 +259,7 @@ namespace LeaveON.Controllers
     }
     private decimal CalculateTripCost(Trip trip)
     {
-      var driver = db.Drivers.FirstOrDefault(d => d.Id == trip.DriverId);
+      var driver = db.Drivers.FirstOrDefault(d => d.Id == trip.DriverId && d.IsActive == true);
       decimal totalHours = trip.TotalHours ?? 0;
       if (driver == null) return 0; // Handle case where driver is not found
 
@@ -312,8 +312,8 @@ namespace LeaveON.Controllers
     }
     private decimal CalculateManagerTripComission(Trip trip)
     {
-      var passenger = db.Passengers.FirstOrDefault(d => d.Id == trip.PassengerId);
-      var driver = db.Drivers.FirstOrDefault(d => d.Id == trip.DriverId);
+      var passenger = db.Passengers.FirstOrDefault(d => d.Id == trip.PassengerId && d.IsActive == true);
+      var driver = db.Drivers.FirstOrDefault(d => d.Id == trip.DriverId && d.IsActive == true);
       decimal managerComission = trip.Passenger.ManagerComission ?? 0;
       if (passenger == null) return 0; // Handle case where driver is not found
       decimal cost = trip.Cost ?? 0; // Default to 0 if Cost is null
@@ -383,7 +383,7 @@ namespace LeaveON.Controllers
       if (User.IsInRole("Admin"))
       {
         var passengers = db.Passengers
-                  .Where(x => x.IsDeleted == false)
+                  .Where(x => x.IsDeleted == false && x.IsActive == true)
                   .Select(x => new
                   {
                     Id = x.Id,
@@ -402,7 +402,7 @@ namespace LeaveON.Controllers
                  }).ToList();
 
         var drivers = db.Drivers
-                 .Where(x => x.IsDeleted == false)
+                 .Where(x => x.IsDeleted == false && x.IsActive == true)
                  .Select(x => new
                  {
                    Id = x.Id,
@@ -421,7 +421,7 @@ namespace LeaveON.Controllers
       else
       {
         var passengers = db.Passengers
-                  .Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false)
+                  .Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false && x.IsActive == true)
                   .Select(x => new
                   {
                     Id = x.Id,
@@ -440,7 +440,7 @@ namespace LeaveON.Controllers
                   }).ToList();
 
         var drivers = db.Drivers
-               .Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false)
+               .Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false && x.IsActive == true)
                .Select(x => new
                {
                  Id = x.Id,
@@ -504,8 +504,8 @@ namespace LeaveON.Controllers
             if (exisitingPlace != null)
             {
               ModelState.AddModelError("PlaceName", "Place already exists.");
-              ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false), "Id", "Name", addTripDto.DriverId);
-              ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.IsDeleted == false), "Id", "Name", addTripDto.PassengerId);
+              ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false && x.IsActive == true), "Id", "Name", addTripDto.DriverId);
+              ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.IsDeleted == false && x.IsActive == true), "Id", "Name", addTripDto.PassengerId);
               ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.IsDeleted == false), "Id", "Name", addTripDto.PlaceId);
               return View(addTripDto);
 
@@ -559,8 +559,8 @@ namespace LeaveON.Controllers
           return RedirectToAction("Index");
         }
 
-        ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false), "Id", "Name", addTripDto.DriverId);
-        ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.IsDeleted == false), "Id", "Name", addTripDto.PassengerId);
+        ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false && x.IsActive == true), "Id", "Name", addTripDto.DriverId);
+        ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.IsDeleted == false && x.IsActive == true), "Id", "Name", addTripDto.PassengerId);
         ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.IsDeleted == false), "Id", "Name", addTripDto.PlaceId);
       }
       catch (Exception ex)
@@ -647,8 +647,8 @@ namespace LeaveON.Controllers
       };
 
       // Populate the ViewBag with drivers and passengers data, with selected values pre-set
-      var driver = await db.Drivers.FirstOrDefaultAsync(d => d.Id == trip.DriverId);
-      var passenger = await db.Passengers.FirstOrDefaultAsync(p => p.Id == trip.PassengerId);
+      var driver = await db.Drivers.FirstOrDefaultAsync(d => d.Id == trip.DriverId && d.IsActive == true);
+      var passenger = await db.Passengers.FirstOrDefaultAsync(p => p.Id == trip.PassengerId && p.IsActive == true);
       var place = await db.Places.FirstOrDefaultAsync(pl => pl.Id == trip.PlaceId);
 
       ViewBag.DriverName = driver?.Name;
@@ -661,7 +661,7 @@ namespace LeaveON.Controllers
       if (User.IsInRole("Admin"))
       {
         var passengers = db.Passengers
-                  .Where(x => x.IsDeleted == false)
+                  .Where(x => x.IsDeleted == false && x.IsActive == true)
                   .Select(x => new
                   {
                     Id = x.Id,
@@ -678,7 +678,7 @@ namespace LeaveON.Controllers
                    IsBlacklistedPlace = x.IsBlackListed,
                    Comment = x.Remarks,
                  }).ToList();
-        ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false), "Id", "Name");
+        ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false && x.IsActive == true), "Id", "Name");
         ViewBag.PassengerId = passengers;
         //ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.IsDeleted == false), "Id", "Name");
         //ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.IsDeleted == false), "Id", "Name");
@@ -687,7 +687,7 @@ namespace LeaveON.Controllers
       else
       {
         var passengers = db.Passengers
-                  .Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false)
+                  .Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false && x.IsActive == true)
                   .Select(x => new
                   {
                     Id = x.Id,
@@ -704,7 +704,7 @@ namespace LeaveON.Controllers
                    IsBlacklistedPlace = x.IsBlackListed,
                    Comment = x.Remarks,
                  }).ToList();
-        ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name", editTripDto.DriverId);
+        ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false && x.IsActive == true), "Id", "Name", editTripDto.DriverId);
         ViewBag.PassengerId = passengers;
         //ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name");
         //ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false), "Id", "Name", editTripDto.PlaceId);
@@ -728,8 +728,8 @@ namespace LeaveON.Controllers
       //{
       var trip = await db.Trips.FirstOrDefaultAsync(x => x.Id == updateTripDto.Id);
       var exisitingPlace = await db.Places.FirstOrDefaultAsync(x => x.Name == updateTripDto.PlaceName);
-      var driver = await db.Drivers.FirstOrDefaultAsync(d => d.Id == trip.DriverId);
-      var passenger = await db.Passengers.FirstOrDefaultAsync(p => p.Id == trip.PassengerId);
+      var driver = await db.Drivers.FirstOrDefaultAsync(d => d.Id == trip.DriverId && d.IsActive == true);
+      var passenger = await db.Passengers.FirstOrDefaultAsync(p => p.Id == trip.PassengerId && p.IsActive == true);
       var place = await db.Places.FirstOrDefaultAsync(pl => pl.Id == trip.PlaceId);
       if (updateTripDto.IsBlackListed == true && trip.DateBlackList == null && place.IsBlackListed == false && place.BlacklistedDate == null)
       {
@@ -752,8 +752,8 @@ namespace LeaveON.Controllers
           ViewBag.DriversId = driver?.Id;  // Add PassengerId to ViewBag
           ViewBag.PassengersId = passenger?.Id;  // Add PassengerId to ViewBag
           ViewBag.PlacesId = place?.Id;
-          ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false), "Id", "Name", updateTripDto.DriverId);
-          ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.IsDeleted == false), "Id", "Name", updateTripDto.PassengerId);
+          ViewBag.DriverId = new SelectList(db.Drivers.Where(x => x.IsDeleted == false && x.IsActive == true), "Id", "Name", updateTripDto.DriverId);
+          ViewBag.PassengerId = new SelectList(db.Passengers.Where(x => x.IsDeleted == false && x.IsActive == true), "Id", "Name", updateTripDto.PassengerId);
           ViewBag.PlaceId = new SelectList(db.Places.Where(x => x.IsDeleted == false), "Id", "Name", updateTripDto.PlaceId);
           return View(updateTripDto);
         }
@@ -866,7 +866,7 @@ namespace LeaveON.Controllers
     public JsonResult SearchDrivers(string searchTerm)
     {
       var drivers = db.Drivers
-                      .Where(x => x.IsDeleted == false && x.Name.Contains(searchTerm))
+                      .Where(x => x.IsDeleted == false && x.IsActive == true && x.Name.Contains(searchTerm))
                       .Select(x => new { id = x.Id, text = x.Name })
                       .ToList();
       return Json(drivers, JsonRequestBehavior.AllowGet);
@@ -874,7 +874,7 @@ namespace LeaveON.Controllers
     public JsonResult SearchPassengers(string searchTerm)
     {
       var drivers = db.Passengers
-                      .Where(x => x.IsDeleted == false && x.Name.Contains(searchTerm))
+                      .Where(x => x.IsDeleted == false && x.IsActive == true && x.Name.Contains(searchTerm))
                       .Select(x => new { id = x.Id, text = x.Name })
                       .ToList();
       return Json(drivers, JsonRequestBehavior.AllowGet);
@@ -909,7 +909,7 @@ namespace LeaveON.Controllers
         {
           // Find drivers who are available (i.e., have no overlapping trips)
           var availableDrivers = db.Drivers
-              .Where(driver => !db.Trips
+              .Where(driver => driver.IsActive == true && !db.Trips
                   .Any(trip => trip.DriverId == driver.Id
                       && trip.IsDeleted == false
                       && trip.CreatedBy == currentUser.UserId

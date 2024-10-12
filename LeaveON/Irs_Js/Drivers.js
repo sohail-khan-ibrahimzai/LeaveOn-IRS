@@ -44,4 +44,20 @@ $(document).ready(function () {
       console.log('Checkbox state:', this.checked); // Debugging output
     });
   }
+  const checkboxDriverStatus = document.getElementById('isActiveDriver');
+  if (checkboxDriverStatus != null) {
+    debugger;
+    // Set the initial value
+    checkboxDriverStatus.value = checkboxDriverStatus.checked;
+
+    // Add event listener
+    checkboxDriverStatus.addEventListener('change', function () {
+      // Update the value based on the checkbox state
+      checkboxDriverStatus.value = this.checked;
+      console.log('Checkbox state Status:', this.checked); // Debugging output
+    });
+  }
+  //function handleCheckboxChange(id, isChecked) {
+  //  console.log("Checkbox ID: " + id + ", Checked: " + isChecked);
+  //}
 });

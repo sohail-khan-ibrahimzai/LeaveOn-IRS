@@ -44,8 +44,10 @@ namespace LeaveON.Controllers
       var currentUser = GetCurrentUserInfo();
       //bool isAdmin = User.IsInRole("Admin");
       if (User.IsInRole("Admin"))
+        //return View(await db.Drivers.Where(x => x.IsDeleted == false).ToListAsync());
         return View(await db.Drivers.Where(x => x.IsDeleted == false).ToListAsync());
       else
+        //return View(await db.Drivers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false).ToListAsync());
         return View(await db.Drivers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false).ToListAsync());
     }
 
@@ -136,6 +138,7 @@ namespace LeaveON.Controllers
         CostPerHour = driver.CostPerHour ?? 0,
         Remarks = driver.Remarks,
         IsFiveHoursPlusEnabled = driver.IsFiveHoursPlusEnabled,
+        IsActive = driver.IsActive,
       };
 
       return View(editDriverDto);
@@ -146,7 +149,7 @@ namespace LeaveON.Controllers
     // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Edit([Bind(Include = "Id,Name,DateCreated,DateModified,Remarks,CostPerHour,IsFiveHoursPlusEnabled")] CreateDriverDto updateDiverDto)
+    public async Task<ActionResult> Edit([Bind(Include = "Id,Name,DateCreated,DateModified,Remarks,CostPerHour,IsFiveHoursPlusEnabled,IsActive")] CreateDriverDto updateDiverDto)
     {
       var currentUser = GetCurrentUserInfo();
       if (ModelState.IsValid)
@@ -160,6 +163,7 @@ namespace LeaveON.Controllers
         driver.Remarks = updateDiverDto.Remarks;
         driver.CostPerHour = updateDiverDto.CostPerHour;
         driver.IsFiveHoursPlusEnabled = updateDiverDto.IsFiveHoursPlusEnabled;
+        driver.IsActive = updateDiverDto.IsActive;
         driver.UpdatedBy = currentUser.UserId;
         db.Entry(driver).State = EntityState.Modified;
         await db.SaveChangesAsync();
@@ -209,7 +213,23 @@ namespace LeaveON.Controllers
       // Redirect to Index action
       return RedirectToAction("Index");
     }
-
+    // POST: UpdateDriverStatus/5
+    public async Task<ActionResult> UpdateDriverStatus(int? driverId, bool? isActive)
+    {
+      if (driverId == null)
+      {
+        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+      }
+      Driver driver = await db.Drivers.FindAsync(driverId);
+      if (driver == null)
+      {
+        return HttpNotFound();
+      }
+      driver.IsActive = isActive;
+      db.Entry(driver).State = EntityState.Modified;
+      await db.SaveChangesAsync();
+      return Json(new { success = true });
+    }
     protected override void Dispose(bool disposing)
     {
       if (disposing)

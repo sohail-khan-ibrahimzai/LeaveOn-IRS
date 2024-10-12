@@ -4,7 +4,17 @@
   ViewBag.Title = "Index";
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+  .custom-switch {
+    display: flex;
+    align-items: center;
+  }
 
+    .custom-switch .custom-control-input {
+      margin-left: 10px; /* Adjust as needed */
+    }
+</style>
+<script src="~/Irs_Js/PassengerList.js"></script>
 <section class="content">
   <div class="row">
     <div class="col-12">
@@ -19,7 +29,6 @@
 
           </h3>
         </div>
-
 
         <div class="card-body">
 
@@ -39,12 +48,15 @@
                     <tr>
                       <th>
                         Name
-                      </th> 
+                      </th>
                       <th>
                         Manager's Deal Cost/Hour
-                      </th> 
+                      </th>
                       <th>
                         Manager Comission/Hour
+                      </th>
+                      <th>
+                        Status (Active / In-active)
                       </th>
                       <th>Actions</th>
                     </tr>
@@ -57,9 +69,27 @@
                       </td>
                       <td>
                         @Html.DisplayFor(modelItem => item.ManagerDeal)
-                      </td> 
+                      </td>
                       <td>
                         @Html.DisplayFor(modelItem => item.ManagerComission)
+                      </td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <!-- Checkbox on the right -->
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox"
+                                   class="custom-control-input"
+                                   id="isActive_@item.Id"
+                                   name="IsActive_@item.Id"
+                                   @(item.IsActive == true ? "checked" : "")
+                                   
+                                   onchange="passengerStatusChange('@item.Id', this.checked)" />
+                            <label class="custom-control-label"
+                                   for="isActive_@item.Id"
+                                   style="margin-top: -28px; margin-left: 28px;">
+                            </label>
+                          </div>
+                        </div>
                       </td>
                       <td>
 
@@ -111,19 +141,19 @@
   $(document).ready(function () {
 
     $('#example').DataTable({
-    //  "paging": false,
-    //  "lengthChange": false,
-    //  "pageLength": 100,
-    //  "searching": false,
-    //  "ordering": true,
-    //  "info": false,
-    //  "autoWidth": true,
-    //  "responsive": true,
-    //  "order": [[0, "asc"]]//,
-    //  //dom: 'Bfrtip',
-    //  //buttons: [
-    //  //  'copy', 'csv', 'excel', 'pdf', 'print'
-    //  //]
+      //  "paging": false,
+      //  "lengthChange": false,
+      //  "pageLength": 100,
+      //  "searching": false,
+      //  "ordering": true,
+      //  "info": false,
+      //  "autoWidth": true,
+      //  "responsive": true,
+      //  "order": [[0, "asc"]]//,
+      //  //dom: 'Bfrtip',
+      //  //buttons: [
+      //  //  'copy', 'csv', 'excel', 'pdf', 'print'
+      //  //]
 
       //});
       "paging": true,

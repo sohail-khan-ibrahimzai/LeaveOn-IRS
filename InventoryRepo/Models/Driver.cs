@@ -31,6 +31,7 @@ namespace InventoryRepo.Models
         public string UpdatedBy { get; set; }
         public Nullable<decimal> CostPerHour { get; set; }
         public Nullable<bool> IsFiveHoursPlusEnabled { get; set; }
+        public Nullable<bool> IsActive { get; set; }
     
         public virtual AspNetUser AspNetUser { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

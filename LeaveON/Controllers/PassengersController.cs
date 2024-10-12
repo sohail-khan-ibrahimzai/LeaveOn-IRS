@@ -37,8 +37,10 @@ namespace LeaveON.Controllers
     {
       var currentUser = GetCurrentUserInfo();
       if (User.IsInRole("Admin"))
+        //return View(await db.Passengers.Where(x => x.IsDeleted == false).ToListAsync());
         return View(await db.Passengers.Where(x => x.IsDeleted == false).ToListAsync());
       else
+        //return View(await db.Passengers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false).ToListAsync());
         return View(await db.Passengers.Where(x => x.CreatedBy == currentUser.UserId && x.IsDeleted == false).ToListAsync());
     }
 
@@ -128,6 +130,7 @@ namespace LeaveON.Controllers
         NickName = passenger.NickName,
         PhoneNumber = passenger.PhoneNumber,
         PickupAddress = passenger.PickupAddress,
+        IsActive = passenger.IsActive,
         ManagerDeal = passenger.ManagerDeal.HasValue ? passenger.ManagerDeal.Value : 0,
         ManagerComission = passenger.ManagerComission.HasValue ? passenger.ManagerComission.Value : 0  // Set default to 0.0M if null
       };
@@ -139,7 +142,7 @@ namespace LeaveON.Controllers
     // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Edit([Bind(Include = "Id,Name,DateCreated,DateModified,Remarks,NickName,PhoneNumber,PickupAddress,ManagerDeal,ManagerComission")] CreatePassengerDto updatePassengerDto)
+    public async Task<ActionResult> Edit([Bind(Include = "Id,Name,DateCreated,DateModified,Remarks,NickName,PhoneNumber,PickupAddress,ManagerDeal,ManagerComission,IsActive")] CreatePassengerDto updatePassengerDto)
     {
       var currentUser = GetCurrentUserInfo();
       if (ModelState.IsValid)
@@ -156,6 +159,7 @@ namespace LeaveON.Controllers
         passenger.PickupAddress = updatePassengerDto.PickupAddress;
         passenger.ManagerDeal = updatePassengerDto.ManagerDeal;
         passenger.ManagerComission = updatePassengerDto.ManagerComission;
+        passenger.IsActive = updatePassengerDto.IsActive;
         passenger.UpdateBy = currentUser.UserId;
         db.Entry(passenger).State = EntityState.Modified;
         await db.SaveChangesAsync();
@@ -196,7 +200,82 @@ namespace LeaveON.Controllers
       await db.SaveChangesAsync();
       return RedirectToAction("Index");
     }
+    // POST: UpdatePassengerStatus/5
+    public async Task<ActionResult> UpdatePassengerStatus(int? passengerId, bool? isActive)
+    {
+      if (passengerId == null)
+      {
+        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+      }
+      Passenger passenger = await db.Passengers.FindAsync(passengerId);
+      if (passenger == null)
+      {
+        return HttpNotFound();
+      }
+      passenger.IsActive = isActive;
+      db.Entry(passenger).State = EntityState.Modified;
+      await db.SaveChangesAsync();
+      return Json(new { success = true });
+    }
+    public async Task<ActionResult> UpdatePassengersManagers()
+    {
+    var passenger = await db.Passengers.ToListAsync();
+    var manager = await db.AspNetUsers
+    .Where(user => user.AspNetRoles.Any(role => role.Name == "Manager")) // Filter to include only managers
+    .ToListAsync();
+      var editPassengerMgrDto = new PassengerMgrUpdateDto
+      {
+        Passengers = passenger.Select(ps => new CreatePassengerDto
+        {
+          Id = ps.Id,
+          Name = ps.Name,
+          SelectedManagerId = ps.CreatedBy
+        }).ToList(),
+        Managers = manager.Select(m => new ManagerDto // Create a DTO for each manager
+        {
+          UserId = m.Id,
+          Name = m.Name
+        }).ToList() // Convert to list
+      };
+      return View(editPassengerMgrDto);
+    }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> UpdatePassengersManagers(PassengerMgrUpdateDto model)
+    {
+      if (ModelState.IsValid)
+      {
+        // Iterate over each passenger in the model
+        foreach (var passenger in model.Passengers)
+        {
+          var existingPassenger = await db.Passengers.FindAsync(passenger.Id);
+          if (existingPassenger != null)
+          {
+            existingPassenger.Name = passenger.Name; // Update passenger name
+            existingPassenger.CreatedBy = passenger.SelectedManagerId; // Update the manager
+          }
+        }
 
+        // Save changes to the database
+        await db.SaveChangesAsync();
+
+        // Optionally redirect to the Index or another action
+        return RedirectToAction("UpdatePassengersManagers");
+      }
+
+      // If model state is not valid, reload managers and passengers
+      var managers = await db.AspNetUsers
+          .Where(user => user.AspNetRoles.Any(role => role.Name == "Manager"))
+          .ToListAsync();
+
+      model.Managers = managers.Select(m => new ManagerDto
+      {
+        UserId = m.Id,
+        Name = m.Name
+      }).ToList();
+
+      return View(model);
+    }
     protected override void Dispose(bool disposing)
     {
       if (disposing)

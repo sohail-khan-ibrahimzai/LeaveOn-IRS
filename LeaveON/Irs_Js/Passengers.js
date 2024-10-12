@@ -8,4 +8,18 @@ $(document).ready(function () {
     focus: true
   });
   $('#passengerName').focus();
+
+  const checkboxPassengerStatus = document.getElementById('isActivePassenger');
+  if (checkboxPassengerStatus != null) {
+    debugger;
+    // Set the initial value
+    checkboxPassengerStatus.value = checkboxPassengerStatus.checked;
+    // Add event listener
+    checkboxPassengerStatus.addEventListener('change', function () {
+      // Update the value based on the checkbox state
+      checkboxPassengerStatus.value = this.checked;
+      console.log('Checkbox state:', this.checked); // Debugging output
+    });
+  }
+
 });

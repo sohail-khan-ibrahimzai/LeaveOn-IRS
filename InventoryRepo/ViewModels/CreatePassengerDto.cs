@@ -11,7 +11,9 @@ namespace InventoryRepo.ViewModels
         public string PickupAddress { get; set; }
         public decimal ManagerDeal { get; set; }
         public decimal ManagerComission { get; set; }
+        public bool? IsActive { get; set; }
         [AllowHtml]
         public string Remarks { get; set; }
+        public string SelectedManagerId { get; set; }
     }
 }
