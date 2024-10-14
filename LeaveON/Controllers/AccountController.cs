@@ -334,7 +334,8 @@ namespace LeaveON.Controllers
       //onchange country... department list is populating using ajax in view. but has little problem. so sending departements data from view. when done comment ViewBag.Departments = db.Departments;
       //ViewBag.Departments = db.Departments;
       //ViewBag.LeavePolicies = db.UserLeavePolicies;
-      return View();
+      RegisterViewModel model = new RegisterViewModel();
+      return View(model);
     }
 
     //

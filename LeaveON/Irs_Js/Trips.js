@@ -70,6 +70,10 @@ $(document).ready(function () {
     var totalCost = selectedHours * tripCost;
     // Alert the total cost
     //alert(totalCost.toFixed(2)); // Show two decimal places
+    if (isNaN(totalCost)) {
+      totalCost = 0;
+    }
+    
     $('#tripTotalCost').val(totalCost);
     // Alert the total cost
     //alert(totalCost);

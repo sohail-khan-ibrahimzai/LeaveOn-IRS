@@ -107,30 +107,41 @@ namespace LeaveON.Controllers
     }
     public async Task<ActionResult> GetBlackListedLocations()
     {
+      //var currentUser = GetCurrentUserInfo();
+
+      //DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
+      //// Start date: 08:00 AM of the current day in PKT
+      //var dtStartDate = new DateTime(PKDate.Year, PKDate.Month, PKDate.Day, 8, 0, 0);
+      //// End date: 07:59 AM of the next day in PKT
+      //var dtEndDate = dtStartDate.AddDays(1).AddMinutes(-1);
+
+      //// Assigning to ViewBag
+      //ViewBag.StartDate = dtStartDate.ToString("dd-MMM-yyyy hh:mm tt");
+      //ViewBag.EndDate = dtEndDate.ToString("dd-MMM-yyyy hh:mm tt");
+      //if (User.IsInRole("Admin"))
+      //{
+      //  //var aa = await db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true).ToListAsync();
+      //  //var blacListedLocation = db.Trips.Where(x => x.Status == TripStatus.SuccessNotPaid);
+      //  //var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true);
+      //  //var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true && x.Place.IsBlackListed == true);
+      //  var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.Place.IsBlackListed == true);
+      //  return View(await blacListedLocation.ToListAsync());
+      //}
+      //else
+      //{
+      //  var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.Place.IsBlackListed == true && x.CreatedBy == currentUser.UserId);
+      //  //var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true && x.Place.IsBlackListed == true && x.CreatedBy == currentUser.UserId);
+      //  return View(await blacListedLocation.ToListAsync());
+      //}
       var currentUser = GetCurrentUserInfo();
-
-      DateTime PKDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time"));
-      // Start date: 08:00 AM of the current day in PKT
-      var dtStartDate = new DateTime(PKDate.Year, PKDate.Month, PKDate.Day, 8, 0, 0);
-      // End date: 07:59 AM of the next day in PKT
-      var dtEndDate = dtStartDate.AddDays(1).AddMinutes(-1);
-
-      // Assigning to ViewBag
-      ViewBag.StartDate = dtStartDate.ToString("dd-MMM-yyyy hh:mm tt");
-      ViewBag.EndDate = dtEndDate.ToString("dd-MMM-yyyy hh:mm tt");
       if (User.IsInRole("Admin"))
       {
-        //var aa = await db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true).ToListAsync();
-        //var blacListedLocation = db.Trips.Where(x => x.Status == TripStatus.SuccessNotPaid);
-        //var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true);
-        //var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true && x.Place.IsBlackListed == true);
-        var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.Place.IsBlackListed == true);
+        var blacListedLocation = db.Trips.Where(x => x.IsDeleted == false && x.Place.IsBlackListed == true);
         return View(await blacListedLocation.ToListAsync());
       }
       else
       {
-        var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.Place.IsBlackListed == true && x.CreatedBy == currentUser.UserId);
-        //var blacListedLocation = db.Trips.Where(x => x.DateCreated >= dtStartDate && x.DateCreated <= dtEndDate && x.IsDeleted == false && x.IsBlackListed == true && x.Place.IsBlackListed == true && x.CreatedBy == currentUser.UserId);
+        var blacListedLocation = db.Trips.Where(x => x.IsDeleted == false && x.Place.IsBlackListed == true && x.CreatedBy == currentUser.UserId);
         return View(await blacListedLocation.ToListAsync());
       }
     }
@@ -142,8 +153,8 @@ namespace LeaveON.Controllers
 
       // Calculate the most recent Sunday (start of the week)
       int daysToLastSunday = ((int)GRDate.DayOfWeek == 0) ? 0 : 7 - (int)GRDate.DayOfWeek;  // Calculate number of days to the last Sunday (0 = Sunday)
-      DateTime dtStartDate = new DateTime(GRDate.Year, GRDate.Month, GRDate.Day, 8, 0, 0).AddDays(-daysToLastSunday);  // Sunday 08:00 AM
-
+      //DateTime dtStartDate = new DateTime(GRDate.Year, GRDate.Month, GRDate.Day).AddDays(-daysToLastSunday);  // starts from Sunday
+      DateTime dtStartDate = new DateTime(GRDate.Year, GRDate.Month, GRDate.Day, 8, 0, 0).AddDays(-daysToLastSunday);  // Sunday stats from 08:00 AM
       // Calculate next Sunday 07:59 AM as the end of the week
       DateTime dtEndDate = dtStartDate.AddDays(7).AddMinutes(-1);  // Saturday 07:59 AM of the next week
 
