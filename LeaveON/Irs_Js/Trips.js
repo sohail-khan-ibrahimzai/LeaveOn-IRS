@@ -59,7 +59,6 @@ $(document).ready(function () {
       $('#fullDateTime').val(fullDateTime);
     }
   });
-  debugger;
   var tripTotalTime = document.getElementById('totalHoursDropdown');
   if (tripTotalTime) {
     // Get the selected value and parse it to a float

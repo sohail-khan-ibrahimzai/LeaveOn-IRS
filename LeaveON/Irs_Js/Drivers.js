@@ -46,7 +46,6 @@ $(document).ready(function () {
   }
   const checkboxDriverStatus = document.getElementById('isActiveDriver');
   if (checkboxDriverStatus != null) {
-    debugger;
     // Set the initial value
     checkboxDriverStatus.value = checkboxDriverStatus.checked;
 

@@ -11,7 +11,6 @@ $(document).ready(function () {
 
   const checkboxPassengerStatus = document.getElementById('isActivePassenger');
   if (checkboxPassengerStatus != null) {
-    debugger;
     // Set the initial value
     checkboxPassengerStatus.value = checkboxPassengerStatus.checked;
     // Add event listener
